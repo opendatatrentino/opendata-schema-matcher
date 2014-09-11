@@ -5,6 +5,8 @@ import it.unitn.disi.sweb.webapi.client.kb.ConceptClient;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import eu.trentorise.opendata.columnrecognizers.ColumnConceptCandidate;
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
@@ -13,6 +15,8 @@ import eu.trentorise.schemamatcher.model.ISchemaElement;
 import eu.trentorise.schemamatcher.schemaanalysis.service.ISchemaElementFeatureExtractor;
 
 public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtractor{
+	
+	public static final double MAX_SCORE_FOR_NO_FIRST_LETTER_MATCH=  0.3;
 
 	@Override
 	public void getSchemaElementConcept(ISchemaElement schemaElement) {
@@ -79,5 +83,33 @@ if (score==0){
 		}
 		else return 0;
 	}
+	
+	
+	
+	
+	 /** Returns the edit distance between source and target strings. 
+	 * @param sourceName
+	 * @param targetName
+	 * @return
+	 */
+	private double getLevinsteinDistance(String sourceName, String targetName) {
+	        if (sourceName.equals(targetName)) {
+	            return 1.0;
+	        }
+
+	        int editDistance = StringUtils.getLevenshteinDistance(
+	        		sourceName, targetName);
+
+	        // Normalize for length:
+	        double score
+	                = (double) (targetName.length() - editDistance) / (double) targetName.length();
+
+	        // Artificially reduce the score if the first letters don't match
+	        if (sourceName.charAt(0) != targetName.charAt(0)) {
+	            score = Math.min(score, MAX_SCORE_FOR_NO_FIRST_LETTER_MATCH);
+	        }
+
+	        return Math.max(0.0, Math.min(score, 1.0));
+	    }
 	
 }

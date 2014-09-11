@@ -10,6 +10,9 @@ public  class SchemaMatcherFactory {
 		ISchemaMatcher schemaMatcher = null;
 		if (schemaMatcherType.equalsIgnoreCase ("Simple")){
 			return (ISchemaMatcher) new SimpleSchemaMatcher();
+		} else if 
+		(schemaMatcherType.equalsIgnoreCase ("HungarianAllocationAndEditDistance")){
+			return (ISchemaMatcher) new HungarianAlgSchemaMatcher();
 		}
 		return schemaMatcher;
 	}

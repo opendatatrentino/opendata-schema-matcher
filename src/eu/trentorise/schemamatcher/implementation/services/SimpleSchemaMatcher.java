@@ -13,6 +13,12 @@ import eu.trentorise.schemamatcher.model.ISchemaElementCorrespondence;
 import eu.trentorise.schemamatcher.model.ISchemaElementMatcher;
 import eu.trentorise.schemamatcher.model.ISchemaMatcher;
 
+/** Implementation of the schema matcher. 
+ * The schema matcher uses Column-ConceptRecognizer that extracts concepts from the headers of schema elements 
+ * (from names and instances of schema element),  
+ * @author Ivan Tankoyeu
+ *
+ */
 public class SimpleSchemaMatcher implements ISchemaMatcher {
 
 	public static final String ALGORITHM_NAME="Simple";

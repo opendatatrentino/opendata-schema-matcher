@@ -26,12 +26,10 @@ public class Schema implements ISchema{
 				+ structureType + "]";
 	}
 
-	@Override
 	public List<ISchemaElement> getSchemaElements() {
 		return this.schemaElements;
 	}
 
-	@Override
 	public int getElementsNumber() {
 		if ((Integer)this.elementsNumber==null){
 			this.elementsNumber=this.schemaElements.size();
@@ -39,17 +37,14 @@ public class Schema implements ISchema{
 		return this.elementsNumber;
 	}
 
-	@Override
 	public String getSchemaName() {
 		return this.schemaName;
 	}
 
-	@Override
 	public String getSchemaDescriptiopn() {
 		return this.schemaDescription;
 	}
 
-	@Override
 	public SchemaStructureType getStructureType() {
 		return this.structureType;
 	}
@@ -67,7 +62,6 @@ public class Schema implements ISchema{
 		this.schemaDescription=schemaDescription;
 	}
 
-	@Override
 	public Long getSchemaConcept() {
 		return this.schemaConcept;
 	}

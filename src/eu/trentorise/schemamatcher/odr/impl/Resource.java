@@ -8,23 +8,19 @@ public class Resource implements IResource {
 	IResourceContext rc;
 	ITableResource tr;
 	
-	@Override
 	public IResourceContext getResourceContext() {
 
 		return this.rc;
 	}
 
-	@Override
 	public void setResourceContext(IResourceContext resourceContext) {
 		this.rc=resourceContext;
 	}
 
-	@Override
 	public ITableResource getTableResource() {
 		return this.tr;
 	}
 
-	@Override
 	public void setTableResource(ITableResource tableResource) {
 	this.tr=tableResource;
 

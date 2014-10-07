@@ -20,13 +20,11 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 
 	public static final double MAX_SCORE_FOR_NO_FIRST_LETTER_MATCH=  0.3;
 
-	@Override
 	public void getSchemaElementConcept(ISchemaElement schemaElement) {
 		//	schemaElement.getElementContext().getElementConcept()
 		//TODO
 	}
 
-	@Override
 	public void getSchemaElementConcept(List<ISchemaElement> schemaElement) {
 		// TODO Auto-generated method stub
 

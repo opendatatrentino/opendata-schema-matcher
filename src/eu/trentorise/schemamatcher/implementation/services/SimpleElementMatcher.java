@@ -20,7 +20,6 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 
 	private final String ELEMENT_MATCHING_ALGORITHM="ConceptDistanceBased";
 
-	@Override
 	public ISchemaElementCorrespondence matchSchemaElements(ISchemaElement sourceSchemaElement,
 			ISchemaElement targetSchemaElement) {
 		ISchemaElementCorrespondence elementCorrespondence = new SchemaElementCorrespondence();
@@ -31,7 +30,6 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 		return elementCorrespondence;
 	}
 
-	@Override
 	public List<ISchemaElementCorrespondence> matchSchemaElements(
 			List<ISchemaElement> sourceElements,
 			List<ISchemaElement> targetElements) {
@@ -63,7 +61,6 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 	}
 
 	
-	@Override
 	public String getElementMatchingAlgorithm() {
 		return this.ELEMENT_MATCHING_ALGORITHM;
 	}

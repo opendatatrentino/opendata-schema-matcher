@@ -10,7 +10,6 @@ public class SchemaMatchingService implements ISchemaMatchingService {
 
 	
 
-	@Override
 	public List<String> getSchemaMatchingAlgorithms() {
 
 		List<String> matcherTypes = new ArrayList<String>();
@@ -18,7 +17,6 @@ public class SchemaMatchingService implements ISchemaMatchingService {
 		return matcherTypes;
 	}
 
-	@Override
 	public ISchemaMatcher getSchemaMatcher(String scheamMatcherType) {
 		
 		ISchemaMatcher sm=	SchemaMatcherFactory.create(scheamMatcherType);

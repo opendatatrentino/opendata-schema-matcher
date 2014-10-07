@@ -17,32 +17,26 @@ public class AtrCorrespondence implements IAttributeCorrespondence {
 	int columnIndex;
 	
 	
-	@Override
 	public IAttributeDef getAttrDef() {
 		return this.attrDef;
 	}
 
-	@Override
 	public Map<IAttributeDef, Float> getAttrMap() {
 		return this.attrMap;
 	}
 
-	@Override
 	public int getColumnIndex() {
 		return this.columnIndex;
 	}
 
-	@Override
 	public String getHeaderConceptURL() {
 		return WebServiceURLs.conceptIDToURL(this.headerConceptID);
 	}
 
-	@Override
 	public long getHeaderConceptID() {
 		return this.headerConceptID;
 	}
 
-	@Override
 	public float getScore() {
 		return this.score;
 	}

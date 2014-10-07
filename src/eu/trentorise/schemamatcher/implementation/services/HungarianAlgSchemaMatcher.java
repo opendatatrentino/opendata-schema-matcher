@@ -22,7 +22,6 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 
 	public static final String ALGORITHM_NAME="HungarianAllocationAndEditDistance";
 
-	@Override
 	public ISchemaCorrespondence matchSchemas(ISchema sourceSchema,
 			ISchema targetSchema, String elementMatchingAlgorithm) {
 
@@ -128,12 +127,10 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 		return assigmentMatrix;
 	}
 
-	@Override
 	public String getSchemaMatchingAlgorithm() {
 		return HungarianAlgSchemaMatcher.ALGORITHM_NAME;
 	}
 
-	@Override
 	public List<ISchemaCorrespondence> matchSchemas(
 			List<ISchema> sourceSchemas, List<ISchema> targetSchemas,
 			String elementMatchingAlgorithm) {

@@ -42,22 +42,18 @@ public class SchemaElement implements ISchemaElement{
 	}
 
 
-	@Override
 	public IElementContent getElementContent() {
 		return  this.elementContent;
 	}
 
-	@Override
 	public IElementContext getElementContext() {
 		return  this.elementContext;
 	}
 
-	@Override
 	public Boolean hasElementContent() {
 		return this.hasElementContent();
 	}
 
-	@Override
 	public List<IElementRelation> getSchemaElementsRelations() {
 		return (List<IElementRelation>) this.schemaElementRelations;
 	}

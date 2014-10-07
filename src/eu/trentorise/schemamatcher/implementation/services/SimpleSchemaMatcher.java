@@ -27,7 +27,6 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 
 	}
 
-	@Override
 	public ISchemaCorrespondence matchSchemas(ISchema sourceSchema,
 			ISchema targetSchema, String elementMatchingAlgorithm) {
 		SchemaCorrespondence schemaCorrespondence = new SchemaCorrespondence();
@@ -62,7 +61,6 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 		return schemaCorrespondence;
 	}
 
-	@Override
 	public List<ISchemaCorrespondence> matchSchemas(
 			List<ISchema> sourceSchemas, List<ISchema> targetSchemas,  String elementMatchingAlgorithm) {
 		List<ISchemaCorrespondence> correspondences = new ArrayList<ISchemaCorrespondence>();
@@ -77,7 +75,6 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 		return correspondences;
 	}
 
-	@Override
 	public String getSchemaMatchingAlgorithm() {
 		return ALGORITHM_NAME;
 	}

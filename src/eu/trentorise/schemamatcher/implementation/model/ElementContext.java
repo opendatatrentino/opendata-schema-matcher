@@ -19,17 +19,14 @@ public class ElementContext implements IElementContext {
 				+ elementConcept + "]";
 	}
 
-	@Override
 	public String getElementName() {
 		return this.elementName;
 	}
 
-	@Override
 	public String getElementDescription() {
 		return this.elementName;
 	}
 
-	@Override
 	public String getElementDataType() {
 		return this.elementDataType;
 	}

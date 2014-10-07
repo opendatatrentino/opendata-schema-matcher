@@ -21,7 +21,6 @@ import eu.trentorise.schemamatcher.model.ISchemaMatcher;
 
 public  class MatchingService implements ISemanticMatchingService {
 
-	@Override
 	public List<ISchemaCorrespondence> matchSchemas(IResourceContext resourceContext, ITableResource tableResource) {
 		Resource rc = new Resource();
 		rc.setResourceContext(resourceContext);

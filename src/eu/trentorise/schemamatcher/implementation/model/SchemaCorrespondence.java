@@ -61,19 +61,15 @@ public class SchemaCorrespondence implements ISchemaCorrespondence {
 		this.elementCorrespondences = elementCorrespondences;
 	}
 
-	@Override
 	public List<ISchemaElementCorrespondence> getSchemaElementCorrespondence() {
 		return elementCorrespondences;
 	}
-	@Override
 	public ISchema getSourceSchema() {
 		return this.sourceSchema;
 	}
-	@Override
 	public ISchema getTargetSchema() {
 		return this.targetSchema;
 	}
-	@Override
 	public float getSchemaCorrespondenceScore() {
 		return score;
 	}

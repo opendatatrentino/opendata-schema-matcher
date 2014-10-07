@@ -35,7 +35,6 @@ public class SchemaImport implements ISchemaImport{
 	private final static Logger logger = Logger.getLogger(SchemaImport.class.getName());
 
 	
-	@Override
 	public ISchema extractSchema(File file) {
 
 
@@ -102,7 +101,6 @@ public class SchemaImport implements ISchemaImport{
 	/* (non-Javadoc)
 	 * @see eu.trentorise.schemamatcher.services.importing.ISchemaImport#extractSchema(java.lang.Object)
 	 */
-	@Override
 	public ISchema extractSchema(Object schema, Locale locale) throws SchemaMatcherException {
 
 		if(schema==null){

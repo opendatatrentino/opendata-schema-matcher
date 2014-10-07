@@ -35,7 +35,7 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
 
-		
+
 		List<ISchemaElement> sourceSchemaElements= sourceSchema.getSchemaElements();
 		List<ISchemaElement> targetSchemaElements= targetSchema.getSchemaElements();
 		//TODO check presence of concepts for schema elements
@@ -66,7 +66,7 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 	public List<ISchemaCorrespondence> matchSchemas(
 			List<ISchema> sourceSchemas, List<ISchema> targetSchemas,  String elementMatchingAlgorithm) {
 		List<ISchemaCorrespondence> correspondences = new ArrayList<ISchemaCorrespondence>();
-		
+
 		for(ISchema sourceSchema: sourceSchemas){
 			for (ISchema targetSchema: targetSchemas){
 				ISchemaCorrespondence correspondence = matchSchemas(sourceSchema, targetSchema, elementMatchingAlgorithm);
@@ -92,6 +92,8 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 		return scoreSum;
 	}
 
+
+
 	/**Methods computes scores from schema names concepts and element correspondences scores
 	 * @param sourceSchema
 	 * @param targetSchema
@@ -108,7 +110,7 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 
 		return overallScore;
 	}
-	
+
 	/** Methods returns score based on the distance between two source and target concepts of schemas names
 	 * @param sourceSchema
 	 * @param targetSchema
@@ -119,13 +121,13 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
 		return sefe.getConceptsDistance(sourceSchema.getSchemaConcept(), targetSchema.getSchemaConcept());
 	}
-	
+
 	/** Sorts the given list of correspondence according to the score of each shema correspondence.
 	 * @param schemaCorespondences
 	 */
 	private void sort(List<ISchemaCorrespondence> schemaCorespondences) {
 		Collections.sort(schemaCorespondences, new CustomComparator());
 	}
-	
+
 
 }

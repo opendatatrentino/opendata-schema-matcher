@@ -11,17 +11,19 @@ import eu.trentorise.opendata.columnrecognizers.ColumnConceptCandidate;
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
+import eu.trentorise.schemamatcher.model.DataType;
+import eu.trentorise.schemamatcher.model.DataType.Datatype;
 import eu.trentorise.schemamatcher.model.ISchemaElement;
 import eu.trentorise.schemamatcher.schemaanalysis.service.ISchemaElementFeatureExtractor;
 
 public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtractor{
-	
+
 	public static final double MAX_SCORE_FOR_NO_FIRST_LETTER_MATCH=  0.3;
 
 	@Override
 	public void getSchemaElementConcept(ISchemaElement schemaElement) {
-		// TODO Auto-generated method stub
-
+		//	schemaElement.getElementContext().getElementConcept()
+		//TODO
 	}
 
 	@Override
@@ -30,6 +32,10 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 
 	}
 
+	/** run column-concept recognizer, that extracts concepts for each schema element in the data set 
+	 * @param schemaEls
+	 * @return
+	 */
 	public List<ISchemaElement> runColumnRecognizer(List<ISchemaElement> schemaEls){
 		List<ISchemaElement> schemaElements = schemaEls;
 		List<String> elementNames = new ArrayList<String>();
@@ -52,7 +58,7 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 		for (int i=0; i<extractedConcepts.size();i++)
 		{
 			Long conceptId = extractedConcepts.get(i).getConceptID();
-			
+
 			ConceptODR codr = new ConceptODR();
 			codr = codr.readConceptGlobalID(conceptId);
 			long globalConceptID =codr.getId();
@@ -60,7 +66,7 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 			se.setColumnIndex(extractedConcepts.get(i).getColumnNumber()-1);
 			se.getElementContext().setElementConcept(globalConceptID);
 			schemaElementsOut.add(se);
-			
+
 		}
 		return schemaElementsOut;
 	}
@@ -72,10 +78,13 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 	 */
 	public float getConceptsDistance( long source, long target){
 		ConceptClient cClient = new ConceptClient(WebServiceURLs.getClientProtocol());
+		if((source==-1)||(target==-1)){
+			return 0;
+		}
 		float score  = (float)cClient.getDistanceUsingLca(source,target);
-if (score==0){
-	return 1;
-}
+		if (score==0){
+			return 1;
+		}
 		if (score==-1.0) return 0;
 		float s = (float) (score-1.0);
 		if (s!=0.0){
@@ -83,33 +92,46 @@ if (score==0){
 		}
 		else return 0;
 	}
-	
-	
-	
-	
-	 /** Returns the edit distance between source and target strings. 
+
+	/** Returns the edit distance between source and target strings. 
 	 * @param sourceName
 	 * @param targetName
 	 * @return
 	 */
-	private double getLevinsteinDistance(String sourceName, String targetName) {
-	        if (sourceName.equals(targetName)) {
-	            return 1.0;
-	        }
+	public double getLevinsteinDistance(String sourceName, String targetName) {
+		if (sourceName.equals(targetName)) {
+			return 1.0;
+		}
+		int editDistance = StringUtils.getLevenshteinDistance(
+				sourceName, targetName);
+		// Normalize for length:
+		double score
+		= (double) (targetName.length() - editDistance) / (double) targetName.length();
 
-	        int editDistance = StringUtils.getLevenshteinDistance(
-	        		sourceName, targetName);
+		// Artificially reduce the score if the first letters don't match
+		if (sourceName.charAt(0) != targetName.charAt(0)) {
+			score = Math.min(score, MAX_SCORE_FOR_NO_FIRST_LETTER_MATCH);
+		}
 
-	        // Normalize for length:
-	        double score
-	                = (double) (targetName.length() - editDistance) / (double) targetName.length();
+		return Math.max(0.0, Math.min(score, 1.0));
+	}
 
-	        // Artificially reduce the score if the first letters don't match
-	        if (sourceName.charAt(0) != targetName.charAt(0)) {
-	            score = Math.min(score, MAX_SCORE_FOR_NO_FIRST_LETTER_MATCH);
-	        }
+	/** The method compares data types from source and target elements and returns score
+	 * that represents similarity between them.
+	 * @param sourceDataType
+	 * @param targetDataType
+	 * @return score from '0' to '1'.
+	 */
+	public float  getDataTypeSimilarity(String sourceDataType, String targetDataType){
 
-	        return Math.max(0.0, Math.min(score, 1.0));
-	    }
-	
+		Datatype sourceDT = DataType.getDataType(sourceDataType);
+		Datatype targetDT = DataType.getDataType(targetDataType);
+		if(sourceDT.equals(targetDT)){
+			return 1;
+		} else if (sourceDT.equals(DataType.STRING))
+			return 0.1f;
+		else 
+			return 0;
+	}
+
 }

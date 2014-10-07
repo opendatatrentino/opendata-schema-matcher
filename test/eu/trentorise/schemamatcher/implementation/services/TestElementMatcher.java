@@ -2,7 +2,6 @@ package eu.trentorise.schemamatcher.implementation.services;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -13,7 +12,6 @@ import org.junit.Test;
 import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.services.EntityTypeService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
-import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 import eu.trentorise.schemamatcher.implementation.model.SchemaElementCorrespondence;
 import eu.trentorise.schemamatcher.implementation.model.SchemaElementFeatureExtractor;
 import eu.trentorise.schemamatcher.implementation.model.SchemaMatcherException;

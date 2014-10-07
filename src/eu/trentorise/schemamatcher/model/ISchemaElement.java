@@ -1,9 +1,6 @@
 package eu.trentorise.schemamatcher.model;
 
 import java.util.List;
-import java.util.Map;
-
-import eu.trentorise.schemamatcher.implementation.model.ElementRelation;
 
 /** A schema element ( e.g. column header, attribute,  etc) contains structural, contextual and content information.
  * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>

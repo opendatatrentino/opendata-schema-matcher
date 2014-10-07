@@ -2,8 +2,6 @@ package eu.trentorise.schemamatcher.services.matching;
 
 import java.util.List;
 
-import eu.trentorise.schemamatcher.model.ISchema;
-import eu.trentorise.schemamatcher.model.ISchemaCorrespondence;
 import eu.trentorise.schemamatcher.model.ISchemaMatcher;
 
 /** Schema matching services allow operations on schemas

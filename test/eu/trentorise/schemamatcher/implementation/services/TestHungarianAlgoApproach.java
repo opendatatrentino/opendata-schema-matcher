@@ -15,6 +15,7 @@ import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.schemamatcher.implementation.model.SchemaMatcherException;
 import eu.trentorise.schemamatcher.model.ISchema;
 import eu.trentorise.schemamatcher.model.ISchemaCorrespondence;
+import eu.trentorise.schemamatcher.model.ISchemaElementCorrespondence;
 import eu.trentorise.schemamatcher.model.ISchemaMatcher;
 
 public class TestHungarianAlgoApproach {
@@ -65,5 +66,13 @@ public class TestHungarianAlgoApproach {
 
 		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("HungarianAllocationAndEditDistance");
 		ISchemaCorrespondence  schemaCor =schemaMatcher.matchSchemas(schemaCSV, schemaEtype, "ConceptDistanceBased");
+		for (ISchemaElementCorrespondence sec: schemaCor.getSchemaElementCorrespondence()){
+			System.out.print("Source Name: "+sec.getSourceElement().getElementContext().getElementName());
+			System.out.print(" Target Name: "+sec.getTargetElement().getElementContext().getElementName());
+			System.out.println(" Score: "+sec.getElementCorrespondenceScore());
+
+
+		}
+		LOGGER.info(schemaCor.getSchemaElementCorrespondence().toString());
 	}
 }

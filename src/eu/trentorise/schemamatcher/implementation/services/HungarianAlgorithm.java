@@ -1,12 +1,16 @@
 package eu.trentorise.schemamatcher.implementation.services;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * An implementation of the classic hungarian algorithm for the assignment problem.
  *
- * 
+ * Copyright 2007 Gary Baker (GPL v3)
+ * @author gbaker
  */
+
 public class HungarianAlgorithm{
 
 

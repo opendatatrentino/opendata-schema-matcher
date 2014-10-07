@@ -7,10 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.log4j.Logger;
+
 import au.com.bytecode.opencsv.CSVReader;
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
+import eu.trentorise.opendata.nlprise.DataTypeGuess;
+import eu.trentorise.opendata.nlprise.DataTypeGuess.Datatype;
 import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
 import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 import eu.trentorise.opendata.semantics.model.knowledge.IResourceContext;
@@ -28,6 +32,9 @@ import eu.trentorise.schemamatcher.services.importing.ISchemaImport;
 
 public class SchemaImport implements ISchemaImport{
 
+	private final static Logger logger = Logger.getLogger(SchemaImport.class.getName());
+
+	
 	@Override
 	public ISchema extractSchema(File file) {
 
@@ -37,51 +44,59 @@ public class SchemaImport implements ISchemaImport{
 		try {
 			schemaOut = parseCSV(file);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return schemaOut;
 	}
 
-	/**
+	/** The method parse schema from a *.csv file. 
+	 * 
 	 * @param file
 	 * @return
 	 * @throws IOException
 	 */
 	public ISchema parseCSV(File file) throws IOException {
-
 		CSVReader reader = new CSVReader(new FileReader(file));
 		//String [] nextLine;
 		List<String[]> strings = reader.readAll();
 		String[] str = strings.get(0);
-		System.out.println( str.length);
 		List<ISchemaElement> sElements = new ArrayList<ISchemaElement>();
 		for (int i=0; i<str.length;i++){
-			SchemaElement scheamaElement = new SchemaElement();
+			SchemaElement schemaElement = new SchemaElement();
 			ElementContext sContext=new ElementContext();
 			sContext.setElementName(str[i]);
-			scheamaElement.setElementContext(sContext);
 
 			ElementContent elContent = new ElementContent();
 			List<Object> elInstances = new ArrayList<Object>();
 
-			int lineNumber=0;
-			for(String[] sArr: strings ){
-				elInstances.add(sArr[i]);				
+			int lineNumber=1;
+			
+			//for(String[] sArr: strings )
+			for(int k=1; k<strings.size(); k++){
+				elInstances.add(strings.get(k)[i]);				
 				lineNumber++;
 			}
 			elContent.setContentSize(lineNumber);
 			elContent.setContent(elInstances);
-			scheamaElement.setElementContent(elContent);
-			sElements.add(scheamaElement);
+			
+			String datatype = extractDataType(elContent);
+			//logger.info("Extracted datatype is: " + datatype);
+			sContext.setElemetnDataType(datatype);
+			
+			schemaElement.setElementContext(sContext);
+			schemaElement.setElementContent(elContent);
+
+			sElements.add(schemaElement);
 		}
 		Schema schema = new Schema();
 		schema.setSchemaElements(sElements);
-		//TODO change to extract concept from name
-		Long conceptId = 2923L;
+
+		String fileName = file.getName().replaceFirst("[.][^.]+$", "");
+		
+		long conceptId=ColumnRecognizer.conceptFromText(fileName);
+
 		schema.setSchemaConcept(conceptId);
-		System.out.println(sElements.get(0).toString());
 		return schema;
 	}	
 	/* (non-Javadoc)
@@ -113,7 +128,7 @@ public class SchemaImport implements ISchemaImport{
 			else {
 				schemaElements=new ArrayList<ISchemaElement>();	
 			}
-			
+
 			ConceptODR codr = new ConceptODR();
 			codr = codr.readConceptGlobalID(etype.getConcept().getGUID());
 			long globalConceptID =codr.getId();
@@ -142,12 +157,12 @@ public class SchemaImport implements ISchemaImport{
 			selements.add(sElement);
 		}
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
-	// Assignment concepts for schema
+		// Assignment concepts for schema
 		selements = sefe.runColumnRecognizer(selements);
 		schema.setSchemaElements(selements);
 		long schemaConceptID=ColumnRecognizer.conceptFromText(resourceContext.getResourceName());
 		schema.setSchemaConcept(schemaConceptID);
-		
+
 		return schema;
 	}
 
@@ -190,5 +205,16 @@ public class SchemaImport implements ISchemaImport{
 		return schemaElements;
 	}
 
+	public String extractDataType(ElementContent elContent){
+		//TODO think about best content for representation
+		String contentToGuess = elContent.getContent().iterator().next().toString();
+		//TODO think about enum of possible datatypes for the matcher
+
+		Datatype datatype = TypeDetector.guessType(contentToGuess);
+		
+		return	datatype.toString();
+
+
+	}
 
 }

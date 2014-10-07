@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import eu.trentorise.opendata.disiclient.model.entity.AttributeDef;
+import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
 import eu.trentorise.opendata.semantics.services.model.IAttributeCorrespondence;
 
@@ -33,8 +34,7 @@ public class AtrCorrespondence implements IAttributeCorrespondence {
 
 	@Override
 	public String getHeaderConceptURL() {
-		// TODO Auto-generated method stub
-		return null;
+		return WebServiceURLs.conceptIDToURL(this.headerConceptID);
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package eu.trentorise.schemamatcher.model;
 
-import eu.trentorise.schemamatcher.implementation.model.SchemaElement;
 
 public interface IElementRelation {
 

@@ -14,9 +14,11 @@ import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.services.EntityTypeService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.semantics.model.entity.IEntityType;
+import eu.trentorise.schemamatcher.implementation.model.SchemaElementCorrespondence;
 import eu.trentorise.schemamatcher.implementation.model.SchemaMatcherException;
 import eu.trentorise.schemamatcher.model.ISchema;
 import eu.trentorise.schemamatcher.model.ISchemaCorrespondence;
+import eu.trentorise.schemamatcher.model.ISchemaElementCorrespondence;
 import eu.trentorise.schemamatcher.model.ISchemaMatcher;
 
 public class TestSimpleSchemaMatcher {
@@ -36,7 +38,7 @@ public class TestSimpleSchemaMatcher {
 	@Test
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/Downloads/impianti-risalita-vivifiemme.csv");
+		File file = new File("/home/ivan/Downloads/prodotti_protetti.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
 		ISchema schemaEtype=si.extractSchema(etype, Locale.ENGLISH);
@@ -49,7 +51,7 @@ public class TestSimpleSchemaMatcher {
 	@Test
 	public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/Downloads/impianti-risalita-vivifiemme.csv");
+		File file = new File("/home/ivan/Downloads/Elenco_osterie_tipiche_civici.1386925759.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
 		List<ISchema> sourceSchemas = new ArrayList<ISchema>();
@@ -71,6 +73,14 @@ public class TestSimpleSchemaMatcher {
 		
 		for (ISchemaCorrespondence c : schemaCor){
 		LOGGER.info("Etype name: "+c.getTargetSchema().getSchemaName()+ " "+c.getSchemaCorrespondenceScore()+" "+c.getSchemaElementCorrespondence() );
+		List<ISchemaElementCorrespondence> sElCors = c.getSchemaElementCorrespondence();
+		
+		for (ISchemaElementCorrespondence sel: sElCors){
+		System.out.print("Source-Target Element: "+sel.getSourceElement().getElementContext().getElementName()+"-");
+		System.out.println(sel.getTargetElement().getElementContext().getElementName()+" Score: "+sel.getElementCorrespondenceScore());
+
+		}
+
 		}
 
 	}

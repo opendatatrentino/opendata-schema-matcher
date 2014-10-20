@@ -40,7 +40,7 @@ public class TestSimpleSchemaMatcher {
 	@Test
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/Downloads/prodotti_protetti.csv");
+		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
 		ISchema schemaEtype=si.extractSchema(etype, Locale.ENGLISH);
@@ -53,7 +53,7 @@ public class TestSimpleSchemaMatcher {
 	@Test
 	public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/Downloads/Elenco_osterie_tipiche_civici.1386925759.csv");
+		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
 		List<ISchema> sourceSchemas = new ArrayList<ISchema>();

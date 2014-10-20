@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.services.EntityTypeService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
@@ -40,7 +41,7 @@ public class TestSimpleSchemaMatcher {
 	@Test
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/Downloads/prodotti_protetti.csv");
+		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
 		ISchema schemaEtype=si.extractSchema(etype, Locale.ENGLISH);
@@ -49,6 +50,16 @@ public class TestSimpleSchemaMatcher {
 		ISchemaCorrespondence  schemaCor =schemaMatcher.matchSchemas(schemaCSV, schemaEtype, "ConceptDistanceBased");
 		LOGGER.info("Schema Cor Score: "+schemaCor.getSchemaCorrespondenceScore());
 	}
+	
+	@Test
+	public void testConceptFromText(){
+		
+	    String resourceName = "IMPIANTI RISALITA";
+	    Long conceptID = ColumnRecognizer.conceptFromText(resourceName);
+	    
+	    
+	}
+	
 
 	@Test
 	public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException{

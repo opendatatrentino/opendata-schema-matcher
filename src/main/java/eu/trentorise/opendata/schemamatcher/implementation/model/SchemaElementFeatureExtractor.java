@@ -110,10 +110,10 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 		if (sourceName.charAt(0) != targetName.charAt(0)) {
 			score = Math.min(score, MAX_SCORE_FOR_NO_FIRST_LETTER_MATCH);
 		}
-
 		return Math.max(0.0, Math.min(score, 1.0));
 	}
 
+	
 	/** The method compares data types from source and target elements and returns score
 	 * that represents similarity between them.
 	 * @param sourceDataType

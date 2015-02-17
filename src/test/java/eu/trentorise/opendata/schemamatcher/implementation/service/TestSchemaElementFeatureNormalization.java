@@ -29,7 +29,7 @@ public class TestSchemaElementFeatureNormalization {
 		String etypeUrl = WebServiceURLs.etypeIDToURL(12L);
 		etype= (EntityType) ets.readEntityType(etypeUrl);
 
-		File file = new File("/home/ivan/Downloads/impianti-risalita-vivifiemme.csv");
+		File file = new File("impianti risalita.csv");
 		sourceSchema= si.parseCSV(file);
 		targetSchema=si.extractSchema(etype, Locale.ENGLISH);
 	}

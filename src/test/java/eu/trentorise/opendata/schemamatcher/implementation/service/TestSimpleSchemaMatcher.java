@@ -44,7 +44,7 @@ public class TestSimpleSchemaMatcher {
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
 		//File file = new File("impianti risalita.csv");
-		File file = new File("/home/ivan/work/development/Schema Matching dataset/6_Elenco_osterie_tipiche_civici.1386925759.csv");
+		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
 		ISchema schemaEtype=si.extractSchema(etype, Locale.ITALIAN);
@@ -70,7 +70,7 @@ public class TestSimpleSchemaMatcher {
 	public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
 		//		File file = new File("/home/ivan/Downloads/Elenco_osterie_tipiche_civici.1386925759.csv");
-		File file = new File("/home/ivan/work/development/Schema Matching dataset/OSPEDALI001.csv");
+		File file = new File("impianti risalita.csv");
 		//		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
@@ -117,7 +117,7 @@ public class TestSimpleSchemaMatcher {
 	public void testConsistanceOfColConcRecognizer() throws IOException{
 		SchemaImport si = new SchemaImport();
 
-		File file = new File("/home/ivan/work/development/Schema Matching dataset/OSPEDALI001.csv");
+		File file = new File("impianti risalita.csv");
 		//		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);

@@ -27,7 +27,6 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 public class TestHungarianAlgoApproach {
 
 	HungarianAlgorithm ha = new HungarianAlgorithm();
-	private final static Logger LOGGER = Logger.getLogger(TestSchemaImport.class.getName());
 	private EntityType etype;
 
 	@Before
@@ -66,7 +65,7 @@ public class TestHungarianAlgoApproach {
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
 		//File file = new File("//home/ivan/work/development/Schema Matching dataset/10_LuoghiStoriciCommercio2010_2013.1387270045.csv");
-		File file = new File("//home/ivan/work/development/Schema Matching dataset/impianti-risalita-vivifiemme .csv");
+		File file = new File("impianti risalita.csv");
 
 		
 		ISchema schemaCSV= si.parseCSV(file);

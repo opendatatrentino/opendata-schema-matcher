@@ -58,7 +58,7 @@ public class TestSchemaImport {
 	@Test 
 	public void testSchemaImportCSV() throws SchemaMatcherException, IOException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/Downloads/impianti-risalita-vivifiemme.csv");
+		File file = new File("impianti risalita.csv");
 		ISchema schemaOut= si.parseCSV(file);
 
 	}

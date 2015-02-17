@@ -9,7 +9,8 @@ public class ElementMatcherFactory {
 		ISchemaElementMatcher elementMatcher = null;
 		if (elementMatcherType.equalsIgnoreCase ("ConceptDistanceBased")){
 			return (ISchemaElementMatcher) new SimpleElementMatcher();
-		}
+		} else if (elementMatcherType.equalsIgnoreCase ("EditDistanceBased"))
+			return (ISchemaElementMatcher) new EditDistanceElementMatcher();
 		return elementMatcher;
 	}
 	

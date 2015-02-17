@@ -74,7 +74,7 @@ public  class MatchingService implements ISemanticMatchingService {
 
 		}
 		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("Simple");
-		List<eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence>  schemaCor =schemaMatcher.matchSchemas(sourceSchemas, targetSchemas, "ConceptDistanceBased");
+		List<eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence>  schemaCor =schemaMatcher.matchSchemas(sourceSchemas, targetSchemas, "EditDistanceBased");
 
 		List<ISchemaCorrespondence> schemaCorODR = new ArrayList<ISchemaCorrespondence>();
 

@@ -38,25 +38,25 @@ public class TestElementMatcher {
 	@Test
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/Downloads/impianti-risalita-vivifiemme.csv");
+		File file = new File("impianti risalita.csv");
 		
 		ISchema schemaCSV= si.parseCSV(file);
-		ISchema schemaEtype=si.extractSchema(etype, Locale.ENGLISH);
+		ISchema schemaEtype=si.extractSchema(etype, Locale.ITALIAN);
 		
 		ElementMatcherFactory emf = new ElementMatcherFactory();
-		ISchemaElementMatcher elementMatcher = emf.create("ConceptDistanceBased");
+		ISchemaElementMatcher elementMatcher = emf.create("EditDistanceBased");
 		
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
-		List<ISchemaElement> elementsConcept = sefe.runColumnRecognizer(schemaCSV.getSchemaElements());
+		//List<ISchemaElement> elementsConcept = sefe.runColumnRecognizer(schemaCSV.getSchemaElements());
 		
 		
-		List<ISchemaElementCorrespondence> correspondences = elementMatcher.matchSchemaElements(elementsConcept, schemaEtype.getSchemaElements());
+		List<ISchemaElementCorrespondence> correspondences = elementMatcher.matchSchemaElements(schemaCSV.getSchemaElements(), schemaEtype.getSchemaElements());
 		for (ISchemaElementCorrespondence cor: correspondences){
-			SchemaElementCorrespondence c = (SchemaElementCorrespondence)cor;
-			c.computeHighestCorrespondencePair();
+			//SchemaElementCorrespondence c = (SchemaElementCorrespondence)cor;
+		//	cor.computeHighestCorrespondencePair();
 		LOGGER.info("SourceName: "+cor.getSourceElement().getElementContext().getElementName());
-		LOGGER.info("Score: "+c.getScore());
-		LOGGER.info("TargetName: "+c.getTargetElement());
+		LOGGER.info("TargetName: "+cor.getTargetElement().getElementContext().getElementName());
+		LOGGER.info("Score: "+cor.getElementCorrespondenceScore());
 
 		
 		}

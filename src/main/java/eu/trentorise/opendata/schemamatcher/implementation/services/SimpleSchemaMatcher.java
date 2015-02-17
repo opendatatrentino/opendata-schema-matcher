@@ -36,10 +36,18 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 
 
 		List<ISchemaElement> sourceSchemaElements= sourceSchema.getSchemaElements();
+	//	System.out.println("1______________________________________");
+	//	System.out.println(sourceSchemaElements.size());
+//		for (ISchemaElement el: sourceSchemaElements){
+//			System.out.println(el.getElementContext().getElementName());
+//		}
 		List<ISchemaElement> targetSchemaElements= targetSchema.getSchemaElements();
-		//TODO check presence of concepts for schema elements
 		sourceSchemaElements = sefe.runColumnRecognizer(sourceSchemaElements);
-
+//		System.out.println("2______________________________________");
+//		System.out.println(sourceSchemaElements.size());
+//		for (ISchemaElement el: sourceSchemaElements){
+//			System.out.println(el.getElementContext().getElementName());
+//		}
 		ISchemaElementMatcher elementMatcher = elMatching.getElementMatcher(elementMatchingAlgorithm);
 		schemaCorrespondence.setSourceSchema(sourceSchema);
 		schemaCorrespondence.setTargetSchema(targetSchema);
@@ -47,6 +55,8 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
 		//create the matrix of schema element correspondence
 		if((sourceSchemaElements.size()!=0)&&(targetSchemaElements.size()!=0)){
 			List<ISchemaElementCorrespondence> elementCorrespondences = elementMatcher.matchSchemaElements(sourceSchemaElements, targetSchemaElements);
+		//	System.out.println("3______________________________________");
+	//		System.out.println(elementCorrespondences.size());
 			schemaCorrespondence.setElementCorrespondences(elementCorrespondences);
 			score = computeOverallSchemaScore(sourceSchema,targetSchema, schemaCorrespondence);
 

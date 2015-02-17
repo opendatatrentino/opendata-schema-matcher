@@ -1,17 +1,28 @@
 package eu.trentorise.opendata.schemamatcher.implementation.services;
 
+import it.unitn.disi.sweb.webapi.client.eb.InstanceClient;
+import it.unitn.disi.sweb.webapi.model.Pagination;
+import it.unitn.disi.sweb.webapi.model.eb.Attribute;
+import it.unitn.disi.sweb.webapi.model.eb.Entity;
+import it.unitn.disi.sweb.webapi.model.eb.Instance;
+import it.unitn.disi.sweb.webapi.model.filters.InstanceFilter;
+import it.unitn.disi.sweb.webapi.model.kb.types.DataType;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
+import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
+import eu.trentorise.opendata.disiclient.services.EntityTypeService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.nlprise.DataTypeGuess;
 import eu.trentorise.opendata.nlprise.DataTypeGuess.Datatype;
@@ -34,7 +45,8 @@ public class SchemaImport implements ISchemaImport{
 
 	private final static Logger logger = Logger.getLogger(SchemaImport.class.getName());
 
-	
+	private final static int PAGE_SIZE=100;
+
 	public ISchema extractSchema(File file) {
 
 
@@ -70,32 +82,36 @@ public class SchemaImport implements ISchemaImport{
 			List<Object> elInstances = new ArrayList<Object>();
 
 			int lineNumber=1;
-			
+
 			//for(String[] sArr: strings )
 			for(int k=1; k<strings.size(); k++){
 				elInstances.add(strings.get(k)[i]);				
 				lineNumber++;
 			}
+			if(lineNumber==1){
+				//	System.out.println(lineNumber);
+			}
 			elContent.setContentSize(lineNumber);
 			elContent.setContent(elInstances);
-			
+
 			String datatype = extractDataType(elContent);
 			//logger.info("Extracted datatype is: " + datatype);
 			sContext.setElemetnDataType(datatype);
-			
+
 			schemaElement.setElementContext(sContext);
 			schemaElement.setElementContent(elContent);
 
 			sElements.add(schemaElement);
+
 		}
 		Schema schema = new Schema();
 		schema.setSchemaElements(sElements);
 
 		String fileName = file.getName().replaceFirst("[.][^.]+$", "");
-		
-		long conceptId=ColumnRecognizer.conceptFromText(fileName);
 
+		long conceptId=ColumnRecognizer.conceptFromText(fileName);
 		schema.setSchemaConcept(conceptId);
+		schema.setSchemaName(fileName);
 		return schema;
 	}	
 	/* (non-Javadoc)
@@ -130,7 +146,7 @@ public class SchemaImport implements ISchemaImport{
 			ConceptODR codr = new ConceptODR();
 			codr = codr.readConceptGlobalID(etype.getConcept().getGUID());
 			long globalConceptID =codr.getId();
-			System.out.println("Etype: "+etype.getName().getString(Locale.ENGLISH) +" conce "+ globalConceptID);
+			//	System.out.println("Etype: "+etype.getName().getString(Locale.ENGLISH) +" conce "+ globalConceptID);
 			schemaOut.setSchemaConcept(globalConceptID);
 			schemaOut.setSchemaElements(schemaElements);
 			return schemaOut;
@@ -157,6 +173,10 @@ public class SchemaImport implements ISchemaImport{
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
 		// Assignment concepts for schema
 		selements = sefe.runColumnRecognizer(selements);
+		//		for(ISchemaElement sel:  selements){
+		//			System.out.println("Name: "+sel.getElementContext().getElementName()+" Concept: "
+		//					+sel.getElementContext().getElementConcept());
+		//		}
 		schema.setSchemaElements(selements);
 		long schemaConceptID=ColumnRecognizer.conceptFromText(resourceContext.getResourceName());
 		schema.setSchemaConcept(schemaConceptID);
@@ -171,8 +191,20 @@ public class SchemaImport implements ISchemaImport{
 
 		List<ISchemaElement> schemaElements = new ArrayList<ISchemaElement>();
 
-		for (IAttributeDef atrDef: attrDefs){
+		getSchemaElements(etype, schemaElements, attrDefs,  locale );
 
+
+
+
+		return schemaElements;
+	}
+
+	private 	void	getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale ){
+
+		List<Instance> instances = getEntities(etype); 
+
+
+		for (IAttributeDef atrDef: attrDefs){
 			SchemaElement schemaElement = new SchemaElement();
 
 			ElementContext elContext = new ElementContext();
@@ -180,8 +212,9 @@ public class SchemaImport implements ISchemaImport{
 			//context extraction
 			schemaElement.setAttrDef(atrDef);
 			elContext.setElementName(atrDef.getName().getString(locale));
-			elContext.setElemetnDataType(atrDef.getDataType());
-
+			//System.out.println(atrDef.getName().getString(locale));
+			String dataType = atrDef.getDataType();
+			elContext.setElemetnDataType(dataType);
 			//convert local concept id to a global one
 			//Long localConceptID = WebServiceURLs.urlToConceptID(atrDef.getConceptURL());
 
@@ -193,26 +226,113 @@ public class SchemaImport implements ISchemaImport{
 			//schema element relation extraction
 			//TODO extract the schema structure
 			//List<IElementRelation> elementRelation = new ArrayList<IElementRelation>();
-			//schemaElement.setSchemaElementRelations(elementRelation);
 
 			//schema element's content extraction
-			//TODO find the way to download best representing content 
+			//TODO find the way to download best representing content
+			List<Object> values = new ArrayList<Object>();
+			if (instances!=null){
+				if((atrDef.getDataType().equalsIgnoreCase("xsd:float"))||(atrDef.getDataType().equalsIgnoreCase("xsd:integer"))
+						||(atrDef.getDataType().equalsIgnoreCase("xsd:long"))){
 
+					values = getValues(instances, atrDef);
+
+				}
+
+			}
+			elContent.setContent(values);
+			schemaElement.setElementContent(elContent);
 			schemaElements.add(schemaElement);
+			if(atrDef.getDataType().equalsIgnoreCase("oe:structure"))
+
+			{
+				//				System.out.println(atrDef.getName().getString(locale));
+				//				System.out.println(atrDef.getRangeEtypeURL());
+				EntityTypeService ets = new EntityTypeService();
+
+				IEntityType structureEtype= (EntityType) ets.readEntityType(atrDef.getRangeEtypeURL());
+				List<IAttributeDef> strAttrDefs = structureEtype.getAttributeDefs();
+
+				getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale);
+			}
+
+
 		}
-		return schemaElements;
+	}
+
+
+
+
+	private List<Object> getValues(List<Instance> instances,
+			IAttributeDef atrDef) {
+		List<Object> objects = new ArrayList<Object>();
+		for(Instance in: instances){
+			List<Attribute> attrs = in.getAttributes();
+
+			for(Attribute a : attrs){
+				if(a.getConceptId()==WebServiceURLs.urlToConceptID(atrDef.getConceptURL()))
+					objects.add(a.getValues().iterator().next().getValue());
+				//System.out.println(a.getDataType());
+				//	System.out.println(a.getValues().iterator().next().getValue().toString());
+
+			}
+		}
+
+		return objects;
+	}
+
+	/** methods takes random entities from Entitypedia
+	 * @param etype
+	 * @return
+	 */
+	public List<Instance> getEntities(IEntityType etype) {
+
+		InstanceClient insClient = new InstanceClient(WebServiceURLs.getClientProtocol());
+		Long etypeId = WebServiceURLs.urlToEtypeID(etype.getURL());
+		Pagination page = new Pagination();
+
+//		Random rand = new Random();
+//		int pageIndex = rand.nextInt((1000 - 1) + 1) + 1; //random number from 1 to 1000
+	//	page.setPageIndex(10);
+		page.setPageSize(PAGE_SIZE);
+
+		List<Instance> instances = 	insClient.readInstances(1L, etypeId, null, null, page); // TODO Make sure that they are taken randomly
+		List<Long> instancesIds =  new ArrayList<Long>();
+
+		for (Instance in : instances){
+			instancesIds.add(in.getId());
+		}
+
+		InstanceFilter filter = new InstanceFilter();
+		filter.setIncludeAttributes(true);
+		if(instancesIds.size()!=0){
+			List<Instance> instancesFull = insClient.readInstancesById(instancesIds, filter);
+			//			for(Instance in: instancesFull){
+			//				List<Attribute> attrs = in.getAttributes();
+			//
+			//				for(Attribute a : attrs){
+			//					if(a.getDataType().equals(DataType.FLOAT))
+			//						//System.out.println(a.getDataType());
+			//						System.out.println(a.getValues().iterator().next().getValue().toString());
+			//				}
+			//			}
+			return instancesFull;
+		} else 
+			return null;
+
 	}
 
 	public String extractDataType(ElementContent elContent){
 		//TODO think about best content for representation
+		//		if(elContent.getContentSize()==1){
+		//			System.out.println("Size: "+elContent.getContentSize());
+		//
+		//			System.out.println("1st element: "+elContent.getContent().get(0));
+		//		}
 		String contentToGuess = elContent.getContent().iterator().next().toString();
 		//TODO think about enum of possible datatypes for the matcher
 
 		Datatype datatype = TypeDetector.guessType(contentToGuess);
-		
 		return	datatype.toString();
-
-
 	}
 
 }

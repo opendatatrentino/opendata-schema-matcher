@@ -33,7 +33,7 @@ public class ElementContext implements IElementContext {
 
 	
 
-	public void setElemetnDataType(String elemetnDataType) {
+	public void setElemetnDataType(String elementDataType) {
 		this.elementDataType = elementDataType;
 	}
 

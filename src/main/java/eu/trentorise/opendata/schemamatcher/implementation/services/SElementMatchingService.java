@@ -11,6 +11,7 @@ public class SElementMatchingService implements ISElementMatchingService {
 	public List<String> getElementMatchingAlgorithms() {
 		List<String> matcherTypes = new ArrayList<String>();
 		matcherTypes.add("ConceptDistanceBased");
+		matcherTypes.add("EditDistanceBased");
 		return matcherTypes;
 	}
 

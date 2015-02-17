@@ -7,14 +7,16 @@ import eu.trentorise.opendata.schemamatcher.model.IElementContent;
 public class ElementContent implements IElementContent{
 
 	public List<Object> instances;
-	public int contentSize;
+	public Integer contentSize;
 	
 	public List<Object> getContent() {
 		return this.instances;
 	}
 
 	public int getContentSize() {
-		return this.contentSize;
+		if(contentSize==null)
+		this.contentSize= instances.size();
+		return contentSize;
 	}
 
 	public void setContent(List<Object> instances) {

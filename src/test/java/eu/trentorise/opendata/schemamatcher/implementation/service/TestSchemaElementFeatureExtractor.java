@@ -16,7 +16,7 @@ public class TestSchemaElementFeatureExtractor {
 	@Test 
 	public void testFeatureExtractor() throws IOException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("impianti-risalita-vivifiemme.csv");
+		File file = new File("impianti risalita.csv.csv");
 		ISchema schemaOut= si.parseCSV(file);
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
 

@@ -37,30 +37,43 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 
 		for(ISchemaElement sElement: sourceElements){
 			List<Entry<Long,Long>> batch =new ArrayList<Entry<Long,Long>>(); 
-
-			for (ISchemaElement tElement: targetElements){
-				Map.Entry<Long,Long> entry =
-						new AbstractMap.SimpleEntry<Long,Long>(sElement.getElementContext().getElementConcept(),tElement.getElementContext().getElementConcept());
-				batch.add(entry);
+			List<Integer> distances;
+			if (sElement.getElementContext().getElementConcept()==-1){
+				distances =null;
+			} else {
+				for (ISchemaElement tElement: targetElements){
+					Map.Entry<Long,Long> entry =
+							new AbstractMap.SimpleEntry<Long,Long>(sElement.getElementContext().getElementConcept(),tElement.getElementContext().getElementConcept());
+					batch.add(entry);
+				}
+				distances = getBatchDistance(batch);
 			}
 
-			List<Integer> distances = getBatchDistance(batch);
 			SchemaElementCorrespondence sec = new SchemaElementCorrespondence();
 			HashMap<ISchemaElement, Float> correspondences = new HashMap <ISchemaElement, Float>();
 
 			for(int i=0; i<targetElements.size(); i++  ){
-				float score = getScore(distances.get(i));
+				//	System.out.println("Conce: "+sElement.getElementContext().getElementConcept()+" Source: " + sElement.getElementContext().getElementName()+ " Name: "+targetElements.get(i).getElementContext().getElementName()+" Score: "+distances.get(i));
+				float score=0.01f;
+				if (distances!=null)
+				{	
+					score = getScore(distances.get(i));
+
+				}
+			//	System.out.println("Conce: "+sElement.getElementContext().getElementConcept()+" Source: " + sElement.getElementContext().getElementName()+ " Name: "+targetElements.get(i).getElementContext().getElementName()+" Score: "+score);
+
 				correspondences.put(targetElements.get(i), score);
 			}
 			sec.setSourceElement(sElement);
 			sec.setElementMapping(correspondences);
 			sec.computeHighestCorrespondencePair();
 			elementCorespondences.add(sec);
+
 		}
 		return elementCorespondences;
 	}
 
-	
+
 	public String getElementMatchingAlgorithm() {
 		return this.ELEMENT_MATCHING_ALGORITHM;
 	}
@@ -103,7 +116,7 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 	 */
 	private float getScore( int distance){
 		float score  = (float)distance;
-		if (score==-1.0) return 0;
+		if (score==-1.0) return 0.001f;
 		if (score==0) return 1;
 		else {
 			return score = 1/(score+1);

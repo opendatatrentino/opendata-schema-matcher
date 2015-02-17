@@ -1,5 +1,6 @@
 package eu.trentorise.opendata.schemamatcher.services.experiment;
 
+import java.io.File;
 import java.util.List;
 
 import eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence;
@@ -7,11 +8,15 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence;
 public interface IMatchingExperiment {
 
 	
+	
 	/**  Methods run experiments on effectivness of a choosen approach and returns it results
-	 * @param methodology of the experiment
-	 * @return
+	 * @param file folder that contains source schemas 
+	 * @param methodology is the parameter that defines how the experimental result will be counted 
+	 * @param approach schema matching approach
+	 * @param groundTruth ground truth for the schemas 
+	 * @return experimental results
 	 */
-	IExperimentResult runExperiment(String methodology, String approach, ISchemaCorrespondence groundTruth);
+	IExperimentResult runExperiment(File file, String methodology, String approach, List<ISchemaCorrespondence> groundTruth);
 	
 	/** Method provides the list of possible methodologies for running experiments
 	 *  i.e. how experimental result should be computed

@@ -6,6 +6,7 @@
 .import-temp/
 
 target/
+output/
 logs/
 conf/sweb-webapi-model.properties
 src/main/resources/META-INF/sweb-webapi-model.properties

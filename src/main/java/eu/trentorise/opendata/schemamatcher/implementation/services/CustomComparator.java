@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 import eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence;
 
-/**
+/** Compares two schema elements by their correspondence score
  * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
  * 
  * 

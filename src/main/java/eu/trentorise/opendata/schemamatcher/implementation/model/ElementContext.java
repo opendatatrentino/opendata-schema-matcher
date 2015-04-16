@@ -2,6 +2,10 @@ package eu.trentorise.opendata.schemamatcher.implementation.model;
 
 import eu.trentorise.opendata.schemamatcher.model.IElementContext;
 
+/** Implementation of IElementCOntext interface
+ * @author Ivan Tankoyeu
+ *
+ */
 public class ElementContext implements IElementContext {
 
 	String elementName;

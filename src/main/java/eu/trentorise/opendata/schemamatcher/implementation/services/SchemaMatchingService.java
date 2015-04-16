@@ -14,6 +14,7 @@ public class SchemaMatchingService implements ISchemaMatchingService {
 
 		List<String> matcherTypes = new ArrayList<String>();
 		matcherTypes.add("Simple");
+		matcherTypes.add("HungarianAllocationAndEditDistance");
 		return matcherTypes;
 	}
 

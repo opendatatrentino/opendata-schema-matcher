@@ -51,7 +51,7 @@ public class SchemaElement implements ISchemaElement{
 	}
 
 	public Boolean hasElementContent() {
-		return this.hasElementContent();
+		return elementContent.getContent().size()>0;
 	}
 
 	public List<IElementRelation> getSchemaElementsRelations() {

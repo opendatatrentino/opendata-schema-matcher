@@ -1,6 +1,10 @@
 package eu.trentorise.opendata.schemamatcher.model;
 
 
+/** Describes  the relationship between different elements of a schema
+ * @author Ivan Tankoyeu
+ *
+ */
 public interface IElementRelation {
 
 	/** Method returns relation between schema elements

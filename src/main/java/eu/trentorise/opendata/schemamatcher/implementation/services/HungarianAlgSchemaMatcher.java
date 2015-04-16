@@ -18,7 +18,8 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementMatcher;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaMatcher;
 
-/** Schema matcher employs Hungarian algorithm for attribute matching
+/** Schema matcher employs Hungarian algorithm for attribute (element) matching.
+ * The algorithm is described in detail at @link http://en.wikipedia.org/wiki/Hungarian_algorithm
  * @author Ivan Tankoyeu
  *
  */
@@ -60,6 +61,10 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 		return schemaCorrespondence;
 	}
 
+	/**
+	 * @param elementCorrespondences
+	 * @return score of correspondences between two schemas
+	 */
 	private float  optimezedCorrespondenceScore(
 			List<ISchemaElementCorrespondence> elementCorrespondences) {
 
@@ -73,19 +78,6 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 
 		ArrayList<ISchemaElement> targetElements = new ArrayList<ISchemaElement>();
 		ArrayList<ISchemaElementCorrespondence> sourceElements = new ArrayList<ISchemaElementCorrespondence>();
-
-
-		//		for (ISchemaElement key : corMaps.keySet()) {
-		//			targetElements.add(key);
-		//		}
-
-		//		System.out.println("Target elements:");
-
-
-
-
-
-
 
 		int els = elementCorrespondences.size();
 		int corMapSize =corMaps.size();
@@ -118,60 +110,37 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 
 
 		for (ISchemaElement key : corMaping.keySet()) {
-				//	System.out.print("  		 "+key.getElementContext().getElementName());
 			if(key.getElementContext().getElementName()!=null){
-			targetElements.add(key);
+				targetElements.add(key);
 			}
 
 		}
 
 		Collections.sort(targetElements, new SElementComparator());
-			//System.out.println();
-
 
 		for (ISchemaElementCorrespondence elCor: elementCorrespondences){
-			//	System.out.print(elCor.getSourceElement().getElementContext().getElementName());
 			int i = 0;
 			HashMap<ISchemaElement, Float> mapingCor = elCor.getElementMapping();
-
-
-			//HashMap<ISchemaElement, Float> maping = elementCorrespondences.get(0).getElementMapping();
-
 
 			TreeMap<ISchemaElement,Float> corMap = new TreeMap<ISchemaElement,Float>(bvc);
 			corMap.putAll(mapingCor);
 
-
-
-			//		System.out.println();
-
-			sourceElements.add(elCor);
-
-			//	Collections.sort(sourceElements, new SElementComparator());
-
 			for (ISchemaElement key : corMap.keySet()) {
 				if(key.getElementContext().getElementName()!=null){
-				//	System.out.print("  		    "+(1-corMap.get(key)));
-				matrix[j][i]=1-corMap.get(key);
-				matrixFin[j][i]=1-corMap.get(key);
-				i++;}
+					matrix[j][i]=1-corMap.get(key);
+					matrixFin[j][i]=1-corMap.get(key);
+					i++;}
 			}
-				//	System.out.println();
 			j++;
 		}
 
 		for (int i=0; i<matrix.length;i++)
 		{
 			for (int k=0; k<matrix.length;k++){
-					//		System.out.print( (double)Math.round(matrix[i][k] * 100) / 100+"  ");
 			}
-				//	System.out.println();
 		}
 
-
-
 		assigmentMatrix=hungarianAssigment(matrix);
-			//System.out.println(Arrays.deepToString(assigmentMatrix));
 
 		int size;
 		if(corMapSize<els){
@@ -186,7 +155,6 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 			}
 
 			ISchemaElementCorrespondence sourceElement = sourceElements.get(assigmentMatrix[i][0]);
-				//	System.out.println("Source: "+assigmentMatrix[i][0]+" target: "+assigmentMatrix[i][1]);
 			ISchemaElement targetElement =targetElements.get(assigmentMatrix[i][1]);
 
 
@@ -197,8 +165,6 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 			sourceElement.setTargetElement(targetElement);
 
 			float scoreEl = 1-matrixFin[indexS][indexT];
-			//			System.out.println("Target: "+targetElement.getElementContext().getElementName()+" Source: "+sourceElement.getSourceElement().getElementContext().getElementName()+
-			//					" Score: "+scoreEl);
 			sourceElement.setElementCorrespondenceScore(scoreEl);
 			score+=scoreEl;
 		}
@@ -206,6 +172,10 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 		return score/elementCorrespondences.size();
 	}
 
+	/** Makes hungarian assigments 
+	 * @param matrix NxN of scores for elements of two schemas. 
+	 * @return matrix with the best assigments
+	 */
 	private int[][] hungarianAssigment(float[][] matrix) {
 		HungarianAlgorithm ha = new HungarianAlgorithm();
 		int[][] assigmentMatrix = ha.computeAssignments(matrix);
@@ -246,22 +216,23 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 
 }
 
+/** Compares names of a schema elements
+ * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
+ *
+ */
 class KeyComparator implements Comparator<ISchemaElement> {
 
 	Map<ISchemaElement, Float> base;
 	public KeyComparator(Map<ISchemaElement, Float> base) {
 		this.base = base;
 	}
-
 	// Note: this comparator imposes orderings that are inconsistent with equals.    
 	public int compare(ISchemaElement a, ISchemaElement b) {
 		if(a.getElementContext().getElementName()==null){
 			return 1;
-			//			System.out.println("1: "+a.getElementContext().getElementName()+ " 2: "+b.getElementContext().getElementName());
 		}else 
 			if(b.getElementContext().getElementName()==null){
 				return -1;
-				//			System.out.println("1: "+b.getElementContext().getElementName()+ " 2: "+b.getElementContext().getElementName());
 			} else
 				return a.getElementContext().getElementName().compareTo(b.getElementContext().getElementName());
 	}

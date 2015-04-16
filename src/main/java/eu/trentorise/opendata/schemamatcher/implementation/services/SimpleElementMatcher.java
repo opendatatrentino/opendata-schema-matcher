@@ -106,10 +106,16 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 	 * @param batch list of entries 
 	 * @return list of LCA distances
 	 */
-	private List<Integer> getBatchDistance(List<Entry<Long, Long>> batch) {
+	private List<Integer> getBatchDistanceLCA(List<Entry<Long, Long>> batch) {
 		ConceptClient cClient = new ConceptClient(getClientProtocol());
 		return cClient.getDistancesUsingLca(batch);
 	}
+	
+	private List<Integer> getBatchDistance(List<Entry<Long, Long>> batch) {
+		ConceptClient cClient = new ConceptClient(getClientProtocol());
+		return cClient.getDistances(batch,0);
+	}
+	
 	/** Converts distance between two concepts into score 
 	 * @param distance between two concepts
 	 * @return score of the closeness between attribute concept and header concept 

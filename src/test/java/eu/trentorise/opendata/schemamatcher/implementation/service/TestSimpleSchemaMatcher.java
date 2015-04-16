@@ -29,7 +29,6 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 public class TestSimpleSchemaMatcher {
 
 
-	private final static Logger LOGGER = Logger.getLogger(TestSchemaImport.class.getName());
 	private EntityType etype;
 
 	@Before
@@ -43,7 +42,7 @@ public class TestSimpleSchemaMatcher {
 	@Test
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		//File file = new File("impianti risalita.csv");
+		//File file = new File("/home/ivan/work/development/Schema Matching dataset/OSPEDALI001.csv");
 		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
@@ -52,7 +51,6 @@ public class TestSimpleSchemaMatcher {
 		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("Simple");
 		ISchemaCorrespondence  schemaCor =schemaMatcher.matchSchemas(schemaCSV, schemaEtype, "ConceptDistanceBased");
 		
-		LOGGER.info("Schema Cor Score: "+schemaCor.getSchemaCorrespondenceScore());
 
 	}
 
@@ -69,8 +67,8 @@ public class TestSimpleSchemaMatcher {
 	@Test
 	public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		//		File file = new File("/home/ivan/Downloads/Elenco_osterie_tipiche_civici.1386925759.csv");
-		File file = new File("impianti risalita.csv");
+		File file = new File("/home/ivan/work/development/Schema Matching dataset/FARM001.csv");
+		//File file = new File("impianti risalita.csv");
 		//		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
@@ -88,25 +86,27 @@ public class TestSimpleSchemaMatcher {
 
 		}
 
-		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("HungarianAllocationAndEditDistance");
-		List<ISchemaCorrespondence>  schemaCor =schemaMatcher.matchSchemas(sourceSchemas, targetSchemas, "EditDistanceBased");
+		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("Simple");
+		List<ISchemaCorrespondence>  schemaCor =schemaMatcher.matchSchemas(sourceSchemas, targetSchemas, "ConceptDistanceBased");
 
 		for (ISchemaCorrespondence c : schemaCor){
-			LOGGER.info("Etype name: "+c.getTargetSchema().getSchemaName()+ " "+c.getSchemaCorrespondenceScore() );
 			List<ISchemaElementCorrespondence> sElCors = c.getSchemaElementCorrespondence();
-
-			//			for (ISchemaElementCorrespondence sel: sElCors){
-			//				LOGGER.info("Source-Target Element: "+sel.getSourceElement().getElementContext().getElementName()+":"+sel.getSourceElement().getElementContext().getElementConcept()+"-");
-			//				LOGGER.info(sel.getTargetElement().getElementContext().getElementName()+":"+sel.getTargetElement().getElementContext().getElementConcept() + " Score: "+sel.getElementCorrespondenceScore());
-			//				for(ISchemaElement key : sel.getElementMapping().keySet())
-			//				{
-			//					LOGGER.info("NameList: "+key.getElementContext().getElementName()+"++"+key.getElementContext().getElementConcept());
-			//					LOGGER.info(" ScoreList: "+ sel.getElementMapping().get(key));
-			//
-			//				}
-			//				LOGGER.info("-------------------------------------------");
-			//
-			//			}
+			System.out.println(c.getSchemaCorrespondenceScore());
+			System.out.println(c.getTargetSchema().getSchemaName());
+						for (ISchemaElementCorrespondence sel: sElCors){
+							
+							System.out.println("Source-Target Element: "+sel.getSourceElement().getElementContext().getElementName()+"-"+
+							sel.getTargetElement().getElementContext().getElementName()+":"+sel.getSourceElement().getElementContext().getElementConcept() + " Score: "+sel.getElementCorrespondenceScore());
+							for(ISchemaElement key : sel.getElementMapping().keySet())
+							{
+								System.out.println("NameList: "+key.getElementContext().getElementName()+"++"+key.getElementContext().getElementConcept());
+								System.out.println(" ScoreList: "+ sel.getElementMapping().get(key));
+			
+							}
+							
+			
+						}
+						System.out.println("-------------------------------------------");
 
 		}
 
@@ -148,8 +148,6 @@ public class TestSimpleSchemaMatcher {
 					ColumnRecognizer.computeScoredCandidates(elementNames, elementContent);
 			List<Long> cid = ColumnRecognizer.computeColumnConceptIDs(elementNames, elementContent);
 			
-//			List<ISchemaElement> schemaElementsOut = new ArrayList<ISchemaElement>();
-//			int i=0;
 		for (Long id: cid){
 			System.out.println(id);
 			
@@ -158,7 +156,6 @@ public class TestSimpleSchemaMatcher {
 
 				System.out.println(" Name: "+map.get(ccc.getColumnNumber())+" concept id: "+ccc.getConceptID()+" col num: " +ccc.getColumnNumber());
 				//Long conceptId = extractedConcepts.get(i).getConceptID();
-		//	}
 		}
 
 	}			

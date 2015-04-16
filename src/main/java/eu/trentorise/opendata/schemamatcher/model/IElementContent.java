@@ -5,7 +5,7 @@ package eu.trentorise.opendata.schemamatcher.model;
 
 import java.util.List;
 
-/** The class stands for instances/content of the schema element
+/** The class stands for instances/content of a schema element
  * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
  * @date 14 Jul 2014
  * 

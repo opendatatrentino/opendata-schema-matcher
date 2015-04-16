@@ -10,6 +10,11 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementMatcher;
 
+/** Implementation of schema matcher where  edit (string) distance of  two schema elements are compared by
+ * 
+ * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
+ *
+ */
 public class EditDistanceElementMatcher implements ISchemaElementMatcher {
 
 	private final String ELEMENT_MATCHING_ALGORITHM="EditDistanceBased";
@@ -24,6 +29,11 @@ public class EditDistanceElementMatcher implements ISchemaElementMatcher {
 		return elementCorrespondence;
 	}
 
+	/** Returns edit distance between source and target element names
+	 * @param sourceSchemaElement source schema element	
+	 * @param targetSchemaElement target schema element
+	 * @return edit distance betweeen two schema element names
+	 */
 	private float getDistance(ISchemaElement sourceSchemaElement, ISchemaElement targetSchemaElement) {
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
 		double distance = sefe.getLevinsteinDistance(sourceSchemaElement.getElementContext().getElementName(), targetSchemaElement.getElementContext().getElementName());
@@ -63,6 +73,7 @@ public class EditDistanceElementMatcher implements ISchemaElementMatcher {
 		return elementCorespondences;
 	}
 
+	
 	public String getElementMatchingAlgorithm() {
 		return ELEMENT_MATCHING_ALGORITHM;
 	}

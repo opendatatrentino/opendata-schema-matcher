@@ -4,6 +4,10 @@ import java.util.List;
 
 import eu.trentorise.opendata.schemamatcher.model.IElementContent;
 
+/** Class implements IElementContent interface 
+ * @author Ivan Tankoyeu
+ *
+ */
 public class ElementContent implements IElementContent{
 
 	public List<Object> instances;

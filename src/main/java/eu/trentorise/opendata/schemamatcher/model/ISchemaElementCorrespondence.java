@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElement;
 
-/**
+/** Interface describes how a schema element corresponds to other schema elements
  * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
  * @date 22 Jul 2014
  * 
@@ -12,7 +12,7 @@ import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElement;
 public interface ISchemaElementCorrespondence {
 
 	/** Methods returns the correspondence score between target and source schema element  from min to max - [0,1], 
-	 * @returncorrespondence score between target and source schema elements.
+	 * @return correspondence score between target and source schema elements.
 	 */
 	public float getElementCorrespondenceScore();
 

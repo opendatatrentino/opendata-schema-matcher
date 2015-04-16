@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -41,16 +42,22 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 import eu.trentorise.opendata.semantics.model.knowledge.IResourceContext;
 import eu.trentorise.opendata.semantics.model.knowledge.ITableResource;
 
+/** 
+ * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
+ *
+ */
 public class SchemaImport implements ISchemaImport{
 
 	private final static Logger logger = Logger.getLogger(SchemaImport.class.getName());
 
 	private final static int PAGE_SIZE=100;
 
-	public ISchema extractSchema(File file) {
+	public ISchema extractSchema(File file) throws SchemaMatcherException {
+		// TODO check supported format
+		if(file==null){
+			throw new SchemaMatcherException("Null input is provided!");
+		}
 
-
-		//TODO check file format 
 		ISchema schemaOut = null;
 		try {
 			schemaOut = parseCSV(file);
@@ -63,8 +70,8 @@ public class SchemaImport implements ISchemaImport{
 
 	/** The method parse schema from a *.csv file. 
 	 * 
-	 * @param file
-	 * @return
+	 * @param input *.csv file
+	 * @return Schema object 
 	 * @throws IOException
 	 */
 	public ISchema parseCSV(File file) throws IOException {
@@ -125,6 +132,7 @@ public class SchemaImport implements ISchemaImport{
 		if(schema instanceof IResource){
 
 			IResource resource = (IResource) schema;
+			logger.log(Level.INFO,  resource.getTableResource().getHeaders());
 			ISchema schemaOut= extractFromODRResource(resource.getResourceContext(), resource.getTableResource());
 			return schemaOut;
 		}
@@ -146,7 +154,6 @@ public class SchemaImport implements ISchemaImport{
 			ConceptODR codr = new ConceptODR();
 			codr = codr.readConceptGlobalID(etype.getConcept().getGUID());
 			long globalConceptID =codr.getId();
-			//	System.out.println("Etype: "+etype.getName().getString(Locale.ENGLISH) +" conce "+ globalConceptID);
 			schemaOut.setSchemaConcept(globalConceptID);
 			schemaOut.setSchemaElements(schemaElements);
 			return schemaOut;
@@ -156,6 +163,11 @@ public class SchemaImport implements ISchemaImport{
 
 	}
 
+	/** Method extracts schema from ODR IResource 
+	 * @param resourceContext
+	 * @param tableResource
+	 * @return object of Schema
+	 */
 	private ISchema extractFromODRResource( IResourceContext resourceContext,ITableResource tableResource){
 		Schema schema= new Schema();	
 
@@ -163,15 +175,30 @@ public class SchemaImport implements ISchemaImport{
 		List<ISchemaElement> selements = new ArrayList<ISchemaElement>();
 
 		List<String> elNames= tableResource.getHeaders();
-		for(String name: elNames){
+		int tableSize = tableResource.getHeaders().size();
+		for(int i=0; i<tableSize; i++){
 			SchemaElement sElement = new SchemaElement();
 			ElementContext elContext = new ElementContext();
-			elContext.setElementName(name);
+			ElementContent elContent = new ElementContent();
+			
+			List<String> tabInstances = tableResource.getColumns().get(i);
+			List<Object> instances = new ArrayList<Object>();
+			for(String st : tabInstances)
+			{
+				instances.add(st);
+			}
+			elContent.setContent(instances);
+			elContext.setElementName(elNames.get(i));
 			sElement.setElementContext(elContext);
+			sElement.setElementContent(elContent);
 			selements.add(sElement);
 		}
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
 		// Assignment concepts for schema
+		for(ISchemaElement el : selements)
+		{
+			logger.log(Level.INFO, "El name: "+el.getElementContext().getElementName());
+		}
 		selements = sefe.runColumnRecognizer(selements);
 		//		for(ISchemaElement sel:  selements){
 		//			System.out.println("Name: "+sel.getElementContext().getElementName()+" Concept: "
@@ -186,24 +213,27 @@ public class SchemaImport implements ISchemaImport{
 
 
 
+	/** Method extracts schema elements from Etype
+	 * @param etype input Etype
+	 * @param locale is used to return schema element names in the required language 
+	 * @return list of schema elements
+	 */
 	private List<ISchemaElement> extractSchemaElements(IEntityType etype,Locale locale){
 		List<IAttributeDef> attrDefs = etype.getAttributeDefs();
-
 		List<ISchemaElement> schemaElements = new ArrayList<ISchemaElement>();
-
 		getSchemaElements(etype, schemaElements, attrDefs,  locale );
-
-
-
-
 		return schemaElements;
 	}
 
-	private 	void	getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale ){
 
+	/** 
+	 * @param etype
+	 * @param schemaElements
+	 * @param attrDefs
+	 * @param locale
+	 */
+	private void getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale ){
 		List<Instance> instances = getEntities(etype); 
-
-
 		for (IAttributeDef atrDef: attrDefs){
 			SchemaElement schemaElement = new SchemaElement();
 
@@ -212,20 +242,13 @@ public class SchemaImport implements ISchemaImport{
 			//context extraction
 			schemaElement.setAttrDef(atrDef);
 			elContext.setElementName(atrDef.getName().getString(locale));
-			//System.out.println(atrDef.getName().getString(locale));
 			String dataType = atrDef.getDataType();
 			elContext.setElemetnDataType(dataType);
 			//convert local concept id to a global one
-			//Long localConceptID = WebServiceURLs.urlToConceptID(atrDef.getConceptURL());
-
-			//			ConceptODR codr = new ConceptODR();
-			//			codr = codr.readConceptGlobalID(ccc.getConceptID());
-
 			elContext.setElementConcept(WebServiceURLs.urlToConceptID(atrDef.getConceptURL()));
 			schemaElement.setElementContext(elContext);
 			//schema element relation extraction
 			//TODO extract the schema structure
-			//List<IElementRelation> elementRelation = new ArrayList<IElementRelation>();
 
 			//schema element's content extraction
 			//TODO find the way to download best representing content
@@ -233,11 +256,8 @@ public class SchemaImport implements ISchemaImport{
 			if (instances!=null){
 				if((atrDef.getDataType().equalsIgnoreCase("xsd:float"))||(atrDef.getDataType().equalsIgnoreCase("xsd:integer"))
 						||(atrDef.getDataType().equalsIgnoreCase("xsd:long"))){
-
 					values = getValues(instances, atrDef);
-
 				}
-
 			}
 			elContent.setContent(values);
 			schemaElement.setElementContent(elContent);
@@ -245,17 +265,11 @@ public class SchemaImport implements ISchemaImport{
 			if(atrDef.getDataType().equalsIgnoreCase("oe:structure"))
 
 			{
-				//				System.out.println(atrDef.getName().getString(locale));
-				//				System.out.println(atrDef.getRangeEtypeURL());
 				EntityTypeService ets = new EntityTypeService();
-
 				IEntityType structureEtype= (EntityType) ets.readEntityType(atrDef.getRangeEtypeURL());
 				List<IAttributeDef> strAttrDefs = structureEtype.getAttributeDefs();
-
 				getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale);
 			}
-
-
 		}
 	}
 
@@ -290,9 +304,9 @@ public class SchemaImport implements ISchemaImport{
 		Long etypeId = WebServiceURLs.urlToEtypeID(etype.getURL());
 		Pagination page = new Pagination();
 
-//		Random rand = new Random();
-//		int pageIndex = rand.nextInt((1000 - 1) + 1) + 1; //random number from 1 to 1000
-	//	page.setPageIndex(10);
+		//		Random rand = new Random();
+		//		int pageIndex = rand.nextInt((1000 - 1) + 1) + 1; //random number from 1 to 1000
+		//	page.setPageIndex(10);
 		page.setPageSize(PAGE_SIZE);
 
 		List<Instance> instances = 	insClient.readInstances(1L, etypeId, null, null, page); // TODO Make sure that they are taken randomly

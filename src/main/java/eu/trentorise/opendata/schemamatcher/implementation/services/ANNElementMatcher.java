@@ -111,7 +111,10 @@ public class ANNElementMatcher {
 
 		DataNormalization norm = new DataNormalization();
 		buildOutputOneOf(norm);
-		File csvFile = new File("csvfile.csv");
+                File outputDir = new File("output");
+                outputDir.mkdir();
+		File csvFile = new File("output/csvfile.csv");
+                
 		norm.setTarget(new NormalizationStorageCSV(csvFile));
 
 		norm.addInputField(input1 = new InputFieldArray1D(true, INPUT1));
@@ -129,8 +132,8 @@ public class ANNElementMatcher {
 		
 		norm.process();
 
-
-		File binFile = new File("binFile");
+                
+		File binFile = new File("output/binFile");
 
 		EncogUtility.convertCSV2Binary(csvFile,
 				binFile, network.getInputCount(), 

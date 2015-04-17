@@ -42,7 +42,7 @@ public class TestSimpleSchemaMatcher {
 	@Test
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		//File file = new File("/home/ivan/work/development/Schema Matching dataset/OSPEDALI001.csv");
+
 		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);

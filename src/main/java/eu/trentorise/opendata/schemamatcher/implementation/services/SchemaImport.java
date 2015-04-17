@@ -221,7 +221,7 @@ public class SchemaImport implements ISchemaImport{
 	private List<ISchemaElement> extractSchemaElements(IEntityType etype,Locale locale){
 		List<IAttributeDef> attrDefs = etype.getAttributeDefs();
 		List<ISchemaElement> schemaElements = new ArrayList<ISchemaElement>();
-		getSchemaElements(etype, schemaElements, attrDefs,  locale );
+		getSchemaElements(etype, schemaElements, attrDefs,  locale, 0 );
 		return schemaElements;
 	}
 
@@ -232,7 +232,7 @@ public class SchemaImport implements ISchemaImport{
 	 * @param attrDefs
 	 * @param locale
 	 */
-	private void getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale ){
+	private void getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale, int depth ){
 		List<Instance> instances = getEntities(etype); 
 		for (IAttributeDef atrDef: attrDefs){
 			SchemaElement schemaElement = new SchemaElement();
@@ -263,19 +263,17 @@ public class SchemaImport implements ISchemaImport{
 			schemaElement.setElementContent(elContent);
 			schemaElements.add(schemaElement);
 			if(atrDef.getDataType().equalsIgnoreCase("oe:structure"))
-
 			{
 				EntityTypeService ets = new EntityTypeService();
 				IEntityType structureEtype= (EntityType) ets.readEntityType(atrDef.getRangeEtypeURL());
 				List<IAttributeDef> strAttrDefs = structureEtype.getAttributeDefs();
-				getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale);
+				  if (depth<2) {
+				getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale, ++depth);
+				  }
 			}
 		}
 	}
-
-
-
-
+	
 	private List<Object> getValues(List<Instance> instances,
 			IAttributeDef atrDef) {
 		List<Object> objects = new ArrayList<Object>();

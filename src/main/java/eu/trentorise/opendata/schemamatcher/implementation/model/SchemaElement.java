@@ -10,13 +10,11 @@ import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
 
 public class SchemaElement implements ISchemaElement{
 
-	IElementContent elementContent;
-	IElementContext elementContext;
-	List<IElementRelation>  schemaElementRelations;
-	IAttributeDef attrDef;
-	int columnIndex; 
-
-	
+	private IElementContent elementContent;
+	private IElementContext elementContext;
+	private List<IElementRelation>  schemaElementRelations;
+	protected IAttributeDef attrDef;
+	private int columnIndex; 
 
 	@Override
 	public String toString() {

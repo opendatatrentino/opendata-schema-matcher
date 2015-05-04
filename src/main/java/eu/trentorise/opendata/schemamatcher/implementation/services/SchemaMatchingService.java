@@ -8,8 +8,6 @@ import eu.trentorise.opendata.schemamatcher.services.matching.ISchemaMatchingSer
 
 public class SchemaMatchingService implements ISchemaMatchingService {
 
-	
-
 	public List<String> getSchemaMatchingAlgorithms() {
 
 		List<String> matcherTypes = new ArrayList<String>();
@@ -19,12 +17,6 @@ public class SchemaMatchingService implements ISchemaMatchingService {
 	}
 
 	public ISchemaMatcher getSchemaMatcher(String scheamMatcherType) {
-		
-		ISchemaMatcher sm=	SchemaMatcherFactory.create(scheamMatcherType);
-		return sm;
+		return SchemaMatcherFactory.create(scheamMatcherType);
 	}
-
-
-
-
 }

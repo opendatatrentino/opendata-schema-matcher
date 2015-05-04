@@ -5,8 +5,8 @@ import eu.trentorise.opendata.semantics.model.knowledge.IResourceContext;
 import eu.trentorise.opendata.semantics.model.knowledge.ITableResource;
 
 public class Resource implements IResource {
-	IResourceContext rc;
-	ITableResource tr;
+	private IResourceContext rc;
+	private ITableResource tr;
 	
 	public IResourceContext getResourceContext() {
 

@@ -21,22 +21,16 @@ import eu.trentorise.opendata.schemamatcher.schemaanalysis.service.ISchemaElemen
 
 public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtractor{
 
-	//public static final double MAX_SCORE_FOR_NO_FIRST_LETTER_MATCH=  0.3;
-
 	public static final float CONCEPT_DISTANCE_WEIGHT=  0.5f;
 	public static final float EDIT_DISTANCE_WEIGHT=  0.4f;
 	public static final float DATATYPE_DISTANCE_WEIGHT=  0.1f;
-
-
 
 	public void getSchemaElementConcept(ISchemaElement schemaElement) {
 		//	schemaElement.getElementContext().getElementConcept()
 		//TODO
 	}
-
 	public void getSchemaElementConcept(List<ISchemaElement> schemaElement) {
 		// TODO Auto-generated method stub
-
 	}
 
 	/** run column-concept recognizer, that extracts concepts for each schema element in the data set 
@@ -59,18 +53,13 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 				contStr.add(o.toString());
 			}
 			elementContent.add(contStr);
-
 		}
 
-		//		List<ColumnConceptCandidate> extractedConcepts =
-		//				ColumnRecognizer.computeScoredCandidates(elementNames, elementContent);
 		List<Long> extractedConceptsIDs = ColumnRecognizer.computeColumnConceptIDs(elementNames, elementContent);
-
 		List<ISchemaElement> schemaElementsOut = new ArrayList<ISchemaElement>();
 
 		for (int i=0; i<extractedConceptsIDs.size();i++)
 		{
-			//	System.out.println(extractedConceptsIDs+" col num: " +i);
 			Long conceptId = extractedConceptsIDs.get(i);
 			long globalConceptID;
 			if (conceptId==-1){
@@ -85,7 +74,6 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 			se.setColumnIndex(i);
 			se.getElementContext().setElementConcept(globalConceptID);
 			schemaElementsOut.add(se);
-			//		System.out.println(se.getElementContext().getElementName()+"  "+globalConceptID);
 		}
 		return schemaElementsOut;
 	}
@@ -104,12 +92,16 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 		if (score==0){
 			return 1;
 		}
-		if (score==-1.0) return 0;
+		if (score==-1.0) { 
+			return 0;
+		}
 		float s = (float) (score-1.0);
 		if (s!=0.0){
-			return score = 1/(score-1);
+			return 1/(score-1);
 		}
-		else return 0;
+		else {
+			return 0;
+		}
 	}
 
 	/** Returns the edit distance between source and target strings. 
@@ -121,12 +113,9 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 		if(sourceName==null||targetName==null){
 			return 0.0;}
 
-		//System.out.println("Source: "+sourceName+" Target: "+targetName);
 		if (sourceName.equalsIgnoreCase(targetName)) {
 			return 1.0;
 		}
-
-		//	System.out.println("Source: "+sourceName+" Target: "+targetName);
 
 		int editDistance = StringUtils.getLevenshteinDistance(
 				sourceName.toLowerCase(), targetName.toLowerCase());
@@ -134,11 +123,6 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 		// Normalize for length:
 		double score
 		= (double) (targetName.length() - editDistance) / (double) targetName.length();
-		//System.out.println("Score: "+score);
-		// Artificially reduce the score if the first letters don't match
-		//		if (sourceName.charAt(0) != targetName.charAt(0)) {
-		//			score = Math.min(score, MAX_SCORE_FOR_NO_FIRST_LETTER_MATCH);
-		//		}
 		return Math.max(0.0, Math.min(score, 1.0));
 	}
 
@@ -165,18 +149,15 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 				CONCEPT_DISTANCE_WEIGHT+getLevinsteinDistance(sourceElementContext.getElementName(),targetElementContext.getElementName())*
 				EDIT_DISTANCE_WEIGHT+getDataTypeSimilarity(sourceElementContext.getElementName(),targetElementContext.getElementName())*
 				DATATYPE_DISTANCE_WEIGHT);
-
-
-
 		return complexDistance;
 	}
 
 	public float getStatisticalDistance(IElementContent sourceElementContent, IElementContent targetElementContent){
-		
+
 		int sSize = sourceElementContent.getContentSize();
 		int tSize = targetElementContent.getContentSize();
 		int size = 0;
-	
+
 		if(sSize<=tSize){
 			size = sSize;
 		}
@@ -187,19 +168,11 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 
 		double[] p1 = new double[size];
 		double[] p2 = new double[size];
-
-		System.out.println("sourceVals"+Arrays.toString(p1));
-		System.out.println("targeteVals"+Arrays.toString(p2));
-
-		
-		
 		for (int i = 0; i < size-1; i++) {
 			p1[i] =  Double.parseDouble((String) sourceElementContent.getContent().get(i));  
 			p2[i] = (Float) targetElementContent.getContent().get(i);  
 		}
-
 		double distance = StatUtil.klDivergence(p1, p2);
-
 		return (float) distance;
 	}
 

@@ -7,8 +7,8 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaMatcher;
  * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
  *
  */
-public  class SchemaMatcherFactory {
 
+public class SchemaMatcherFactory {
 
 	/** Method create an object of @see ISchemaMatcher
 	 * @param schemaMatcherType type of schema matcher. The full list of schema matching algorithms can be returned by calling @see SchemaMatchingService.getSchemaMatchingAlgorithms() 
@@ -24,6 +24,5 @@ public  class SchemaMatcherFactory {
 		}
 		return schemaMatcher;
 	}
-
 }
 

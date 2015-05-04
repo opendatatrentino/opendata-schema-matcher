@@ -53,15 +53,12 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 			HashMap<ISchemaElement, Float> correspondences = new HashMap <ISchemaElement, Float>();
 
 			for(int i=0; i<targetElements.size(); i++  ){
-				//	System.out.println("Conce: "+sElement.getElementContext().getElementConcept()+" Source: " + sElement.getElementContext().getElementName()+ " Name: "+targetElements.get(i).getElementContext().getElementName()+" Score: "+distances.get(i));
 				float score=0.01f;
 				if (distances!=null)
 				{	
 					score = getScore(distances.get(i));
 
 				}
-			//	System.out.println("Conce: "+sElement.getElementContext().getElementConcept()+" Source: " + sElement.getElementContext().getElementName()+ " Name: "+targetElements.get(i).getElementContext().getElementName()+" Score: "+score);
-
 				correspondences.put(targetElements.get(i), score);
 			}
 			sec.setSourceElement(sElement);
@@ -73,11 +70,9 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 		return elementCorespondences;
 	}
 
-
 	public String getElementMatchingAlgorithm() {
 		return this.ELEMENT_MATCHING_ALGORITHM;
 	}
-
 
 	/** Returns the distance between two concept. The method uses LCA approach. 
 	 * @param source source concept
@@ -87,11 +82,15 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 	private float getConceptsDistance( long source, long target){
 		ConceptClient cClient = new ConceptClient(getClientProtocol());
 		float score  = (float)cClient.getDistanceUsingLca(source,target);
-		if (score==-1) return 0;
+		if (score==-1) {
+			return 0;
+		}
 		if ((score-1)!=0){
 			return score = 1/(score-1);
 		}
-		else return 0;
+		else {
+			return 0;
+		}
 	}
 
 
@@ -102,29 +101,25 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
 		return  WebServiceURLs.getClientProtocol();
 	}
 
-	/** Method sends to a server map of concept ids to compute distances among them. 
-	 * @param batch list of entries 
-	 * @return list of LCA distances
-	 */
-	private List<Integer> getBatchDistanceLCA(List<Entry<Long, Long>> batch) {
-		ConceptClient cClient = new ConceptClient(getClientProtocol());
-		return cClient.getDistancesUsingLca(batch);
-	}
-	
 	private List<Integer> getBatchDistance(List<Entry<Long, Long>> batch) {
 		ConceptClient cClient = new ConceptClient(getClientProtocol());
 		return cClient.getDistances(batch,0);
 	}
-	
+
 	/** Converts distance between two concepts into score 
 	 * @param distance between two concepts
 	 * @return score of the closeness between attribute concept and header concept 
 	 */
 	private float getScore( int distance){
 		float score  = (float)distance;
-		if (score==-1.0) return 0.001f;
-		if (score==0) return 1;
+		if (score==-1.0) {
+			return 0.001f;
+		}
+		if (score==0) {
+			return 1;
+		}
 		else {
 			return score = 1/(score+1);
-		}}
+		}
+	}
 }

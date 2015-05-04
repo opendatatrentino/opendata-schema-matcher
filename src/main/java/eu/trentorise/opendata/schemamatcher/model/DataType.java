@@ -16,8 +16,8 @@ public final class  DataType {
 	public enum Datatype {
 		INT, FLOAT, DATE, STRING, NL_STRING, BOOLEAN, UNRECOGNIZED ;
 	}
-	
-	
+
+
 	/** Method takes as input string and returns data type defined in the matcher.
 	 *@see Datatype
 	 * @param st
@@ -43,7 +43,9 @@ public final class  DataType {
 							if ((st.equalsIgnoreCase(BOOLEAN))){
 								return Datatype.BOOLEAN;
 							}
-							else return Datatype.UNRECOGNIZED;
+							else { 
+								return Datatype.UNRECOGNIZED;
+							}
 	}
 
 	//public float getDataTypeSimilarityScore

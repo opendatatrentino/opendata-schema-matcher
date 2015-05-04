@@ -1,5 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.service;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 public class TestSimpleSchemaMatcher {
 
 
+	private static final int CONCEPT_ID = 14557;
 	private EntityType etype;
 
 	@Before
@@ -43,31 +46,46 @@ public class TestSimpleSchemaMatcher {
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
 
-		File file = new File("impianti risalita.csv");
+		File file = new File("/home/ivan/work/development/Schema Matching dataset/16_PUNTIPREL001.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
 		ISchema schemaEtype=si.extractSchema(etype, Locale.ITALIAN);
 
 		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("Simple");
-		ISchemaCorrespondence  schemaCor =schemaMatcher.matchSchemas(schemaCSV, schemaEtype, "ConceptDistanceBased");
+		ISchemaCorrespondence  schemaCor =schemaMatcher.matchSchemas(schemaCSV, schemaEtype, "EditDistanceBased");
 		
+			List<ISchemaElementCorrespondence> sElCors = schemaCor.getSchemaElementCorrespondence();
+			System.out.println(schemaCor.getSchemaCorrespondenceScore());
+			System.out.println(schemaCor.getTargetSchema().getSchemaName());
+						for (ISchemaElementCorrespondence sel: sElCors){
+							
+							System.out.println("Source-Target Element: "+sel.getSourceElement().getElementContext().getElementName()+"("+sel.getSourceElement().getElementContext().getElementConcept()+")"+"-"+
+							sel.getTargetElement().getElementContext().getElementName()+":"+sel.getSourceElement().getElementContext().getElementConcept() + " Score: "+sel.getElementCorrespondenceScore());
+						for(ISchemaElement key : sel.getElementMapping().keySet())
+							{
+								System.out.println("NameList: "+key.getElementContext().getElementName()+"++"+key.getElementContext().getElementConcept());
+								System.out.println(" ScoreList: "+ sel.getElementMapping().get(key));
+			
+							}
+							
+			
+						}
+						System.out.println("-------------------------------------------");
 
 	}
 
 	@Test
 	public void testConceptFromText(){
-
 		String resourceName = "IMPIANTI RISALITA";
 		Long conceptID = ColumnRecognizer.conceptFromText(resourceName);
-
-
+		assertEquals(CONCEPT_ID, conceptID.intValue());
 	}
 
 
 	@Test
 	public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/work/development/Schema Matching dataset/FARM001.csv");
+		File file = new File("/home/ivan/work/development/Schema Matching dataset/16_PUNTIPREL001.csv");
 		//File file = new File("impianti risalita.csv");
 		//		File file = new File("impianti risalita.csv");
 
@@ -97,14 +115,6 @@ public class TestSimpleSchemaMatcher {
 							
 							System.out.println("Source-Target Element: "+sel.getSourceElement().getElementContext().getElementName()+"-"+
 							sel.getTargetElement().getElementContext().getElementName()+":"+sel.getSourceElement().getElementContext().getElementConcept() + " Score: "+sel.getElementCorrespondenceScore());
-							for(ISchemaElement key : sel.getElementMapping().keySet())
-							{
-								System.out.println("NameList: "+key.getElementContext().getElementName()+"++"+key.getElementContext().getElementConcept());
-								System.out.println(" ScoreList: "+ sel.getElementMapping().get(key));
-			
-							}
-							
-			
 						}
 						System.out.println("-------------------------------------------");
 
@@ -117,7 +127,7 @@ public class TestSimpleSchemaMatcher {
 	public void testConsistanceOfColConcRecognizer() throws IOException{
 		SchemaImport si = new SchemaImport();
 
-		File file = new File("impianti risalita.csv");
+		File file = new File("/home/ivan/work/development/Schema Matching dataset/16_PUNTIPREL001.csv");
 		//		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
@@ -155,7 +165,6 @@ public class TestSimpleSchemaMatcher {
 			for(ColumnConceptCandidate ccc: extractedConcepts){
 
 				System.out.println(" Name: "+map.get(ccc.getColumnNumber())+" concept id: "+ccc.getConceptID()+" col num: " +ccc.getColumnNumber());
-				//Long conceptId = extractedConcepts.get(i).getConceptID();
 		}
 
 	}			

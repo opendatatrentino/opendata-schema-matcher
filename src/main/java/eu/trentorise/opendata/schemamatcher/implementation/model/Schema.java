@@ -9,14 +9,13 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 
 public class Schema implements ISchema{
 
-	String schemaName;
-	String schemaDescription;
-	List<ISchemaElement> schemaElements;
-	int elementsNumber;
-	SchemaStructureType structureType;
-	Long schemaConcept;
-	IEntityType etype;
-
+    private	String schemaName;
+	private String schemaDescription;
+	private List<ISchemaElement> schemaElements;
+	private int elementsNumber;
+	private SchemaStructureType structureType;
+	private Long schemaConcept;
+	private IEntityType etype;
 
 	@Override
 	public String toString() {

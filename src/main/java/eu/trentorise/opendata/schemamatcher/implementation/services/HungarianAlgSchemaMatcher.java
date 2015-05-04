@@ -142,12 +142,6 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 
 		assigmentMatrix=hungarianAssigment(matrix);
 
-		int size;
-		if(corMapSize<els){
-			size = corMapSize;
-		}
-		else {
-			size = els;}
 		for(int i =0; i<assigmentMatrix.length;i++ ){
 			if((assigmentMatrix[i][0]>sourceElements.size()-1)||assigmentMatrix[i][1]>targetElements.size()-1)
 			{ 
@@ -178,8 +172,7 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 	 */
 	private int[][] hungarianAssigment(float[][] matrix) {
 		HungarianAlgorithm ha = new HungarianAlgorithm();
-		int[][] assigmentMatrix = ha.computeAssignments(matrix);
-		return assigmentMatrix;
+		return ha.computeAssignments(matrix);
 	}
 
 	public String getSchemaMatchingAlgorithm() {
@@ -222,9 +215,10 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
  */
 class KeyComparator implements Comparator<ISchemaElement> {
 
-	Map<ISchemaElement, Float> base;
+	private Map<ISchemaElement, Float> base;
+	
 	public KeyComparator(Map<ISchemaElement, Float> base) {
-		this.base = base;
+		this.setBase(base);
 	}
 	// Note: this comparator imposes orderings that are inconsistent with equals.    
 	public int compare(ISchemaElement a, ISchemaElement b) {
@@ -233,7 +227,16 @@ class KeyComparator implements Comparator<ISchemaElement> {
 		}else 
 			if(b.getElementContext().getElementName()==null){
 				return -1;
-			} else
+			} else {
 				return a.getElementContext().getElementName().compareTo(b.getElementContext().getElementName());
+			}
+				
+	}
+	
+	public Map<ISchemaElement, Float> getBase() {
+		return base;
+	}
+	public void setBase(Map<ISchemaElement, Float> base) {
+		this.base = base;
 	}
 }

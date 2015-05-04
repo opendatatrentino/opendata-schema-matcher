@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.log4j.Logger;
+
 import eu.trentorise.opendata.disiclient.services.EntityTypeService;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaCorrespondence;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaMatcherException;
@@ -20,6 +22,8 @@ import eu.trentorise.opendata.semantics.services.ISemanticMatchingService;
 import eu.trentorise.opendata.semantics.services.model.ISchemaCorrespondence;
 
 public  class MatchingService implements ISemanticMatchingService {
+	private final static Logger LOGGER = Logger.getLogger(MatchingService.class.getName());
+
 
 	public List<ISchemaCorrespondence> matchSchemas(IResourceContext resourceContext, ITableResource tableResource) {
 		Resource rc = new Resource();
@@ -30,7 +34,7 @@ public  class MatchingService implements ISemanticMatchingService {
 		try {
 			schemaSource = si.extractSchema(rc, Locale.ITALIAN);
 		} catch (SchemaMatcherException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		List<ISchema> sourceSchemas = new ArrayList<ISchema>();
 		sourceSchemas.add(schemaSource);
@@ -40,18 +44,14 @@ public  class MatchingService implements ISemanticMatchingService {
 
 	public List<ISchemaCorrespondence> matchSchemasFile(File file) {
 		SchemaImport si = new SchemaImport();
-		//File file = new File("/home/ivan/Downloads/impianti-risalita-vivifiemme.csv");
-
 		ISchema schemaCSV = null;
 		try {
 			schemaCSV = si.parseCSV(file);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		List<ISchema> sourceSchemas = new ArrayList<ISchema>();
 		sourceSchemas.add(schemaCSV);
-
-
 		return	match(sourceSchemas);
 	}
 
@@ -68,16 +68,14 @@ public  class MatchingService implements ISemanticMatchingService {
 			try {
 				schemaEtype = si.extractSchema(etype, Locale.ITALIAN);
 			} catch (SchemaMatcherException e) {
-				e.printStackTrace();
+				LOGGER.error(e.getMessage());
 			}
 			targetSchemas.add(schemaEtype);
 
 		}
 		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("Simple");
 		List<eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence>  schemaCor =schemaMatcher.matchSchemas(sourceSchemas, targetSchemas, "ConceptDistanceBased");
-
 		List<ISchemaCorrespondence> schemaCorODR = new ArrayList<ISchemaCorrespondence>();
-
 		for(eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence sc: schemaCor){
 			SchemaCorrespondence scor = (SchemaCorrespondence) sc;
 			ScheCorrespondence scheC = scor.convertToScheCorrespondence();

@@ -2,12 +2,12 @@ package eu.trentorise.opendata.schemamatcher.services.experiment;
 
 
 public class ExperimentResult implements IExperimentResult {
-	long timeSpent;
-	long memoryUsed;
-	double precision;
-	double precisionFive;
-	double recall;
-	double map;
+	private long timeSpent;
+	private long memoryUsed;
+	private double precision;
+	private double precisionFive;
+	private double recall;
+	private double map;
 	
 
 	public void setTimeSpent(long timeSpent) {

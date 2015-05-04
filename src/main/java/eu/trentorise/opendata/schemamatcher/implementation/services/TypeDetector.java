@@ -30,17 +30,6 @@ public class TypeDetector {
 	 * @return		The datatype
 	 */
 	public static Datatype guessType(String cell) {
-//		Datatype type = Datatype.STRING;
-		
-		// Doing only int and float for now
-//		if (IntTypeChecker.check(cell)) {
-//			type = Datatype.INT;
-//		} else if (FloatTypeChecker.check(cell)) {
-//			type = Datatype.FLOAT;
-//		}
-		/* Should be using the DataTypeGuess.guessType method.
-		 * Currently the date type check throws a runtime exception.
-		 */
 		
 		if (EmptyTypeChecker.check(cell)) {
 			return Datatype.EMPTY;
@@ -51,9 +40,6 @@ public class TypeDetector {
 		if (FloatTypeChecker.check(cell)) {
 			return Datatype.FLOAT;
 		}
-//		if (DateTypeChecker.check(cell)) {
-//			return Datatype.DATE;
-//		}
         if (XmlTypeChecker.check(cell)) {
             return Datatype.XML;
         }
@@ -67,8 +53,6 @@ public class TypeDetector {
             return Datatype.NL_STRING;
         }
 		return Datatype.STRING;
-		
-//		return type;
 	}
 	
 	/**
@@ -98,7 +82,4 @@ public class TypeDetector {
 		}
 		return foundType ? lastType : Datatype.STRING;		
 	}
-	
-	
-	
 }

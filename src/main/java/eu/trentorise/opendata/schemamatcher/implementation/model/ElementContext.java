@@ -8,12 +8,10 @@ import eu.trentorise.opendata.schemamatcher.model.IElementContext;
  */
 public class ElementContext implements IElementContext {
 
-	String elementName;
-	String elementDescription;
-	String elementDataType;
-	Long elementConcept;
-	
-	
+	private String elementName;
+	private String elementDescription;
+	private String elementDataType;
+	private Long elementConcept;
 	
 	@Override
 	public String toString() {
@@ -35,8 +33,6 @@ public class ElementContext implements IElementContext {
 		return this.elementDataType;
 	}
 
-	
-
 	public void setElemetnDataType(String elementDataType) {
 		this.elementDataType = elementDataType;
 	}
@@ -56,6 +52,4 @@ public class ElementContext implements IElementContext {
 	public void setElementDescription(String elementDescription) {
 		this.elementDescription = elementDescription;
 	}
-
-	
 }

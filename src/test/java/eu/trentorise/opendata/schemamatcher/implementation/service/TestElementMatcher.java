@@ -48,13 +48,9 @@ public class TestElementMatcher {
 		ISchemaElementMatcher elementMatcher = emf.create("EditDistanceBased");
 		
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
-		//List<ISchemaElement> elementsConcept = sefe.runColumnRecognizer(schemaCSV.getSchemaElements());
-		
 		
 		List<ISchemaElementCorrespondence> correspondences = elementMatcher.matchSchemaElements(schemaCSV.getSchemaElements(), schemaEtype.getSchemaElements());
 		for (ISchemaElementCorrespondence cor: correspondences){
-			//SchemaElementCorrespondence c = (SchemaElementCorrespondence)cor;
-		//	cor.computeHighestCorrespondencePair();
 		LOGGER.info("SourceName: "+cor.getSourceElement().getElementContext().getElementName());
 		LOGGER.info("TargetName: "+cor.getTargetElement().getElementContext().getElementName());
 		LOGGER.info("Score: "+cor.getElementCorrespondenceScore());

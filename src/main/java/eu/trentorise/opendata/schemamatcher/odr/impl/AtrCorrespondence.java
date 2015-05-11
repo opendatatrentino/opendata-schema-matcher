@@ -10,11 +10,11 @@ import eu.trentorise.opendata.semantics.services.model.IAttributeCorrespondence;
 
 public class AtrCorrespondence implements IAttributeCorrespondence {
 	
-	float score;
-	HashMap<IAttributeDef,Float> attrMap;
-	AttributeDef attrDef;
-	long headerConceptID;
-	int columnIndex;
+	private float score;
+	private HashMap<IAttributeDef,Float> attrMap;
+	private AttributeDef attrDef;
+	private long headerConceptID;
+	private int columnIndex;
 	
 	
 	public IAttributeDef getAttrDef() {

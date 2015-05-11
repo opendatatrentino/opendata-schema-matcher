@@ -37,7 +37,6 @@ public class EditDistanceElementMatcher implements ISchemaElementMatcher {
 	private float getDistance(ISchemaElement sourceSchemaElement, ISchemaElement targetSchemaElement) {
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
 		double distance = sefe.getLevinsteinDistance(sourceSchemaElement.getElementContext().getElementName(), targetSchemaElement.getElementContext().getElementName());
-	//	System.out.println("Source: "+sourceSchemaElement.getElementContext().getElementName()+" Target: "+ targetSchemaElement.getElementContext().getElementName() + " Score: "+distance);
 		return (float) distance;
 	}
 
@@ -52,7 +51,6 @@ public class EditDistanceElementMatcher implements ISchemaElementMatcher {
 
 			for (ISchemaElement stel: targetElements){
 				ISchemaElementCorrespondence elementCorrespondence=	matchSchemaElements(sel,stel);
-
 				correspondences.put(stel, elementCorrespondence.getElementCorrespondenceScore());
 			}
 			sec.setElementMapping(correspondences);
@@ -60,25 +58,10 @@ public class EditDistanceElementMatcher implements ISchemaElementMatcher {
 			sec.computeHighestCorrespondencePair();
 			elementCorespondences.add(sec);
 		}
-
-//		for (ISchemaElementCorrespondence elCor: elementCorespondences){
-//			System.out.println(elCor.getSourceElement().getElementContext().getElementName());
-//			for (ISchemaElement key : elCor.getElementMapping().keySet()) {
-//				System.out.print(key.getElementContext().getElementName()+": "+elCor.getElementMapping().get(key)+" ");
-//				
-//			}
-//			System.out.println();
-//		}
-		
 		return elementCorespondences;
 	}
-
 	
 	public String getElementMatchingAlgorithm() {
 		return ELEMENT_MATCHING_ALGORITHM;
 	}
-
-
-
-
 }

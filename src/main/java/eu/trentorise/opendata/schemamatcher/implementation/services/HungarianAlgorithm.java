@@ -80,7 +80,9 @@ public class HungarianAlgorithm{
 
 	private boolean allAreCovered(int[] coveredCols) {
 		for (int covered : coveredCols) {
-			if (0 == covered) return false;
+			if (0 == covered)  {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -188,7 +190,9 @@ public class HungarianAlgorithm{
 
 		// find an uncovered zero and prime it
 		for (int i = 0; i < matrix.length; i++) {
-			if (1 == coveredRows[i]) continue;
+			if (1 == coveredRows[i]) {
+				continue;
+			}
 			for (int j = 0; j < matrix[i].length; j++) {
 				// if it's a zero and the column is not covered
 				if (0 == matrix[i][j] && 0 == coveredCols[j]) {
@@ -222,8 +226,9 @@ public class HungarianAlgorithm{
 		do {
 			i = starsByCol[j];
 			paired = -1 != i && zeroSequence.add(new int[]{i,j});
-			if (!paired) break;
-
+			if (!paired) {
+				break;
+			}
 			j = primesByRow[i];
 			paired = -1 != j && zeroSequence.add(new int[]{ i, j });
 
@@ -242,7 +247,6 @@ public class HungarianAlgorithm{
 				starsByCol[zero[1]] = zero[0];
 			}
 		}
-
 	}
 
 

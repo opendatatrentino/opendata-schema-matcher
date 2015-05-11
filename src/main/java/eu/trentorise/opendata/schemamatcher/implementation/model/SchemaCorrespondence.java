@@ -22,11 +22,11 @@ public class SchemaCorrespondence implements ISchemaCorrespondence {
 	/** Scores are considered equals up to this margin */
 	static public final double SCORE_TOLERANCE = 0.01;
 
-	ISchema sourceSchema;
-	IEntityType etype;
-	ISchema targetSchema;
-	float score;
-	List<ISchemaElementCorrespondence> elementCorrespondences;
+	private	ISchema sourceSchema;
+	private IEntityType etype;
+	private ISchema targetSchema;
+	private float score;
+	private List<ISchemaElementCorrespondence> elementCorrespondences;
 
 	@Override
 	public String toString() {
@@ -82,10 +82,9 @@ public class SchemaCorrespondence implements ISchemaCorrespondence {
 			Schema s= (Schema)this.targetSchema;
 			sc.setEtype((EntityType)s.getEtype());
 		} 
-		else sc.setEtype((EntityType) this.etype);
-
-
-
+		else {
+			sc.setEtype((EntityType) this.etype);
+		}
 		List<IAttributeCorrespondence> atrCors = new ArrayList<IAttributeCorrespondence>();
 		List<ISchemaElementCorrespondence> elCors =  this.elementCorrespondences;
 		for (ISchemaElementCorrespondence elCor: elCors){
@@ -96,6 +95,4 @@ public class SchemaCorrespondence implements ISchemaCorrespondence {
 		sc.setAttributeCorrespondence(atrCors);
 		return sc;
 	}
-
 }
-

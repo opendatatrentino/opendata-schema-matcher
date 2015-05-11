@@ -3,10 +3,8 @@ package eu.trentorise.opendata.schemamatcher.implementation.services;
 import it.unitn.disi.sweb.webapi.client.eb.InstanceClient;
 import it.unitn.disi.sweb.webapi.model.Pagination;
 import it.unitn.disi.sweb.webapi.model.eb.Attribute;
-import it.unitn.disi.sweb.webapi.model.eb.Entity;
 import it.unitn.disi.sweb.webapi.model.eb.Instance;
 import it.unitn.disi.sweb.webapi.model.filters.InstanceFilter;
-import it.unitn.disi.sweb.webapi.model.kb.types.DataType;
 
 import java.io.File;
 import java.io.FileReader;
@@ -14,7 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -25,7 +22,6 @@ import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
 import eu.trentorise.opendata.disiclient.services.EntityTypeService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
-import eu.trentorise.opendata.nlprise.DataTypeGuess;
 import eu.trentorise.opendata.nlprise.DataTypeGuess.Datatype;
 import eu.trentorise.opendata.schemamatcher.implementation.model.ElementContent;
 import eu.trentorise.opendata.schemamatcher.implementation.model.ElementContext;
@@ -42,11 +38,13 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 import eu.trentorise.opendata.semantics.model.knowledge.IResourceContext;
 import eu.trentorise.opendata.semantics.model.knowledge.ITableResource;
 
-/** 
+/** Contains logic for import from *.csv files, EntityTypes and ODR's IResource
  * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
  *
  */
 public class SchemaImport implements ISchemaImport{
+
+	private static final int RECURSION_DEPTH = 3;
 
 	private final static Logger logger = Logger.getLogger(SchemaImport.class.getName());
 
@@ -57,14 +55,12 @@ public class SchemaImport implements ISchemaImport{
 		if(file==null){
 			throw new SchemaMatcherException("Null input is provided!");
 		}
-
 		ISchema schemaOut = null;
 		try {
 			schemaOut = parseCSV(file);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
-
 		return schemaOut;
 	}
 
@@ -76,7 +72,6 @@ public class SchemaImport implements ISchemaImport{
 	 */
 	public ISchema parseCSV(File file) throws IOException {
 		CSVReader reader = new CSVReader(new FileReader(file));
-		//String [] nextLine;
 		List<String[]> strings = reader.readAll();
 		String[] str = strings.get(0);
 		List<ISchemaElement> sElements = new ArrayList<ISchemaElement>();
@@ -90,19 +85,14 @@ public class SchemaImport implements ISchemaImport{
 
 			int lineNumber=1;
 
-			//for(String[] sArr: strings )
 			for(int k=1; k<strings.size(); k++){
 				elInstances.add(strings.get(k)[i]);				
 				lineNumber++;
-			}
-			if(lineNumber==1){
-				//	System.out.println(lineNumber);
 			}
 			elContent.setContentSize(lineNumber);
 			elContent.setContent(elInstances);
 
 			String datatype = extractDataType(elContent);
-			//logger.info("Extracted datatype is: " + datatype);
 			sContext.setElemetnDataType(datatype);
 
 			schemaElement.setElementContext(sContext);
@@ -119,11 +109,12 @@ public class SchemaImport implements ISchemaImport{
 		long conceptId=ColumnRecognizer.conceptFromText(fileName);
 		schema.setSchemaConcept(conceptId);
 		schema.setSchemaName(fileName);
+		reader.close();
 		return schema;
 	}	
-	/* (non-Javadoc)
-	 * @see eu.trentorise.schemamatcher.services.importing.ISchemaImport#extractSchema(java.lang.Object)
-	 */
+
+
+	@SuppressWarnings("deprecation")
 	public ISchema extractSchema(Object schema, Locale locale) throws SchemaMatcherException {
 
 		if(schema==null){
@@ -133,8 +124,7 @@ public class SchemaImport implements ISchemaImport{
 
 			IResource resource = (IResource) schema;
 			logger.log(Level.INFO,  resource.getTableResource().getHeaders());
-			ISchema schemaOut= extractFromODRResource(resource.getResourceContext(), resource.getTableResource());
-			return schemaOut;
+			return extractFromODRResource(resource.getResourceContext(), resource.getTableResource());
 		}
 		if ((schema instanceof IEntityType)){
 			IEntityType etype = (IEntityType) schema;
@@ -150,7 +140,6 @@ public class SchemaImport implements ISchemaImport{
 			else {
 				schemaElements=new ArrayList<ISchemaElement>();	
 			}
-
 			ConceptODR codr = new ConceptODR();
 			codr = codr.readConceptGlobalID(etype.getConcept().getGUID());
 			long globalConceptID =codr.getId();
@@ -158,9 +147,9 @@ public class SchemaImport implements ISchemaImport{
 			schemaOut.setSchemaElements(schemaElements);
 			return schemaOut;
 		}
-		else
+		else {
 			throw new SchemaMatcherException("Unsupported schema format!");
-
+		}
 	}
 
 	/** Method extracts schema from ODR IResource 
@@ -180,7 +169,7 @@ public class SchemaImport implements ISchemaImport{
 			SchemaElement sElement = new SchemaElement();
 			ElementContext elContext = new ElementContext();
 			ElementContent elContent = new ElementContent();
-			
+
 			List<String> tabInstances = tableResource.getColumns().get(i);
 			List<Object> instances = new ArrayList<Object>();
 			for(String st : tabInstances)
@@ -194,16 +183,7 @@ public class SchemaImport implements ISchemaImport{
 			selements.add(sElement);
 		}
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
-		// Assignment concepts for schema
-		for(ISchemaElement el : selements)
-		{
-			logger.log(Level.INFO, "El name: "+el.getElementContext().getElementName());
-		}
 		selements = sefe.runColumnRecognizer(selements);
-		//		for(ISchemaElement sel:  selements){
-		//			System.out.println("Name: "+sel.getElementContext().getElementName()+" Concept: "
-		//					+sel.getElementContext().getElementConcept());
-		//		}
 		schema.setSchemaElements(selements);
 		long schemaConceptID=ColumnRecognizer.conceptFromText(resourceContext.getResourceName());
 		schema.setSchemaConcept(schemaConceptID);
@@ -267,25 +247,22 @@ public class SchemaImport implements ISchemaImport{
 				EntityTypeService ets = new EntityTypeService();
 				IEntityType structureEtype= (EntityType) ets.readEntityType(atrDef.getRangeEtypeURL());
 				List<IAttributeDef> strAttrDefs = structureEtype.getAttributeDefs();
-				  if (depth<2) {
-				getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale, ++depth);
-				  }
+				if (depth<RECURSION_DEPTH) {
+					getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale, ++depth);
+				}
 			}
 		}
 	}
-	
+
 	private List<Object> getValues(List<Instance> instances,
 			IAttributeDef atrDef) {
 		List<Object> objects = new ArrayList<Object>();
 		for(Instance in: instances){
 			List<Attribute> attrs = in.getAttributes();
-
 			for(Attribute a : attrs){
-				if(a.getConceptId()==WebServiceURLs.urlToConceptID(atrDef.getConceptURL()))
+				if(a.getConceptId()==WebServiceURLs.urlToConceptID(atrDef.getConceptURL())) {
 					objects.add(a.getValues().iterator().next().getValue());
-				//System.out.println(a.getDataType());
-				//	System.out.println(a.getValues().iterator().next().getValue().toString());
-
+				}
 			}
 		}
 
@@ -301,50 +278,28 @@ public class SchemaImport implements ISchemaImport{
 		InstanceClient insClient = new InstanceClient(WebServiceURLs.getClientProtocol());
 		Long etypeId = WebServiceURLs.urlToEtypeID(etype.getURL());
 		Pagination page = new Pagination();
-
-		//		Random rand = new Random();
-		//		int pageIndex = rand.nextInt((1000 - 1) + 1) + 1; //random number from 1 to 1000
-		//	page.setPageIndex(10);
 		page.setPageSize(PAGE_SIZE);
-
 		List<Instance> instances = 	insClient.readInstances(1L, etypeId, null, null, page); // TODO Make sure that they are taken randomly
 		List<Long> instancesIds =  new ArrayList<Long>();
 
 		for (Instance in : instances){
 			instancesIds.add(in.getId());
 		}
-
 		InstanceFilter filter = new InstanceFilter();
 		filter.setIncludeAttributes(true);
 		if(instancesIds.size()!=0){
 			List<Instance> instancesFull = insClient.readInstancesById(instancesIds, filter);
-			//			for(Instance in: instancesFull){
-			//				List<Attribute> attrs = in.getAttributes();
-			//
-			//				for(Attribute a : attrs){
-			//					if(a.getDataType().equals(DataType.FLOAT))
-			//						//System.out.println(a.getDataType());
-			//						System.out.println(a.getValues().iterator().next().getValue().toString());
-			//				}
-			//			}
 			return instancesFull;
-		} else 
+		} else {
 			return null;
-
+		}
 	}
 
 	public String extractDataType(ElementContent elContent){
 		//TODO think about best content for representation
-		//		if(elContent.getContentSize()==1){
-		//			System.out.println("Size: "+elContent.getContentSize());
-		//
-		//			System.out.println("1st element: "+elContent.getContent().get(0));
-		//		}
 		String contentToGuess = elContent.getContent().iterator().next().toString();
 		//TODO think about enum of possible datatypes for the matcher
-
 		Datatype datatype = TypeDetector.guessType(contentToGuess);
 		return	datatype.toString();
 	}
-
 }

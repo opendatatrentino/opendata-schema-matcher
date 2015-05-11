@@ -16,9 +16,6 @@ public class SElementMatchingService implements ISElementMatchingService {
 	}
 
 	public ISchemaElementMatcher getElementMatcher(String elementMatcherType) {
-		ISchemaElementMatcher em=	ElementMatcherFactory.create (elementMatcherType);
-		return em;
+		return ElementMatcherFactory.create (elementMatcherType);
 	}
-	
-
 }

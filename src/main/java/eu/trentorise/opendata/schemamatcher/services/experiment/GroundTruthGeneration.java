@@ -19,11 +19,17 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
 
+/** Generates ground truth for schema matching experiments.
+ * It is important to provide appropriate GROUND_TRUTH_DATA_FOLDER that contains all the data sets that were used in experiments. 
+ * 
+ * @author Ivan Tankoyeu
+ *
+ */
 public class GroundTruthGeneration {
 
 
 
-	private final String GROUND_TRUTH_DATA_FOLDER = "/home/ivan/work/development/Schema Matching dataset/"; 
+	private final String GROUND_TRUTH_DATA_FOLDER = "/home/ivan/work/development/Schema_Matching_dataset/"; 
 
 	private final String LODGING_FACILITY_DATASET="1_agritur16_10_2014.csv";
 	private final Long LODGING_FACILITY_ETYPE_ID=8L;
@@ -50,9 +56,6 @@ public class GroundTruthGeneration {
 
 	}
 
-
-
-
 	private final String REFRESHMENT_FACILITY_DATASET="6_Elenco_osterie_tipiche_civici.1386925759.csv";
 	private final static HashMap<String,String> REFRESHMENT_FACILITY_ELEMENTS_MAP;
 	static
@@ -68,7 +71,6 @@ public class GroundTruthGeneration {
 
 	}
 	private final Long REFRESHMENT_FACILITY_ETYPE_ID=15L;
-
 	private final String FACILITY_DATASET1="impianti-risalita-vivifiemme .csv";
 	private final static HashMap<String,String> FACILITY_ELEMENTS_MAP1;
 	static
@@ -104,6 +106,7 @@ public class GroundTruthGeneration {
 
 
 	}
+	
 	private final String FACILITY_DATASET3="16_PUNTIPREL001.csv";
 	private final static HashMap<String,String> FACILITY_ELEMENTS_MAP3;
 	static
@@ -118,7 +121,6 @@ public class GroundTruthGeneration {
 		FACILITY_ELEMENTS_MAP3.put("COMUNE", "Comune");
 		FACILITY_ELEMENTS_MAP3.put("TELEFONO", "Telefono");
 	}
-
 	private final Long FACILITY_ETYPE_ID=12L;
 
 	private final String SHOPPING_FACILITY_DATASET1="3_Botteghe_Storiche_del_Commercio.1392719556.csv";
@@ -153,6 +155,7 @@ public class GroundTruthGeneration {
 
 
 	}
+	
 	private final String SHOPPING_FACILITY_DATASET3="12_PARAFARM001.csv";
 	private final static HashMap<String,String>  SHOPPING_FACILITY_ELEMENTS_MAP3;
 	static
@@ -169,8 +172,6 @@ public class GroundTruthGeneration {
 	}
 	private final Long  SHOPPING_FACILITY_ETYPE_ID=1L;
 
-
-
 	private final String PRODUCT_DATASET="15_prodotti_tradizionali.csv";
 	private final static HashMap<String,String>  PRODUCT_ELEMENTS_MAP;
 	static
@@ -184,7 +185,6 @@ public class GroundTruthGeneration {
 		PRODUCT_ELEMENTS_MAP.put("production_areas", "Zona di produzione");
 	}
 	private final Long   PRODUCT_ETYPE_ID=19L;
-
 
 	private final String CERT_PRODUCT_DATASET="14_prodotti_protetti.csv";
 	private final static HashMap<String,String>  CERT_PRODUCT_ELEMENTS_MAP;
@@ -209,11 +209,16 @@ public class GroundTruthGeneration {
 	private final Long   LOCATION_ETYPE_ID=18L;
 	SchemaImport si= new SchemaImport();
 
-
 	List<ISchemaCorrespondence> schemaCorrespondenceGT = new ArrayList<ISchemaCorrespondence>();
 
+	/** Generate correspondence between source and target schemas
+	 * @param inputDataSet an input  data set (source schema) 
+	 * @param etypeID an etype id (target schema)
+	 * @param elementMapping element mapping among two schemas 
+	 * @return schema correspondence
+	 * @throws SchemaMatcherException
+	 */
 	private SchemaCorrespondence generateGT(String inputDataSet, Long etypeID, HashMap<String,String> elementMapping) throws SchemaMatcherException{
-
 		SchemaCorrespondence sc = new SchemaCorrespondence();
 		File file1 = new File(GROUND_TRUTH_DATA_FOLDER+inputDataSet);
 		ISchema sourceSchema = si.extractSchema(file1);
@@ -227,48 +232,43 @@ public class GroundTruthGeneration {
 		return sc;
 	}
 
+	/** Provides GT correspondence between elements from source and target schemas
+	 * @param sourceSchema source schema	
+	 * @param targetSchema target schema
+	 * @param elementMapping hard-coded mapping among elements
+	 * @return list of correspondences among input and source schemas elements
+	 */
 	private List<ISchemaElementCorrespondence> generateGTElementCorrespondence(ISchema sourceSchema,ISchema targetSchema, HashMap<String,String> elementMapping) {
-
 		List<ISchemaElementCorrespondence> elementCorrs =  new ArrayList<ISchemaElementCorrespondence>();
-
 		List<ISchemaElement> elements =sourceSchema.getSchemaElements();
 
 		for(ISchemaElement el: elements){
 			ISchemaElementCorrespondence elCorr = new SchemaElementCorrespondence();
-
 			elCorr.setSourceElement(el);
-
-			//String elName = el.getElementContext().getElementName();
-			//	String targetElementName = elementMapping.get(el.getElementContext().getElementName());
-			System.out.println(el.getElementContext().getElementName());
 			ISchemaElement targetElement = getTargetElement( elementMapping.get(el.getElementContext().getElementName()), targetSchema);
 			elCorr.setTargetElement(targetElement);
 			elementCorrs.add(elCorr);
 		}
-
-		//		for(ISchemaElementCorrespondence iselc: elementCorrs){
-		//			if(iselc.getTargetElement()!=null)
-		//		//	System.out.println("Source: "+iselc.getSourceElement().getElementContext().getElementName()+" Target: "+iselc.getTargetElement().getElementContext().getElementName());
-		//		}
-
 		return elementCorrs;
-
 	}
-
-
-
-
+	
+	/** Returns an element of a given schema by provided name
+	 * @param targetElementName name of schema element
+	 * @param targetSchema schema
+	 * @return schema element
+	 */
 	private ISchemaElement getTargetElement(String targetElementName,ISchema targetSchema) {
 		for (ISchemaElement el: targetSchema.getSchemaElements())
 		{
 			if ((el.getElementContext().getElementName()!=null)&&(el.getElementContext().getElementName().equalsIgnoreCase(targetElementName))){
-				System.out.println(el.getElementContext().getElementName()+"  "+targetElementName);
 				return el;
 			}
-			
 		}return null;
 	}
 
+	/** Generates ground truth assigning hard-coded sources schemas to correspondent target schemas.
+	 * @throws SchemaMatcherException
+	 */
 	public void generateGT() throws SchemaMatcherException{
 		SchemaCorrespondence sc1 = generateGT(LODGING_FACILITY_DATASET, LODGING_FACILITY_ETYPE_ID, LODGING_FACILITY_ELEMENTS_MAP);
 		schemaCorrespondenceGT.add(sc1);
@@ -292,10 +292,6 @@ public class GroundTruthGeneration {
 		schemaCorrespondenceGT.add(sc13);
 		SchemaCorrespondence sc14 = generateGT(LOCATION_DATASET1, LOCATION_ETYPE_ID,LOCATION_ELEMENTS_MAP);
 		schemaCorrespondenceGT.add(sc14);
-
-
-
-
 	}
 
 }

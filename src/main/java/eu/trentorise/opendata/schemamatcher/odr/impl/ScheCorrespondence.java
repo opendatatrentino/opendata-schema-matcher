@@ -9,9 +9,9 @@ import eu.trentorise.opendata.semantics.services.model.ISchemaCorrespondence;
 public class ScheCorrespondence implements ISchemaCorrespondence{
 
 	 
-		EntityType etype;
-		float score;
-		List<IAttributeCorrespondence> attributeCorrespondences;
+		private EntityType etype;
+		private float score;
+		private List<IAttributeCorrespondence> attributeCorrespondences;
 		
 		
 		@Override

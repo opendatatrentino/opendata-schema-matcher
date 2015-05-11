@@ -10,8 +10,8 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
  */
 public class ElementRelation implements IElementRelation {
 
-	String relation;
-	ISchemaElement relatedElement;
+	private String relation;
+	private ISchemaElement relatedElement;
 
 	public String getRelation() {
 		return relation;

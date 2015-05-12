@@ -17,14 +17,14 @@ public class TestCachedEtypes {
 	private final static Logger LOGGER = Logger.getLogger(TestSchemaImport.class.getName());
 	private EntityType etype;
 
-//	@Test
+//	@Test  TODO COMMENTED TEST!
 	public void cacheTest(){
 		EtypeCache ec = new EtypeCache();
 		
 	//	ec.createSchemas();
 		List<IEntityType> etypes =ec.readSchemas();
 		for(IEntityType etype : etypes){
-			System.out.println(etype.getName().getStrings(Locale.ENGLISH));
+			System.out.println(etype.getName().strings(Locale.ENGLISH));
 			System.out.println(etype.getAttributeDefs().get(0).getConceptURL());
 
 		}

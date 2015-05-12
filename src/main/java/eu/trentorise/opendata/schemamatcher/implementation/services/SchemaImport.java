@@ -130,7 +130,7 @@ public class SchemaImport implements ISchemaImport{
 			IEntityType etype = (IEntityType) schema;
 
 			Schema schemaOut = new Schema();
-			String name = etype.getName().getString(locale);
+			String name = etype.getName().string(locale);
 			schemaOut.setSchemaName(name);
 			schemaOut.setEtype(etype);
 			List<ISchemaElement>	schemaElements=null;
@@ -221,7 +221,7 @@ public class SchemaImport implements ISchemaImport{
 			ElementContent elContent = new ElementContent();
 			//context extraction
 			schemaElement.setAttrDef(atrDef);
-			elContext.setElementName(atrDef.getName().getString(locale));
+			elContext.setElementName(atrDef.getName().string(locale));
 			String dataType = atrDef.getDataType();
 			elContext.setElemetnDataType(dataType);
 			//convert local concept id to a global one

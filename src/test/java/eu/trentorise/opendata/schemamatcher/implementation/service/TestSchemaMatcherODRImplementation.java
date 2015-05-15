@@ -29,6 +29,9 @@ public class TestSchemaMatcherODRImplementation {
 		List<eu.trentorise.opendata.semantics.services.model.ISchemaCorrespondence> sc = ms.matchSchemasFile(file);
 		for (eu.trentorise.opendata.semantics.services.model.ISchemaCorrespondence c : sc){
 			LOGGER.info("Etype name: "+c.getEtype().getName().getString(Locale.ENGLISH)+" "+c.getScore());
+//			for(IAttributeCorrespondence ac: c.getAttributeCorrespondences()){
+//				LOGGER.info("Attribute: "+ac.getAttrDef().getName().getString(Locale.ENGLISH)+" score: "+ac.getScore()+ " index: "+ac.getColumnIndex());
+//			}
 		}
 		assertEquals(sc.get(0).getEtype().getName().getString(Locale.ENGLISH), FACILITY);
 	}

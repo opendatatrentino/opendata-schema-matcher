@@ -17,7 +17,7 @@ public class TestCachedEtypes {
 	private final static Logger LOGGER = Logger.getLogger(TestSchemaImport.class.getName());
 	private EntityType etype;
 
-//	@Test
+//	@Test  TODO COMMENTED TEST!
 	public void cacheTest(){
 		EtypeCache ec = new EtypeCache();
 		

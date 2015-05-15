@@ -28,7 +28,7 @@ public interface IElementContext {
 	/** Method return id of the concept 
 	 * @return name of the element
 	 */
-	public Long getElementConcept();
+	public long getElementConcept();
 	
 	/**Method allows assigns concept id
 	 * @param conceptId

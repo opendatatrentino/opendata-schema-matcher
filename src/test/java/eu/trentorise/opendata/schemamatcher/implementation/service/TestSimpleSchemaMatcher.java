@@ -17,6 +17,7 @@ import eu.trentorise.opendata.columnrecognizers.ColumnConceptCandidate;
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.services.EntityTypeService;
+import eu.trentorise.opendata.disiclient.services.NLPService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaMatcherException;
 import eu.trentorise.opendata.schemamatcher.implementation.services.SchemaImport;
@@ -30,7 +31,9 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 
 public class TestSimpleSchemaMatcher {
 
-
+	private static final int ORARI_CONCEPT_ID = 80505;
+	private static final int NAME_CONCEPT_ID = 2;
+	private static final double DELTA = 1e-6;
 	private static final int CONCEPT_ID = 14557;
 	private EntityType etype;
 
@@ -46,32 +49,20 @@ public class TestSimpleSchemaMatcher {
 	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
 
-		File file = new File("/home/ivan/work/development/Schema Matching dataset/16_PUNTIPREL001.csv");
+		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
-		ISchema schemaEtype=si.extractSchema(etype, Locale.ITALIAN);
+		List<String> nlpInput = new ArrayList<String>();
+		nlpInput.add(schemaCSV.getSchemaElements().get(0).getElementContext().getElementName());
+		nlpInput.add(schemaCSV.getSchemaElements().get(1).getElementContext().getElementName());
+
+		Locale locale = NLPService.detectLanguage(nlpInput);
+		ISchema schemaEtype=si.extractSchema(etype, locale);
 
 		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("Simple");
 		ISchemaCorrespondence  schemaCor =schemaMatcher.matchSchemas(schemaCSV, schemaEtype, "EditDistanceBased");
-		
-			List<ISchemaElementCorrespondence> sElCors = schemaCor.getSchemaElementCorrespondence();
-			System.out.println(schemaCor.getSchemaCorrespondenceScore());
-			System.out.println(schemaCor.getTargetSchema().getSchemaName());
-						for (ISchemaElementCorrespondence sel: sElCors){
-							
-							System.out.println("Source-Target Element: "+sel.getSourceElement().getElementContext().getElementName()+"("+sel.getSourceElement().getElementContext().getElementConcept()+")"+"-"+
-							sel.getTargetElement().getElementContext().getElementName()+":"+sel.getSourceElement().getElementContext().getElementConcept() + " Score: "+sel.getElementCorrespondenceScore());
-						for(ISchemaElement key : sel.getElementMapping().keySet())
-							{
-								System.out.println("NameList: "+key.getElementContext().getElementName()+"++"+key.getElementContext().getElementConcept());
-								System.out.println(" ScoreList: "+ sel.getElementMapping().get(key));
-			
-							}
-							
-			
-						}
-						System.out.println("-------------------------------------------");
-
+		assertEquals(schemaCor.getTargetSchema().getSchemaName(),"Infrastruttura");
+		assertEquals(schemaCor.getSchemaCorrespondenceScore(),0.6204213,DELTA);
 	}
 
 	@Test
@@ -82,53 +73,12 @@ public class TestSimpleSchemaMatcher {
 	}
 
 
-	@Test
-	public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException{
-		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/work/development/Schema Matching dataset/16_PUNTIPREL001.csv");
-		//File file = new File("impianti risalita.csv");
-		//		File file = new File("impianti risalita.csv");
-
-		ISchema schemaCSV= si.parseCSV(file);
-		List<ISchema> sourceSchemas = new ArrayList<ISchema>();
-		sourceSchemas.add(schemaCSV);
-
-		EntityTypeService etypeService = new EntityTypeService();
-		List<IEntityType> etypeList = etypeService.getAllEntityTypes();
-		List<ISchema> targetSchemas = new ArrayList<ISchema>();
-
-		for (IEntityType etype:etypeList){
-
-			ISchema schemaEtype=si.extractSchema(etype, Locale.ITALIAN);
-			targetSchemas.add(schemaEtype);
-
-		}
-
-		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("Simple");
-		List<ISchemaCorrespondence>  schemaCor =schemaMatcher.matchSchemas(sourceSchemas, targetSchemas, "ConceptDistanceBased");
-
-		for (ISchemaCorrespondence c : schemaCor){
-			List<ISchemaElementCorrespondence> sElCors = c.getSchemaElementCorrespondence();
-			System.out.println(c.getSchemaCorrespondenceScore());
-			System.out.println(c.getTargetSchema().getSchemaName());
-						for (ISchemaElementCorrespondence sel: sElCors){
-							
-							System.out.println("Source-Target Element: "+sel.getSourceElement().getElementContext().getElementName()+"-"+
-							sel.getTargetElement().getElementContext().getElementName()+":"+sel.getSourceElement().getElementContext().getElementConcept() + " Score: "+sel.getElementCorrespondenceScore());
-						}
-						System.out.println("-------------------------------------------");
-
-		}
-
-
-	}
 
 	@Test 
 	public void testConsistanceOfColConcRecognizer() throws IOException{
 		SchemaImport si = new SchemaImport();
 
-		File file = new File("/home/ivan/work/development/Schema Matching dataset/16_PUNTIPREL001.csv");
-		//		File file = new File("impianti risalita.csv");
+		File file = new File("impianti risalita.csv");
 
 		ISchema schemaCSV= si.parseCSV(file);
 		List<ISchema> sourceSchemas = new ArrayList<ISchema>();
@@ -137,7 +87,7 @@ public class TestSimpleSchemaMatcher {
 		List<ISchemaElement> schemaElements = schemaCSV.getSchemaElements();
 		List<String> elementNames = new ArrayList<String>();
 		List<List<String>> elementContent = new ArrayList<List<String>>();
-		
+
 		HashMap<Integer,String> map = new HashMap<Integer,String>();
 		int z=0;
 		for (ISchemaElement element: schemaElements){
@@ -151,22 +101,19 @@ public class TestSimpleSchemaMatcher {
 			}
 			elementContent.add(contStr);
 		}
+		List<ColumnConceptCandidate> extractedConcepts = new ArrayList<ColumnConceptCandidate>();
+		extractedConcepts =
+				ColumnRecognizer.computeScoredCandidates(elementNames, elementContent);
 
-			List<ColumnConceptCandidate> extractedConcepts = new ArrayList<ColumnConceptCandidate>();
-		
-			extractedConcepts =
-					ColumnRecognizer.computeScoredCandidates(elementNames, elementContent);
-			List<Long> cid = ColumnRecognizer.computeColumnConceptIDs(elementNames, elementContent);
-			
-		for (Long id: cid){
-			System.out.println(id);
-			
+		for(ColumnConceptCandidate ccc: extractedConcepts){
+
+			if(map.get(ccc.getColumnNumber()).equalsIgnoreCase("nome")) {
+				assertEquals(ccc.getConceptID(),NAME_CONCEPT_ID);
+			}
+			if(map.get(ccc.getColumnNumber()).equalsIgnoreCase("orari")) {
+				assertEquals(ccc.getConceptID(),ORARI_CONCEPT_ID);
+			}
 		}
-			for(ColumnConceptCandidate ccc: extractedConcepts){
-
-				System.out.println(" Name: "+map.get(ccc.getColumnNumber())+" concept id: "+ccc.getConceptID()+" col num: " +ccc.getColumnNumber());
-		}
-
 	}			
 
 

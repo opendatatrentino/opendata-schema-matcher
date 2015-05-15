@@ -1,5 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.service;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -12,13 +14,10 @@ import org.junit.Test;
 import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.services.EntityTypeService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
-import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElementCorrespondence;
-import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElementFeatureExtractor;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaMatcherException;
 import eu.trentorise.opendata.schemamatcher.implementation.services.ElementMatcherFactory;
 import eu.trentorise.opendata.schemamatcher.implementation.services.SchemaImport;
 import eu.trentorise.opendata.schemamatcher.model.ISchema;
-import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementMatcher;
 
@@ -26,7 +25,8 @@ public class TestElementMatcher {
 	
 	private final static Logger LOGGER = Logger.getLogger(TestSchemaImport.class.getName());
 	private EntityType etype;
-	
+	private static final double DELTA = 1e-15;
+
 	@Before
 	public void readEtype(){
 		EntityTypeService ets = new EntityTypeService();
@@ -44,17 +44,17 @@ public class TestElementMatcher {
 		ISchema schemaEtype=si.extractSchema(etype, Locale.ITALIAN);
 		
 		ElementMatcherFactory emf = new ElementMatcherFactory();
+		@SuppressWarnings("static-access")
 		ISchemaElementMatcher elementMatcher = emf.create("EditDistanceBased");
 		
-		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
 		
 		List<ISchemaElementCorrespondence> correspondences = elementMatcher.matchSchemaElements(schemaCSV.getSchemaElements(), schemaEtype.getSchemaElements());
 		for (ISchemaElementCorrespondence cor: correspondences){
+			if(cor.getSourceElement().getElementContext().getElementName().equalsIgnoreCase("nome"))
+				assertEquals(cor.getElementCorrespondenceScore(),1.0, DELTA);
 		LOGGER.info("SourceName: "+cor.getSourceElement().getElementContext().getElementName());
 		LOGGER.info("TargetName: "+cor.getTargetElement().getElementContext().getElementName());
 		LOGGER.info("Score: "+cor.getElementCorrespondenceScore());
-
-		
 		}
 		
 	}

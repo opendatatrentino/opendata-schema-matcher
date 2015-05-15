@@ -1,5 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.service;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,15 +9,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
-import org.junit.Before;
 import org.junit.Test;
 
-import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.services.EntityTypeService;
-import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaMatcherException;
-import eu.trentorise.opendata.schemamatcher.implementation.services.HungarianAlgorithm;
+import eu.trentorise.opendata.schemamatcher.implementation.services.KuhnMunkres;
 import eu.trentorise.opendata.schemamatcher.implementation.services.SchemaImport;
 import eu.trentorise.opendata.schemamatcher.implementation.services.SchemaMatcherFactory;
 import eu.trentorise.opendata.schemamatcher.model.ISchema;
@@ -26,19 +24,13 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 
 public class TestHungarianAlgoApproach {
 
-	HungarianAlgorithm ha = new HungarianAlgorithm();
-	private EntityType etype;
+	KuhnMunkres ha = new KuhnMunkres();
+	private static final double DELTA = 1e-15;
 
-	@Before
-	public void readEtype(){
-		EntityTypeService ets = new EntityTypeService();
-		String etypeUrl = WebServiceURLs.etypeIDToURL(12L);
-		etype= (EntityType) ets.readEntityType(etypeUrl);
-	}
 
-	//@Test
+	@Test
 	public void testHungarianMethod(){
-		float[][] inputMatrix = new float[5][5];
+		double[][] inputMatrix = new double[5][5];
 		float minX = 0.0f;
 		float maxX = 1.0f;
 		Random rand = new Random();
@@ -51,7 +43,7 @@ public class TestHungarianAlgoApproach {
 			}
 			System.out.println();
 		}
-		int[][] assignedAttrs= ha.computeAssignments(inputMatrix);
+		int[][] assignedAttrs= KuhnMunkres.computeAssignments(inputMatrix);
 
 		for (int i =0; i<5; i++){
 			for (int j=0; j<2; j++){
@@ -67,9 +59,8 @@ public class TestHungarianAlgoApproach {
 		//File file = new File("//home/ivan/work/development/Schema Matching dataset/10_LuoghiStoriciCommercio2010_2013.1387270045.csv");
 		File file = new File("impianti risalita.csv");
 
-		
+
 		ISchema schemaCSV= si.parseCSV(file);
-		ISchema schemaEtype=si.extractSchema(etype, Locale.ENGLISH);
 
 		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("HungarianAllocationAndEditDistance");
 		List<ISchema> sourceSchemas = new ArrayList<ISchema>();
@@ -80,12 +71,14 @@ public class TestHungarianAlgoApproach {
 			System.out.print("Source Name: "+sec.getSourceElement().getElementContext().getElementName());
 			System.out.print(" Target Name: "+sec.getTargetElement().getElementContext().getElementName());
 			System.out.println(" Score: "+sec.getElementCorrespondenceScore());
-
+			if(sec.getSourceElement().getElementContext().getElementName().equalsIgnoreCase("nome")){
+				assertEquals(sec.getElementCorrespondenceScore(), 1.0,DELTA);
+			}
 
 		}
-	//LOGGER.info(schemaCor.getSchemaElementCorrespondence().toString());
+		//LOGGER.info(schemaCor.getSchemaElementCorrespondence().toString());
 	}
-	
+
 	public static List<ISchema> getAllTargetSchemas() throws SchemaMatcherException{
 		EntityTypeService etypeService = new EntityTypeService();
 		List<IEntityType> etypeList = etypeService.getAllEntityTypes();

@@ -43,7 +43,7 @@ public interface ISchemaCorrespondence {
 	/** Method aloows to set a score [0,1] that shows the closeness between two given schemas. The higher the score is, the more similar two schemas are.  
 	 * @param score
 	 */
-	public void setScore(Float score);
+	public void setScore(float score);
 	
 	/** Method allows to set correspondences between  schema elements.
 	 * @param elementCorrespondences

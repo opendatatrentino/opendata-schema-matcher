@@ -1,5 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.service;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -21,10 +23,10 @@ public class TestSchemaElementFeatureExtractor {
 		SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
 
 		List<ISchemaElement> elementsConcept = sefe.runColumnRecognizer(schemaOut.getSchemaElements());
-		System.out.println(elementsConcept.get(0).getElementContext().getElementConcept());
-		System.out.println(elementsConcept.get(1).getElementContext().getElementConcept());
-		System.out.println(elementsConcept.get(2).getElementContext().getElementConcept());
 
+		assertEquals(elementsConcept.get(0).getElementContext().getElementConcept(),2);
+		assertEquals(elementsConcept.get(1).getElementContext().getElementConcept(),72797);
+		assertEquals(elementsConcept.get(2).getElementContext().getElementConcept(),32593);
 
 	}
 	

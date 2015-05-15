@@ -1,4 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.service;
+import static org.junit.Assert.*;
+import it.unitn.disi.sweb.webapi.model.eb.Instance;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +28,8 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 
 public class TestSchemaImport {
 
+	private static final int INSTANCES = 100;
+	private static final String FACILITY = "Facility";
 	private final static Logger LOGGER = Logger.getLogger(TestSchemaImport.class.getName());
 	private EntityType etype;
 
@@ -40,35 +45,24 @@ public class TestSchemaImport {
 
 		SchemaImport si = new SchemaImport();
 		ISchema schema=si.extractSchema(etype, Locale.ENGLISH);
-
-		List<ISchemaElement> elements = schema.getSchemaElements();
-		for(ISchemaElement el: elements){
-		//	System.out.println(el.getElementContext().getElementName()+" "+el.getElementContext().getElementDataType());
-			if((el.getElementContext().getElementDataType().equalsIgnoreCase("xsd:float"))|| (el.getElementContext().getElementDataType().equalsIgnoreCase("xsd:integer")) 
-					|| (el.getElementContext().getElementDataType().equalsIgnoreCase("xsd:long")) )
-			{
-				//System.out.println("Content size: "+el.getElementContent().getContentSize());
-			//	if(el.getElementContent().getContentSize()!=0)
-			//	System.out.println("Content example: "+el.getElementContent().getContent().iterator().next());
-			}
+			LOGGER.info(schema.toString());
+			assertEquals(schema.getSchemaName(), FACILITY);
 		}
-		LOGGER.info(schema.toString());
+
+		@Test 
+		public void testSchemaImportCSV() throws SchemaMatcherException, IOException{
+			SchemaImport si = new SchemaImport();
+			File file = new File("impianti risalita.csv");
+			ISchema schemaOut= si.parseCSV(file);
+			assertNotNull(schemaOut);
+		}
+
+		@Test
+		public void testSchemaImportEntities() throws SchemaMatcherException{
+
+			SchemaImport si = new SchemaImport();
+			List<Instance> instances= si.getEntities(etype);
+			assertEquals(instances.size(), INSTANCES);
+		}
+
 	}
-
-	@Test 
-	public void testSchemaImportCSV() throws SchemaMatcherException, IOException{
-		SchemaImport si = new SchemaImport();
-		File file = new File("impianti risalita.csv");
-		ISchema schemaOut= si.parseCSV(file);
-
-	}
-
-	@Test
-	public void testSchemaImportEntities() throws SchemaMatcherException{
-
-		SchemaImport si = new SchemaImport();
-		si.getEntities(etype);
-
-	}
-
-}

@@ -1,5 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.model;
 
+import com.google.common.base.Preconditions;
+
 import eu.trentorise.opendata.schemamatcher.model.IElementContext;
 
 /** Implementation of IElementCOntext interface
@@ -11,8 +13,21 @@ public class ElementContext implements IElementContext {
 	private String elementName;
 	private String elementDescription;
 	private String elementDataType;
-	private Long elementConcept;
-	
+	private long elementConcept;
+
+	public ElementContext(String elementName, String elementDescription,
+			String elementDataType, long elementConcept) {
+		super();
+		this.elementName = elementName;
+		this.elementDescription = elementDescription;
+		this.elementDataType = elementDataType;
+		this.elementConcept = elementConcept;
+	}
+
+	public ElementContext() {
+
+	}
+
 	@Override
 	public String toString() {
 		return "ElementContext [elementName=" + elementName
@@ -20,28 +35,29 @@ public class ElementContext implements IElementContext {
 				+ ", elementDataType=" + elementDataType + ", elementConcept="
 				+ elementConcept + "]";
 	}
-
+	@Override
 	public String getElementName() {
 		return this.elementName;
 	}
-
+	@Override
 	public String getElementDescription() {
 		return this.elementName;
 	}
-
+	@Override
 	public String getElementDataType() {
 		return this.elementDataType;
 	}
-
 	public void setElemetnDataType(String elementDataType) {
+		Preconditions.checkNotNull(elementDataType);
 		this.elementDataType = elementDataType;
 	}
-
-	public Long getElementConcept() {
+	@Override
+	public long getElementConcept() {
 		return elementConcept;
 	}
-
+	@Override
 	public void setElementConcept(Long elementConcept) {
+		Preconditions.checkNotNull(elementConcept);
 		this.elementConcept = elementConcept;
 	}
 
@@ -50,6 +66,7 @@ public class ElementContext implements IElementContext {
 	}
 
 	public void setElementDescription(String elementDescription) {
+		Preconditions.checkNotNull(elementDescription);
 		this.elementDescription = elementDescription;
 	}
 }

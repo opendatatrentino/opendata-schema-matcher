@@ -24,7 +24,10 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 	public static final float CONCEPT_DISTANCE_WEIGHT=  0.5f;
 	public static final float EDIT_DISTANCE_WEIGHT=  0.4f;
 	public static final float DATATYPE_DISTANCE_WEIGHT=  0.1f;
+	public static final double LOGOF2 = Math.log(2);
 
+	
+	
 	public void getSchemaElementConcept(ISchemaElement schemaElement) {
 		//	schemaElement.getElementContext().getElementConcept()
 		//TODO
@@ -154,26 +157,27 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 
 	public float getStatisticalDistance(IElementContent sourceElementContent, IElementContent targetElementContent){
 
-		int sSize = sourceElementContent.getContentSize();
-		int tSize = targetElementContent.getContentSize();
-		int size = 0;
+		int size = sourceElementContent.getContentSize();
+		double[] sourceSampleDistr = new double[size];
+		double[] targetSampleDistr = new double[size];
 
-		if(sSize<=tSize){
-			size = sSize;
-		}
-		else 
-		{	
-			size = tSize;
-		}
-
-		double[] p1 = new double[size];
-		double[] p2 = new double[size];
 		for (int i = 0; i < size-1; i++) {
-			p1[i] =  Double.parseDouble((String) sourceElementContent.getContent().get(i));  
-			p2[i] = (Float) targetElementContent.getContent().get(i);  
+			sourceSampleDistr[i] =  Double.parseDouble((String) sourceElementContent.getContent().get(i));  
+			targetSampleDistr[i] = (Float) targetElementContent.getContent().get(i);  
 		}
-		double distance = StatUtil.klDivergence(p1, p2);
+		double distance = computeKLDivergence(sourceSampleDistr, targetSampleDistr);
 		return (float) distance;
+	}
+
+	private static double computeKLDivergence(double[] sourceSampleDistr, double[] targetSampleDistr) {
+
+		double divergence = 0;
+		for (int i = 0; i < sourceSampleDistr.length; ++i) {
+			if (sourceSampleDistr[i] == 0||targetSampleDistr[i]==0) {
+				continue; } 
+			divergence += sourceSampleDistr[i] * Math.log( sourceSampleDistr[i] / targetSampleDistr[i] );
+		}
+		return divergence / LOGOF2; 
 	}
 
 }

@@ -25,10 +25,12 @@ import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.nlprise.DataTypeGuess.Datatype;
 import eu.trentorise.opendata.schemamatcher.implementation.model.ElementContent;
 import eu.trentorise.opendata.schemamatcher.implementation.model.ElementContext;
+import eu.trentorise.opendata.schemamatcher.implementation.model.ElementRelation;
 import eu.trentorise.opendata.schemamatcher.implementation.model.Schema;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElement;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElementFeatureExtractor;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaMatcherException;
+import eu.trentorise.opendata.schemamatcher.model.IElementRelation;
 import eu.trentorise.opendata.schemamatcher.model.IResource;
 import eu.trentorise.opendata.schemamatcher.model.ISchema;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
@@ -201,7 +203,7 @@ public class SchemaImport implements ISchemaImport{
 	private List<ISchemaElement> extractSchemaElements(IEntityType etype,Locale locale){
 		List<IAttributeDef> attrDefs = etype.getAttributeDefs();
 		List<ISchemaElement> schemaElements = new ArrayList<ISchemaElement>();
-		getSchemaElements(etype, schemaElements, attrDefs,  locale, 0 );
+		getSchemaElements(etype, schemaElements, attrDefs,  locale, 0, null);
 		return schemaElements;
 	}
 
@@ -212,13 +214,20 @@ public class SchemaImport implements ISchemaImport{
 	 * @param attrDefs
 	 * @param locale
 	 */
-	private void getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale, int depth ){
+	private void getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale, int depth, ISchemaElement parentElement ){
 		List<Instance> instances = getEntities(etype); 
 		for (IAttributeDef atrDef: attrDefs){
 			SchemaElement schemaElement = new SchemaElement();
 
 			ElementContext elContext = new ElementContext();
 			ElementContent elContent = new ElementContent();
+			List<IElementRelation>  schemaElementRelations = new ArrayList<IElementRelation>();
+			ElementRelation elRelation = new ElementRelation();
+			if(parentElement!=null){
+				elRelation.setRelation("parent");
+				elRelation.setRelatedElement(parentElement);
+			}
+			schemaElementRelations.add(elRelation);
 			//context extraction
 			schemaElement.setAttrDef(atrDef);
 			elContext.setElementName(atrDef.getName().getString(locale));
@@ -228,7 +237,7 @@ public class SchemaImport implements ISchemaImport{
 			elContext.setElementConcept(WebServiceURLs.urlToConceptID(atrDef.getConceptURL()));
 			schemaElement.setElementContext(elContext);
 			//schema element relation extraction
-			//TODO extract the schema structure
+			schemaElement.setSchemaElementRelations(schemaElementRelations);
 
 			//schema element's content extraction
 			//TODO find the way to download best representing content
@@ -248,7 +257,7 @@ public class SchemaImport implements ISchemaImport{
 				IEntityType structureEtype= (EntityType) ets.readEntityType(atrDef.getRangeEtypeURL());
 				List<IAttributeDef> strAttrDefs = structureEtype.getAttributeDefs();
 				if (depth<RECURSION_DEPTH) {
-					getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale, ++depth);
+					getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale, ++depth, schemaElement);
 				}
 			}
 		}

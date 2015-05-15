@@ -68,8 +68,8 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 	private float  optimezedCorrespondenceScore(
 			List<ISchemaElementCorrespondence> elementCorrespondences) {
 
-		float[][] matrix;
-		float[][] matrixFin;
+		double[][] matrix;
+		double[][] matrixFin;
 		int j = 0;
 		float score = 0;
 		int assigmentMatrix[][];
@@ -83,11 +83,11 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 		int corMapSize =corMaps.size();
 
 		if(corMapSize>els){
-			matrix = new float[corMaps.size()][corMaps.size()];
-			matrixFin = new float[corMaps.size()][corMaps.size()];
+			matrix = new double[corMaps.size()][corMaps.size()];
+			matrixFin = new double[corMaps.size()][corMaps.size()];
 		} else 	{	
-			matrix = new float[els][els];
-			matrixFin = new float[els][els];
+			matrix = new double[els][els];
+			matrixFin = new double[els][els];
 		}
 		// initialize matrix with max score 1.0
 		for(int z=0; z<matrix.length; z++)
@@ -158,7 +158,7 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 
 			sourceElement.setTargetElement(targetElement);
 
-			float scoreEl = 1-matrixFin[indexS][indexT];
+			float scoreEl = (float) (1-matrixFin[indexS][indexT]);
 			sourceElement.setElementCorrespondenceScore(scoreEl);
 			score+=scoreEl;
 		}
@@ -170,8 +170,8 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 	 * @param matrix NxN of scores for elements of two schemas. 
 	 * @return matrix with the best assigments
 	 */
-	private int[][] hungarianAssigment(float[][] matrix) {
-		HungarianAlgorithm ha = new HungarianAlgorithm();
+	private int[][] hungarianAssigment(double[][] matrix) {
+		KuhnMunkres ha = new KuhnMunkres();
 		return ha.computeAssignments(matrix);
 	}
 

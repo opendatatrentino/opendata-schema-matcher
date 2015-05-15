@@ -1,5 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.service;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -18,9 +20,12 @@ import eu.trentorise.opendata.schemamatcher.model.ISchema;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 
 public class TestSchemaElementFeatureNormalization {
+	private static final double DIVERGENCE = 4.0861425;
 	private EntityType etype;
 	ISchema sourceSchema;
 	ISchema targetSchema;
+	private static final double DELTA = 1e-6;
+
 	@Before
 	public void importSchemas() throws IOException, SchemaMatcherException{
 
@@ -43,17 +48,16 @@ public class TestSchemaElementFeatureNormalization {
 
 		for(ISchemaElement sel: sourceSchemaElements){
 			if(sel.getElementContext().getElementDataType().equalsIgnoreCase("FLOAT")){
-				System.out.println("Source: "+sel.getElementContext().getElementName());
 				for (ISchemaElement tel: targetSchemaElements){
 					if((tel.getElementContext().getElementDataType().equalsIgnoreCase("xsd:float"))&&(tel.getElementContent().getContentSize()>0)){
-						System.out.println("Target: "+tel.getElementContext().getElementName());
-						System.out.println("Divergence: "+sefe.getStatisticalDistance(sel.getElementContent(), tel.getElementContent()));
+						if(tel.getElementContext().getElementName().equalsIgnoreCase("Latitude")&&sel.getElementContext().getElementName().equalsIgnoreCase("latitudine"))
+							assertEquals(sefe.getStatisticalDistance(sel.getElementContent(), tel.getElementContent()), DIVERGENCE, DELTA);
 					}
 				}
 			}
 		}
 
-	
+
 
 	}
 

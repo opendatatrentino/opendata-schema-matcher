@@ -43,7 +43,7 @@ public interface ISchemaElementCorrespondence {
 	 * Score is in the interval [0,1], where maximum and minimum similarities are '1' and '0' accordingly.  
 	 * @param score
 	 */
-	public void setElementCorrespondenceScore(Float score);
+	public void setElementCorrespondenceScore(float score);
 	
 	/** Method allows to get a correspondence of a source element to all the target elements with scores.
 	 * @return map where key is a target schema element and value is the score between target and source. 

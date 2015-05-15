@@ -12,6 +12,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.google.common.base.Preconditions;
+
 import eu.trentorise.opendata.disiclient.model.entity.AttributeDef;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
@@ -22,44 +24,65 @@ public class SchemaElementCorrespondence implements ISchemaElementCorrespondence
 
 	private SchemaElement sourceElement;
 	private HashMap<ISchemaElement, Float> elementMapping;
-	private Float score; 
+	private float score; 
 	private SchemaElement highestTargetElement; 
 	private IAttributeDef attrDef;
 
+	
+	
+	public SchemaElementCorrespondence(SchemaElement sourceElement,
+			HashMap<ISchemaElement, Float> elementMapping, float score,
+			SchemaElement highestTargetElement, IAttributeDef attrDef) {
+		super();
+		this.sourceElement = sourceElement;
+		this.elementMapping = elementMapping;
+		this.score = score;
+		this.highestTargetElement = highestTargetElement;
+		this.attrDef = attrDef;
+	}
+
+	public SchemaElementCorrespondence() {
+		// TODO Auto-generated constructor stub
+	}
+	@Override
 	public float getElementCorrespondenceScore() {
 		return this.score;
 	}
-
+	@Override
 	public SchemaElement getTargetElement() {
 		return highestTargetElement;
 	}
-
+	@Override
 	public void setTargetElement(ISchemaElement targetElement) {
+		Preconditions.checkNotNull(targetElement);
 		this.highestTargetElement = (SchemaElement) targetElement;
 	}
-
+	@Override
 	public SchemaElement getSourceElement() {
 		return sourceElement;
 	}
-
+	@Override
 	public void setSourceElement(ISchemaElement sourceElement) {
+		Preconditions.checkNotNull(sourceElement);
 		this.sourceElement = (SchemaElement) sourceElement;
 	}
 
-	public Float getScore() {
+	public float getScore() {
 		return score;
 	}
-
-	public void setElementCorrespondenceScore(Float score) {
+	@Override
+	public void setElementCorrespondenceScore(float score) {
+		Preconditions.checkNotNull(score);
 		this.score = score;
 	}
-
+	@Override
 	public HashMap<ISchemaElement, Float> getElementMapping() {
 		return elementMapping;
 	}
 
-
+	@Override
 	public void setElementMapping(HashMap<ISchemaElement, Float> elementMapping) {
+		Preconditions.checkNotNull(elementMapping);
 		this.elementMapping = elementMapping;
 	}
 
@@ -151,5 +174,10 @@ public class SchemaElementCorrespondence implements ISchemaElementCorrespondence
 			}
 			return result;
 		}
+	}
+
+	public void setElementCorrespondenceScore(Float score) {
+		// TODO Auto-generated method stub
+		
 	}
 }

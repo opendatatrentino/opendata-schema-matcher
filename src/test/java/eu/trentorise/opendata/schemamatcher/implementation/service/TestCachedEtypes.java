@@ -24,7 +24,7 @@ public class TestCachedEtypes {
 	//	ec.createSchemas();
 		List<IEntityType> etypes =ec.readSchemas();
 		for(IEntityType etype : etypes){
-			System.out.println(etype.getName().getStrings(Locale.ENGLISH));
+			System.out.println(etype.getName().strings(Locale.ENGLISH));
 			System.out.println(etype.getAttributeDefs().get(0).getConceptURL());
 
 		}

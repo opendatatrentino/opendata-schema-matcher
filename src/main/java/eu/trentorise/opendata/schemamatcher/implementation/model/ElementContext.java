@@ -1,5 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.model;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 
 import eu.trentorise.opendata.schemamatcher.model.IElementContext;
@@ -13,6 +15,7 @@ public class ElementContext implements IElementContext {
 	private String elementName;
 	private String elementDescription;
 	private String elementDataType;
+	@Nullable 
 	private long elementConcept;
 
 	public ElementContext(String elementName, String elementDescription,
@@ -52,10 +55,12 @@ public class ElementContext implements IElementContext {
 		this.elementDataType = elementDataType;
 	}
 	@Override
+	@Nullable
 	public long getElementConcept() {
 		return elementConcept;
 	}
 	@Override
+	@Nullable
 	public void setElementConcept(Long elementConcept) {
 		Preconditions.checkNotNull(elementConcept);
 		this.elementConcept = elementConcept;

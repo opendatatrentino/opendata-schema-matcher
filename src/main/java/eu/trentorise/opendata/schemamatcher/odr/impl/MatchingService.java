@@ -22,72 +22,75 @@ import eu.trentorise.opendata.semantics.model.knowledge.ITableResource;
 import eu.trentorise.opendata.semantics.services.ISemanticMatchingService;
 import eu.trentorise.opendata.semantics.services.model.ISchemaCorrespondence;
 
-public  class MatchingService implements ISemanticMatchingService {
-	private static final String SCHEMA_MATCHER_ALGORITHM = "Simple";
-	private final static Logger LOGGER = Logger.getLogger(MatchingService.class.getName());
-	private Locale locale;
+public class MatchingService implements ISemanticMatchingService {
 
-	public List<ISchemaCorrespondence> matchSchemas(IResourceContext resourceContext, ITableResource tableResource) {
-		Resource rc = new Resource();
-		List<String> strings = tableResource.getHeaders();
-		List<String> nlpInput = new ArrayList<String>();
-		nlpInput.add(strings.toString());
-		locale = NLPService.detectLanguage(nlpInput);
-		rc.setResourceContext(resourceContext);
-		rc.setTableResource(tableResource);
-		SchemaImport si = new SchemaImport();
-		ISchema schemaSource = null;
-		try {
-			schemaSource = si.extractSchema(rc, locale);
-		} catch (SchemaMatcherException e) {
-			LOGGER.error(e.getMessage());
-		}
-		List<ISchema> sourceSchemas = new ArrayList<ISchema>();
-		sourceSchemas.add(schemaSource);
+    private static final String SCHEMA_MATCHER_ALGORITHM = "Simple";
+    private final static Logger LOGGER = Logger.getLogger(MatchingService.class.getName());
+    private Locale locale;
 
-		return match(sourceSchemas);
-	}
+    public List<ISchemaCorrespondence> matchSchemas(IResourceContext resourceContext, ITableResource tableResource) {
+        Resource rc = new Resource();
+        List<String> strings = tableResource.getHeaders();
+        List<String> nlpInput = new ArrayList<String>();
+        nlpInput.add(strings.toString());
+        locale = NLPService.detectLanguage(nlpInput);
+        rc.setResourceContext(resourceContext);
+        rc.setTableResource(tableResource);
+        SchemaImport si = new SchemaImport();
+        ISchema schemaSource = null;
+        try {
+            schemaSource = si.extractSchema(rc, locale);
+        }
+        catch (SchemaMatcherException e) {
+            LOGGER.error(e.getMessage());
+        }
+        List<ISchema> sourceSchemas = new ArrayList<ISchema>();
+        sourceSchemas.add(schemaSource);
 
-	public List<ISchemaCorrespondence> matchSchemasFile(File file) {
-		SchemaImport si = new SchemaImport();
-		ISchema schemaCSV = null;
-		try {
-			schemaCSV = si.parseCSV(file);
-		} catch (IOException e) {
-			LOGGER.error(e.getMessage());
-		}
-		List<ISchema> sourceSchemas = new ArrayList<ISchema>();
-		sourceSchemas.add(schemaCSV);
-		return	match(sourceSchemas);
-	}
+        return match(sourceSchemas);
+    }
 
+    public List<ISchemaCorrespondence> matchSchemasFile(File file) {
+        SchemaImport si = new SchemaImport();
+        ISchema schemaCSV = null;
+        try {
+            schemaCSV = si.parseCSV(file);
+        }
+        catch (IOException e) {
+            LOGGER.error(e.getMessage());
+        }
+        List<ISchema> sourceSchemas = new ArrayList<ISchema>();
+        sourceSchemas.add(schemaCSV);
+        return match(sourceSchemas);
+    }
 
-	private List<ISchemaCorrespondence> match(List<ISchema> sourceSchemas){
-		SchemaImport si = new SchemaImport();
-		EntityTypeService etypeService = new EntityTypeService();
-		List<IEntityType> etypeList = etypeService.getAllEntityTypes();
-		List<ISchema> targetSchemas = new ArrayList<ISchema>();
+    private List<ISchemaCorrespondence> match(List<ISchema> sourceSchemas) {
+        SchemaImport si = new SchemaImport();
+        EntityTypeService etypeService = new EntityTypeService();
+        List<IEntityType> etypeList = etypeService.getAllEntityTypes();
+        List<ISchema> targetSchemas = new ArrayList<ISchema>();
 
-		for (IEntityType etype:etypeList){
+        for (IEntityType etype : etypeList) {
 
-			ISchema schemaEtype = null;
-			try {
-				schemaEtype = si.extractSchema(etype, locale);
-			} catch (SchemaMatcherException e) {
-				LOGGER.error(e.getMessage());
-			}
-			targetSchemas.add(schemaEtype);
+            ISchema schemaEtype = null;
+            try {
+                schemaEtype = si.extractSchema(etype, locale);
+            }
+            catch (SchemaMatcherException e) {
+                LOGGER.error(e.getMessage());
+            }
+            targetSchemas.add(schemaEtype);
 
-		}
-		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create(SCHEMA_MATCHER_ALGORITHM);
-		List<eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence>  schemaCor =schemaMatcher.matchSchemas(sourceSchemas, targetSchemas, "ConceptDistanceBased");
-		List<ISchemaCorrespondence> schemaCorODR = new ArrayList<ISchemaCorrespondence>();
-		for(eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence sc: schemaCor){
-			SchemaCorrespondence scor = (SchemaCorrespondence) sc;
-			ScheCorrespondence scheC = scor.convertToScheCorrespondence();
-			schemaCorODR.add(scheC);
-		}
+        }
+        ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create(SCHEMA_MATCHER_ALGORITHM);
+        List<eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence> schemaCor = schemaMatcher.matchSchemas(sourceSchemas, targetSchemas, "ConceptDistanceBased");
+        List<ISchemaCorrespondence> schemaCorODR = new ArrayList<ISchemaCorrespondence>();
+        for (eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence sc : schemaCor) {
+            SchemaCorrespondence scor = (SchemaCorrespondence) sc;
+            ScheCorrespondence scheC = scor.convertToScheCorrespondence();
+            schemaCorODR.add(scheC);
+        }
 
-		return schemaCorODR;
-	}
+        return schemaCorODR;
+    }
 }

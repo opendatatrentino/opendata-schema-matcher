@@ -10,93 +10,92 @@ import eu.trentorise.opendata.schemamatcher.model.IElementRelation;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
 
-public class SchemaElement implements ISchemaElement{
+public class SchemaElement implements ISchemaElement {
 
-	private IElementContent elementContent;
-	private IElementContext elementContext;
-	private List<IElementRelation>  schemaElementRelations;
-	protected IAttributeDef attrDef;
-	private int columnIndex; 
+    private IElementContent elementContent;
+    private IElementContext elementContext;
+    private List<IElementRelation> schemaElementRelations;
+    protected IAttributeDef attrDef;
+    private int columnIndex;
 
-	
-	
-	public SchemaElement(IElementContent elementContent,
-			IElementContext elementContext,
-			List<IElementRelation> schemaElementRelations,
-			IAttributeDef attrDef, int columnIndex) {
-		super();
-		this.elementContent = elementContent;
-		this.elementContext = elementContext;
-		this.schemaElementRelations = schemaElementRelations;
-		this.attrDef = attrDef;
-		this.columnIndex = columnIndex;
-	}
+    public SchemaElement(IElementContent elementContent,
+            IElementContext elementContext,
+            List<IElementRelation> schemaElementRelations,
+            IAttributeDef attrDef, int columnIndex) {
+        super();
+        this.elementContent = elementContent;
+        this.elementContext = elementContext;
+        this.schemaElementRelations = schemaElementRelations;
+        this.attrDef = attrDef;
+        this.columnIndex = columnIndex;
+    }
 
-	public SchemaElement() {
-		// TODO Auto-generated constructor stub
-	}
+    public SchemaElement() {
+        // TODO Auto-generated constructor stub
+    }
 
-	@Override
-	public String toString() {
-		return "SchemaElement [elementContent=" + elementContent
-				+ ", elementContext=" + elementContext
-				+ ", schemaElementRelations=" + schemaElementRelations + "]";
-	}
+    @Override
+    public String toString() {
+        return "SchemaElement [elementContent=" + elementContent
+                + ", elementContext=" + elementContext
+                + ", schemaElementRelations=" + schemaElementRelations + "]";
+    }
 
-	public List<IElementRelation> getSchemaElementRelations() {
-		return schemaElementRelations;
-	}
+    public List<IElementRelation> getSchemaElementRelations() {
+        return schemaElementRelations;
+    }
 
-	public void setSchemaElementRelations(List<IElementRelation> schemaElementRelations) {
-		Preconditions.checkNotNull(schemaElementRelations);
-		this.schemaElementRelations = schemaElementRelations;
-	}
+    public void setSchemaElementRelations(List<IElementRelation> schemaElementRelations) {
+        Preconditions.checkNotNull(schemaElementRelations);
+        this.schemaElementRelations = schemaElementRelations;
+    }
 
-	public void setElementContent(ElementContent elContent) {
-		Preconditions.checkNotNull(elContent);
-		this.elementContent = elContent;
-	}
+    public void setElementContent(ElementContent elContent) {
+        Preconditions.checkNotNull(elContent);
+        this.elementContent = elContent;
+    }
 
-	public void setElementContext(IElementContext elementContext) {
-		Preconditions.checkNotNull(elementContext);
-		this.elementContext =  elementContext;
-	}
+    public void setElementContext(IElementContext elementContext) {
+        Preconditions.checkNotNull(elementContext);
+        this.elementContext = elementContext;
+    }
 
-	@Override
-	public IElementContent getElementContent() {
-		return  this.elementContent;
-	}
-	@Override
-	public IElementContext getElementContext() {
-		return  this.elementContext;
-	}
-	@Override
-	public Boolean hasElementContent() {
-		return elementContent.getContent().size()>0;
-	}
-	@Override
-	public List<IElementRelation> getSchemaElementsRelations() {
-		return (List<IElementRelation>) this.schemaElementRelations;
-	}
+    @Override
+    public IElementContent getElementContent() {
+        return this.elementContent;
+    }
 
-	public IAttributeDef getAttrDef() {
-		return attrDef;
-	}
+    @Override
+    public IElementContext getElementContext() {
+        return this.elementContext;
+    }
 
-	public void setAttrDef(IAttributeDef attrDef) {
-		Preconditions.checkNotNull(attrDef);
-		this.attrDef = attrDef;
-	}
+    @Override
+    public Boolean hasElementContent() {
+        return elementContent.getContent().size() > 0;
+    }
 
-	public int getColumnIndex() {
-		return columnIndex;
-	}
+    @Override
+    public List<IElementRelation> getSchemaElementsRelations() {
+        return (List<IElementRelation>) this.schemaElementRelations;
+    }
 
-	public void setColumnIndex(int columnIndex) {
-		Preconditions.checkNotNull(columnIndex);
-		this.columnIndex = columnIndex;
-	}
-	
-	
+    public IAttributeDef getAttrDef() {
+        return attrDef;
+    }
+
+    public void setAttrDef(IAttributeDef attrDef) {
+        Preconditions.checkNotNull(attrDef);
+        this.attrDef = attrDef;
+    }
+
+    public int getColumnIndex() {
+        return columnIndex;
+    }
+
+    public void setColumnIndex(int columnIndex) {
+        Preconditions.checkNotNull(columnIndex);
+        this.columnIndex = columnIndex;
+    }
 
 }

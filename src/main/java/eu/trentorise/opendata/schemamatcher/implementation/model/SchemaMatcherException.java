@@ -2,8 +2,7 @@ package eu.trentorise.opendata.schemamatcher.implementation.model;
 
 public class SchemaMatcherException extends Exception {
 
-
-    public SchemaMatcherException(String s){
+    public SchemaMatcherException(String s) {
         super(s);
     }
 

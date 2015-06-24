@@ -14,116 +14,118 @@ import eu.trentorise.opendata.schemamatcher.odr.impl.ScheCorrespondence;
 import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 import eu.trentorise.opendata.semantics.services.model.IAttributeCorrespondence;
 
-
 /**
  * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
  * @date 24 Feb 2014
- * 
+ *
  */
 public class SchemaCorrespondence implements ISchemaCorrespondence {
-	/** Scores are considered equals up to this margin */
-	static public final double SCORE_TOLERANCE = 0.01;
 
-	private	ISchema sourceSchema;
-	private IEntityType etype;
-	private ISchema targetSchema;
-	private float score;
-	private List<ISchemaElementCorrespondence> elementCorrespondences;
+    /**
+     * Scores are considered equals up to this margin
+     */
+    static public final double SCORE_TOLERANCE = 0.01;
 
-	
-	
-	public SchemaCorrespondence(ISchema sourceSchema, IEntityType etype,
-			ISchema targetSchema, float score,
-			List<ISchemaElementCorrespondence> elementCorrespondences) {
-		super();
-		this.sourceSchema = sourceSchema;
-		this.etype = etype;
-		this.targetSchema = targetSchema;
-		this.score = score;
-		this.elementCorrespondences = elementCorrespondences;
-	}
-	
-	public SchemaCorrespondence()
-	{
-		
-	}
+    private ISchema sourceSchema;
+    private IEntityType etype;
+    private ISchema targetSchema;
+    private float score;
+    private List<ISchemaElementCorrespondence> elementCorrespondences;
 
-	@Override
-	public String toString() {
-		return "SchemaCorrespondence [sourceSchema=" + sourceSchema
-				+ ", targetSchema=" + targetSchema + ", score=" + score
-				+ ", attributeCorrespondences=" + elementCorrespondences
-				+ "]";
-	}
+    public SchemaCorrespondence(ISchema sourceSchema, IEntityType etype,
+            ISchema targetSchema, float score,
+            List<ISchemaElementCorrespondence> elementCorrespondences) {
+        super();
+        this.sourceSchema = sourceSchema;
+        this.etype = etype;
+        this.targetSchema = targetSchema;
+        this.score = score;
+        this.elementCorrespondences = elementCorrespondences;
+    }
 
-	public void setScore(Float score) {
-		this.score = score;
-	}
-	public void setSchemaElementCorrespondence(
-			List<ISchemaElementCorrespondence> elementCorrespondences) {
-		Preconditions.checkNotNull(elementCorrespondences);
+    public SchemaCorrespondence() {
 
-		this.elementCorrespondences = elementCorrespondences;
-	}
+    }
 
-	public void setSourceSchema(ISchema sourceSchema) {
-		Preconditions.checkNotNull(sourceSchema);
-		this.sourceSchema = sourceSchema;
-	}
+    @Override
+    public String toString() {
+        return "SchemaCorrespondence [sourceSchema=" + sourceSchema
+                + ", targetSchema=" + targetSchema + ", score=" + score
+                + ", attributeCorrespondences=" + elementCorrespondences
+                + "]";
+    }
 
-	public void setTargetSchema(ISchema targetSchema) {
-		Preconditions.checkNotNull(targetSchema);
+    public void setScore(Float score) {
+        this.score = score;
+    }
 
-		this.targetSchema = targetSchema;
-	}
+    public void setSchemaElementCorrespondence(
+            List<ISchemaElementCorrespondence> elementCorrespondences) {
+        Preconditions.checkNotNull(elementCorrespondences);
 
-	public void setScore(float score) {
-		Preconditions.checkNotNull(score);
+        this.elementCorrespondences = elementCorrespondences;
+    }
 
-		this.score = score;
-	}
+    public void setSourceSchema(ISchema sourceSchema) {
+        Preconditions.checkNotNull(sourceSchema);
+        this.sourceSchema = sourceSchema;
+    }
 
-	public void setElementCorrespondences(
-			List<ISchemaElementCorrespondence> elementCorrespondences) {
-		Preconditions.checkNotNull(elementCorrespondences);
-		this.elementCorrespondences = elementCorrespondences;
-	}
+    public void setTargetSchema(ISchema targetSchema) {
+        Preconditions.checkNotNull(targetSchema);
 
-	public List<ISchemaElementCorrespondence> getSchemaElementCorrespondence() {
-		return elementCorrespondences;
-	}
-	@Override
-	public ISchema getSourceSchema() {
-		return this.sourceSchema;
-	}
-	@Override
-	public ISchema getTargetSchema() {
-		return this.targetSchema;
-	}
-	@Override
-	public float getSchemaCorrespondenceScore() {
-		return score;
-	}
+        this.targetSchema = targetSchema;
+    }
 
-	public ScheCorrespondence convertToScheCorrespondence(){
-		ScheCorrespondence sc = new ScheCorrespondence();
-		sc.setScore(this.score);
+    public void setScore(float score) {
+        Preconditions.checkNotNull(score);
 
-		if (this.etype==null){
-			Schema s= (Schema)this.targetSchema;
-			sc.setEtype((EntityType)s.getEtype());
-		} 
-		else {
-			sc.setEtype((EntityType) this.etype);
-		}
-		List<IAttributeCorrespondence> atrCors = new ArrayList<IAttributeCorrespondence>();
-		List<ISchemaElementCorrespondence> elCors =  this.elementCorrespondences;
-		for (ISchemaElementCorrespondence elCor: elCors){
-			SchemaElementCorrespondence el=(SchemaElementCorrespondence)elCor;
-			AtrCorrespondence a = el.convertToACorrespondence();
-			atrCors.add(a);
-		}
-		sc.setAttributeCorrespondence(atrCors);
-		return sc;
-	}
+        this.score = score;
+    }
+
+    public void setElementCorrespondences(
+            List<ISchemaElementCorrespondence> elementCorrespondences) {
+        Preconditions.checkNotNull(elementCorrespondences);
+        this.elementCorrespondences = elementCorrespondences;
+    }
+
+    public List<ISchemaElementCorrespondence> getSchemaElementCorrespondence() {
+        return elementCorrespondences;
+    }
+
+    @Override
+    public ISchema getSourceSchema() {
+        return this.sourceSchema;
+    }
+
+    @Override
+    public ISchema getTargetSchema() {
+        return this.targetSchema;
+    }
+
+    @Override
+    public float getSchemaCorrespondenceScore() {
+        return score;
+    }
+
+    public ScheCorrespondence convertToScheCorrespondence() {
+        ScheCorrespondence sc = new ScheCorrespondence();
+        sc.setScore(this.score);
+
+        if (this.etype == null) {
+            Schema s = (Schema) this.targetSchema;
+            sc.setEtype((EntityType) s.getEtype());
+        } else {
+            sc.setEtype((EntityType) this.etype);
+        }
+        List<IAttributeCorrespondence> atrCors = new ArrayList<IAttributeCorrespondence>();
+        List<ISchemaElementCorrespondence> elCors = this.elementCorrespondences;
+        for (ISchemaElementCorrespondence elCor : elCors) {
+            SchemaElementCorrespondence el = (SchemaElementCorrespondence) elCor;
+            AtrCorrespondence a = el.convertToACorrespondence();
+            atrCors.add(a);
+        }
+        sc.setAttributeCorrespondence(atrCors);
+        return sc;
+    }
 }

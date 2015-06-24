@@ -31,90 +31,86 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 
 public class TestSimpleSchemaMatcher {
 
-	private static final int ORARI_CONCEPT_ID = 80505;
-	private static final int NAME_CONCEPT_ID = 2;
-	private static final double DELTA = 1e-6;
-	private static final int CONCEPT_ID = 14557;
-	private EntityType etype;
+    private static final int ORARI_CONCEPT_ID = 80505;
+    private static final int NAME_CONCEPT_ID = 2;
+    private static final double DELTA = 1e-6;
+    private static final int CONCEPT_ID = 14557;
+    private EntityType etype;
 
-	@Before
-	public void readEtype(){
-		EntityTypeService ets = new EntityTypeService();
-		String etypeUrl = WebServiceURLs.etypeIDToURL(12L);
-		etype= (EntityType) ets.readEntityType(etypeUrl);
-	}
+    @Before
+    public void readEtype() {
+        EntityTypeService ets = new EntityTypeService();
+        String etypeUrl = WebServiceURLs.etypeIDToURL(12L);
+        etype = (EntityType) ets.readEntityType(etypeUrl);
+    }
 
+    @Test
+    public void testSchemaElementMatcher() throws IOException, SchemaMatcherException {
+        SchemaImport si = new SchemaImport();
 
-	@Test
-	public void testSchemaElementMatcher() throws IOException, SchemaMatcherException{
-		SchemaImport si = new SchemaImport();
+        File file = new File("impianti risalita.csv");
 
-		File file = new File("impianti risalita.csv");
+        ISchema schemaCSV = si.parseCSV(file);
+        List<String> nlpInput = new ArrayList<String>();
+        nlpInput.add(schemaCSV.getSchemaElements().get(0).getElementContext().getElementName());
+        nlpInput.add(schemaCSV.getSchemaElements().get(1).getElementContext().getElementName());
 
-		ISchema schemaCSV= si.parseCSV(file);
-		List<String> nlpInput = new ArrayList<String>();
-		nlpInput.add(schemaCSV.getSchemaElements().get(0).getElementContext().getElementName());
-		nlpInput.add(schemaCSV.getSchemaElements().get(1).getElementContext().getElementName());
+        Locale locale = NLPService.detectLanguage(nlpInput);
+        ISchema schemaEtype = si.extractSchema(etype, locale);
 
-		Locale locale = NLPService.detectLanguage(nlpInput);
-		ISchema schemaEtype=si.extractSchema(etype, locale);
+        ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("Simple");
+        ISchemaCorrespondence schemaCor = schemaMatcher.matchSchemas(schemaCSV, schemaEtype, "EditDistanceBased");
+        assertEquals(schemaCor.getTargetSchema().getSchemaName(), "Infrastruttura");
+        assertEquals(schemaCor.getSchemaCorrespondenceScore(), 0.6204213, DELTA);
+    }
 
-		ISchemaMatcher schemaMatcher = SchemaMatcherFactory.create("Simple");
-		ISchemaCorrespondence  schemaCor =schemaMatcher.matchSchemas(schemaCSV, schemaEtype, "EditDistanceBased");
-		assertEquals(schemaCor.getTargetSchema().getSchemaName(),"Infrastruttura");
-		assertEquals(schemaCor.getSchemaCorrespondenceScore(),0.6204213,DELTA);
-	}
+    @Test
+    public void testConceptFromText() {
+        String resourceName = "IMPIANTI RISALITA";
+        Long conceptID = ColumnRecognizer.conceptFromText(resourceName);
+        assertEquals(CONCEPT_ID, conceptID.intValue());
+    }
 
-	@Test
-	public void testConceptFromText(){
-		String resourceName = "IMPIANTI RISALITA";
-		Long conceptID = ColumnRecognizer.conceptFromText(resourceName);
-		assertEquals(CONCEPT_ID, conceptID.intValue());
-	}
+    @Test
+    public void testConsistanceOfColConcRecognizer() throws IOException {
+        SchemaImport si = new SchemaImport();
 
+        File file = new File("impianti risalita.csv");
 
+        ISchema schemaCSV = si.parseCSV(file);
+        List<ISchema> sourceSchemas = new ArrayList<ISchema>();
+        sourceSchemas.add(schemaCSV);
 
-	@Test 
-	public void testConsistanceOfColConcRecognizer() throws IOException{
-		SchemaImport si = new SchemaImport();
+        List<ISchemaElement> schemaElements = schemaCSV.getSchemaElements();
+        List<String> elementNames = new ArrayList<String>();
+        List<List<String>> elementContent = new ArrayList<List<String>>();
 
-		File file = new File("impianti risalita.csv");
+        HashMap<Integer, String> map = new HashMap<Integer, String>();
+        int z = 0;
+        for (ISchemaElement element : schemaElements) {
+            z++;
+            map.put(z, element.getElementContext().getElementName());
+            elementNames.add(element.getElementContext().getElementName());
+            List<Object> content = element.getElementContent().getContent();
+            List<String> contStr = new ArrayList<String>();
+            for (Object o : content) {
+                contStr.add(o.toString());
+            }
+            elementContent.add(contStr);
+        }
+        List<ColumnConceptCandidate> extractedConcepts = new ArrayList<ColumnConceptCandidate>();
+        extractedConcepts
+                = ColumnRecognizer.computeScoredCandidates(elementNames, elementContent);
 
-		ISchema schemaCSV= si.parseCSV(file);
-		List<ISchema> sourceSchemas = new ArrayList<ISchema>();
-		sourceSchemas.add(schemaCSV);
+        for (ColumnConceptCandidate ccc : extractedConcepts) {
 
-		List<ISchemaElement> schemaElements = schemaCSV.getSchemaElements();
-		List<String> elementNames = new ArrayList<String>();
-		List<List<String>> elementContent = new ArrayList<List<String>>();
-
-		HashMap<Integer,String> map = new HashMap<Integer,String>();
-		int z=0;
-		for (ISchemaElement element: schemaElements){
-			z++;
-			map.put( z,element.getElementContext().getElementName());
-			elementNames.add(element.getElementContext().getElementName());
-			List<Object> content = element.getElementContent().getContent();
-			List<String> contStr = new ArrayList<String>();
-			for(Object o: content){
-				contStr.add(o.toString());
-			}
-			elementContent.add(contStr);
-		}
-		List<ColumnConceptCandidate> extractedConcepts = new ArrayList<ColumnConceptCandidate>();
-		extractedConcepts =
-				ColumnRecognizer.computeScoredCandidates(elementNames, elementContent);
-
-		for(ColumnConceptCandidate ccc: extractedConcepts){
-
-			if(map.get(ccc.getColumnNumber()).equalsIgnoreCase("nome")) {
-				assertEquals(ccc.getConceptID(),NAME_CONCEPT_ID);
-			}
-			if(map.get(ccc.getColumnNumber()).equalsIgnoreCase("orari")) {
-				assertEquals(ccc.getConceptID(),ORARI_CONCEPT_ID);
-			}
-		}
-	}			
-
+            if (map.get(ccc.getColumnNumber()).equalsIgnoreCase("nome")) {
+                assertEquals(ccc.getConceptID(), NAME_CONCEPT_ID);
+            }
+            if (map.get(ccc.getColumnNumber()).equalsIgnoreCase("orari")) {
+                assertEquals(ccc.getConceptID(), ORARI_CONCEPT_ID);
+            }
+        }
+    }
 
 }

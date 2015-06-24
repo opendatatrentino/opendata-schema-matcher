@@ -8,14 +8,14 @@ import eu.trentorise.opendata.schemamatcher.services.matching.ISElementMatchingS
 
 public class SElementMatchingService implements ISElementMatchingService {
 
-	public List<String> getElementMatchingAlgorithms() {
-		List<String> matcherTypes = new ArrayList<String>();
-		matcherTypes.add("ConceptDistanceBased");
-		matcherTypes.add("EditDistanceBased");
-		return matcherTypes;
-	}
+    public List<String> getElementMatchingAlgorithms() {
+        List<String> matcherTypes = new ArrayList<String>();
+        matcherTypes.add("ConceptDistanceBased");
+        matcherTypes.add("EditDistanceBased");
+        return matcherTypes;
+    }
 
-	public ISchemaElementMatcher getElementMatcher(String elementMatcherType) {
-		return ElementMatcherFactory.create (elementMatcherType);
-	}
+    public ISchemaElementMatcher getElementMatcher(String elementMatcherType) {
+        return ElementMatcherFactory.create(elementMatcherType);
+    }
 }

@@ -18,33 +18,34 @@ import eu.trentorise.opendata.nlprise.typecheckers.XmlTypeChecker;
  *
  */
 public class TypeDetector {
-	/** 
-	 * Minimal fraction of cells that need to match a datatype
-	 */
-	private static final double CONFIDENCE_THRESHOLD = 0.9;
 
-	/**
-	 * Guesses the type of an individual cell.
-	 * 
-	 * @param cell	The contents of the cell
-	 * @return		The datatype
-	 */
-	public static Datatype guessType(String cell) {
-		
-		if (EmptyTypeChecker.check(cell)) {
-			return Datatype.EMPTY;
-		}
-		if (IntTypeChecker.check(cell)) {
-			return Datatype.INT;
-		}
-		if (FloatTypeChecker.check(cell)) {
-			return Datatype.FLOAT;
-		}
+    /**
+     * Minimal fraction of cells that need to match a datatype
+     */
+    private static final double CONFIDENCE_THRESHOLD = 0.9;
+
+    /**
+     * Guesses the type of an individual cell.
+     *
+     * @param cell	The contents of the cell
+     * @return	The datatype
+     */
+    public static Datatype guessType(String cell) {
+
+        if (EmptyTypeChecker.check(cell)) {
+            return Datatype.EMPTY;
+        }
+        if (IntTypeChecker.check(cell)) {
+            return Datatype.INT;
+        }
+        if (FloatTypeChecker.check(cell)) {
+            return Datatype.FLOAT;
+        }
         if (XmlTypeChecker.check(cell)) {
             return Datatype.XML;
         }
         if (JsonTypeChecker.check(cell)) {
-        return Datatype.JSON;
+            return Datatype.JSON;
         }
         if (ListTypeChecker.check(cell)) {
             return Datatype.LIST;
@@ -52,34 +53,34 @@ public class TypeDetector {
         if (cell.length() > 20 && cell.contains(" ")) {
             return Datatype.NL_STRING;
         }
-		return Datatype.STRING;
-	}
-	
-	/**
-	 * Guesses the type of a column.
-	 * 
-	 * @param column	The column
-	 * @return			The datatype
-	 */
-	public static Datatype guessType(Column column) {
-		int rowCount = column.size();
-		int requiredMatchCount = (int)Math.ceil(CONFIDENCE_THRESHOLD * rowCount);
-		Map<Datatype, Integer> matchCounts = new HashMap<Datatype, Integer>();
-		for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-			Datatype cellType = guessType(column.getFieldAt(rowIndex));
-			if (matchCounts.containsKey(cellType)) {
-				matchCounts.put(cellType, matchCounts.get(cellType) + 1);
-			} else {
-				matchCounts.put(cellType, 1);
-			}
-		}
-		Datatype lastType = Datatype.STRING;
-		boolean foundType = false;
-		Iterator<Datatype> it = matchCounts.keySet().iterator();
-		while (!foundType && it.hasNext()) {
-			lastType = it.next();
-			foundType = matchCounts.get(lastType) >= requiredMatchCount;
-		}
-		return foundType ? lastType : Datatype.STRING;		
-	}
+        return Datatype.STRING;
+    }
+
+    /**
+     * Guesses the type of a column.
+     *
+     * @param column	The column
+     * @return	The datatype
+     */
+    public static Datatype guessType(Column column) {
+        int rowCount = column.size();
+        int requiredMatchCount = (int) Math.ceil(CONFIDENCE_THRESHOLD * rowCount);
+        Map<Datatype, Integer> matchCounts = new HashMap<Datatype, Integer>();
+        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+            Datatype cellType = guessType(column.getFieldAt(rowIndex));
+            if (matchCounts.containsKey(cellType)) {
+                matchCounts.put(cellType, matchCounts.get(cellType) + 1);
+            } else {
+                matchCounts.put(cellType, 1);
+            }
+        }
+        Datatype lastType = Datatype.STRING;
+        boolean foundType = false;
+        Iterator<Datatype> it = matchCounts.keySet().iterator();
+        while (!foundType && it.hasNext()) {
+            lastType = it.next();
+            foundType = matchCounts.get(lastType) >= requiredMatchCount;
+        }
+        return foundType ? lastType : Datatype.STRING;
+    }
 }

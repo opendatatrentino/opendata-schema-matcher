@@ -22,162 +22,160 @@ import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
 
 public class SchemaElementCorrespondence implements ISchemaElementCorrespondence {
 
-	private SchemaElement sourceElement;
-	private HashMap<ISchemaElement, Float> elementMapping;
-	private float score; 
-	private SchemaElement highestTargetElement; 
-	private IAttributeDef attrDef;
+    private SchemaElement sourceElement;
+    private HashMap<ISchemaElement, Float> elementMapping;
+    private float score;
+    private SchemaElement highestTargetElement;
+    private IAttributeDef attrDef;
 
-	
-	
-	public SchemaElementCorrespondence(SchemaElement sourceElement,
-			HashMap<ISchemaElement, Float> elementMapping, float score,
-			SchemaElement highestTargetElement, IAttributeDef attrDef) {
-		super();
-		this.sourceElement = sourceElement;
-		this.elementMapping = elementMapping;
-		this.score = score;
-		this.highestTargetElement = highestTargetElement;
-		this.attrDef = attrDef;
-	}
+    public SchemaElementCorrespondence(SchemaElement sourceElement,
+            HashMap<ISchemaElement, Float> elementMapping, float score,
+            SchemaElement highestTargetElement, IAttributeDef attrDef) {
+        super();
+        this.sourceElement = sourceElement;
+        this.elementMapping = elementMapping;
+        this.score = score;
+        this.highestTargetElement = highestTargetElement;
+        this.attrDef = attrDef;
+    }
 
-	public SchemaElementCorrespondence() {
-		// TODO Auto-generated constructor stub
-	}
-	@Override
-	public float getElementCorrespondenceScore() {
-		return this.score;
-	}
-	@Override
-	public SchemaElement getTargetElement() {
-		return highestTargetElement;
-	}
-	@Override
-	public void setTargetElement(ISchemaElement targetElement) {
-		Preconditions.checkNotNull(targetElement);
-		this.highestTargetElement = (SchemaElement) targetElement;
-	}
-	@Override
-	public SchemaElement getSourceElement() {
-		return sourceElement;
-	}
-	@Override
-	public void setSourceElement(ISchemaElement sourceElement) {
-		Preconditions.checkNotNull(sourceElement);
-		this.sourceElement = (SchemaElement) sourceElement;
-	}
+    public SchemaElementCorrespondence() {
+        // TODO Auto-generated constructor stub
+    }
 
-	public float getScore() {
-		return score;
-	}
-	@Override
-	public void setElementCorrespondenceScore(float score) {
-		Preconditions.checkNotNull(score);
-		this.score = score;
-	}
-	@Override
-	public HashMap<ISchemaElement, Float> getElementMapping() {
-		return elementMapping;
-	}
+    @Override
+    public float getElementCorrespondenceScore() {
+        return this.score;
+    }
 
-	@Override
-	public void setElementMapping(HashMap<ISchemaElement, Float> elementMapping) {
-		Preconditions.checkNotNull(elementMapping);
-		this.elementMapping = elementMapping;
-	}
+    @Override
+    public SchemaElement getTargetElement() {
+        return highestTargetElement;
+    }
 
-	public void computeHighestCorrespondencePair(){
-		Map<ISchemaElement, Float> correspondences = this.elementMapping;
-		if (correspondences==null){
-			this.highestTargetElement=null;
-			this.score=(float) 0;
-		}
-		else{
-			Map.Entry<ISchemaElement,Float> maxEntry = null;
-			TreeMap<ISchemaElement,Float> map = new TreeMap<ISchemaElement,Float>();
-			KeyComparator bvc =  new KeyComparator(map);
-			TreeMap<ISchemaElement,Float> sortedKeyMap = new TreeMap<ISchemaElement,Float>(bvc);
-			sortedKeyMap.putAll(correspondences);
-			for (Map.Entry<ISchemaElement,Float> entry : sortedKeyMap.entrySet())
-			{
-			    if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
-			    {
-			        maxEntry = entry;
-			    }
-			}
-			this.highestTargetElement=(SchemaElement) maxEntry.getKey() ;
-			this.score = maxEntry.getValue();
-		}
+    @Override
+    public void setTargetElement(ISchemaElement targetElement) {
+        Preconditions.checkNotNull(targetElement);
+        this.highestTargetElement = (SchemaElement) targetElement;
+    }
 
-	}
+    @Override
+    public SchemaElement getSourceElement() {
+        return sourceElement;
+    }
 
-	public AtrCorrespondence convertToACorrespondence(){
-		AtrCorrespondence ac = new AtrCorrespondence();
-		ac.setScore(this.score);
-		if(this.attrDef==null){
-			ac.setAttrDef((AttributeDef) this.highestTargetElement.attrDef);
-		} else {
-			ac.setAttrDef((AttributeDef) this.attrDef);
-		}
-		ac.setColumnIndex(this.sourceElement.getColumnIndex());
-		ac.setHeaderConceptID(this.sourceElement.getElementContext().getElementConcept());
+    @Override
+    public void setSourceElement(ISchemaElement sourceElement) {
+        Preconditions.checkNotNull(sourceElement);
+        this.sourceElement = (SchemaElement) sourceElement;
+    }
 
-		HashMap<ISchemaElement, Float> map = this.elementMapping;
-		HashMap <IAttributeDef, Float> atrCorMap= new HashMap <IAttributeDef, Float> ();
-		for (Map.Entry<ISchemaElement, Float> entry : map.entrySet())
-		{
-			SchemaElement se = (SchemaElement) entry.getKey();
-			atrCorMap.put(se.getAttrDef(), entry.getValue());
-		}
-		ac.setAttrMap(atrCorMap);
-		return ac;
+    public float getScore() {
+        return score;
+    }
 
-	}
+    @Override
+    public void setElementCorrespondenceScore(float score) {
+        Preconditions.checkNotNull(score);
+        this.score = score;
+    }
 
-	class KeyComparator implements Comparator<ISchemaElement> {
+    @Override
+    public HashMap<ISchemaElement, Float> getElementMapping() {
+        return elementMapping;
+    }
 
-		private Map<ISchemaElement, Float> base;
-		public KeyComparator(Map<ISchemaElement, Float> base) {
-			this.base = base;
-		}
-		// Note: this comparator imposes orderings that are inconsistent with equals.    
-		public int compare(ISchemaElement a, ISchemaElement b) {
-			if(a.getElementContext().getElementName()==null){
-				return 1;
-			}else 
-				if(b.getElementContext().getElementName()==null){
-					return -1;
-				} else {
-					return a.getElementContext().getElementName().compareTo(b.getElementContext().getElementName());
-				}
-		}
-	}
+    @Override
+    public void setElementMapping(HashMap<ISchemaElement, Float> elementMapping) {
+        Preconditions.checkNotNull(elementMapping);
+        this.elementMapping = elementMapping;
+    }
 
-	public static class MapUtil
-	{
-		public static <K, V extends Comparable<? super V>> Map<K, V> 
-		sortByValue( Map<K, V> map )
-		{
-			List<Map.Entry<K, V>> list =
-					new LinkedList<Map.Entry<K, V>>( map.entrySet() );
-			Collections.sort( list, new Comparator<Map.Entry<K, V>>()
-					{
-				public int compare( Map.Entry<K, V> o1, Map.Entry<K, V> o2 )
-				{
-					return (o1.getValue()).compareTo( o2.getValue() );
-				}
-					} );
-			Map<K, V> result = new LinkedHashMap<K, V>();
-			for (Map.Entry<K, V> entry : list)
-			{
-				result.put( entry.getKey(), entry.getValue() );
-			}
-			return result;
-		}
-	}
+    public void computeHighestCorrespondencePair() {
+        Map<ISchemaElement, Float> correspondences = this.elementMapping;
+        if (correspondences == null) {
+            this.highestTargetElement = null;
+            this.score = (float) 0;
+        } else {
+            Map.Entry<ISchemaElement, Float> maxEntry = null;
+            TreeMap<ISchemaElement, Float> map = new TreeMap<ISchemaElement, Float>();
+            KeyComparator bvc = new KeyComparator(map);
+            TreeMap<ISchemaElement, Float> sortedKeyMap = new TreeMap<ISchemaElement, Float>(bvc);
+            sortedKeyMap.putAll(correspondences);
+            for (Map.Entry<ISchemaElement, Float> entry : sortedKeyMap.entrySet()) {
+                if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
+                    maxEntry = entry;
+                }
+            }
+            this.highestTargetElement = (SchemaElement) maxEntry.getKey();
+            this.score = maxEntry.getValue();
+        }
 
-	public void setElementCorrespondenceScore(Float score) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    public AtrCorrespondence convertToACorrespondence() {
+        AtrCorrespondence ac = new AtrCorrespondence();
+        ac.setScore(this.score);
+        if (this.attrDef == null) {
+            ac.setAttrDef((AttributeDef) this.highestTargetElement.attrDef);
+        } else {
+            ac.setAttrDef((AttributeDef) this.attrDef);
+        }
+        ac.setColumnIndex(this.sourceElement.getColumnIndex());
+        ac.setHeaderConceptID(this.sourceElement.getElementContext().getElementConcept());
+
+        HashMap<ISchemaElement, Float> map = this.elementMapping;
+        HashMap<IAttributeDef, Float> atrCorMap = new HashMap<IAttributeDef, Float>();
+        for (Map.Entry<ISchemaElement, Float> entry : map.entrySet()) {
+            SchemaElement se = (SchemaElement) entry.getKey();
+            atrCorMap.put(se.getAttrDef(), entry.getValue());
+        }
+        ac.setAttrMap(atrCorMap);
+        return ac;
+
+    }
+
+    class KeyComparator implements Comparator<ISchemaElement> {
+
+        private Map<ISchemaElement, Float> base;
+
+        public KeyComparator(Map<ISchemaElement, Float> base) {
+            this.base = base;
+        }
+
+        // Note: this comparator imposes orderings that are inconsistent with equals.    
+        public int compare(ISchemaElement a, ISchemaElement b) {
+            if (a.getElementContext().getElementName() == null) {
+                return 1;
+            } else if (b.getElementContext().getElementName() == null) {
+                return -1;
+            } else {
+                return a.getElementContext().getElementName().compareTo(b.getElementContext().getElementName());
+            }
+        }
+    }
+
+    public static class MapUtil {
+
+        public static <K, V extends Comparable<? super V>> Map<K, V>
+                sortByValue(Map<K, V> map) {
+            List<Map.Entry<K, V>> list
+                    = new LinkedList<Map.Entry<K, V>>(map.entrySet());
+            Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+                public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                    return (o1.getValue()).compareTo(o2.getValue());
+                }
+            });
+            Map<K, V> result = new LinkedHashMap<K, V>();
+            for (Map.Entry<K, V> entry : list) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+            return result;
+        }
+    }
+
+    public void setElementCorrespondenceScore(Float score) {
+        // TODO Auto-generated method stub
+
+    }
 }

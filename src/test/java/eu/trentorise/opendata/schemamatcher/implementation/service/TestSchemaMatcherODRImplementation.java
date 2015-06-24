@@ -15,27 +15,23 @@ import eu.trentorise.opendata.schemamatcher.odr.impl.MatchingService;
 
 public class TestSchemaMatcherODRImplementation {
 
-	private static final String FACILITY = "Facility";
+    private static final String FACILITY = "Facility";
 
+    private final static Logger LOGGER = Logger.getLogger(TestSchemaImport.class.getName());
 
-	private final static Logger LOGGER = Logger.getLogger(TestSchemaImport.class.getName());
+    @Test
+    public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException {
 
-
-	@Test
-	public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException{
-
-		File file = new File("impianti risalita.csv");
-		MatchingService ms = new MatchingService();
-		List<eu.trentorise.opendata.semantics.services.model.ISchemaCorrespondence> sc = ms.matchSchemasFile(file);
-		for (eu.trentorise.opendata.semantics.services.model.ISchemaCorrespondence c : sc){
-			LOGGER.info("Etype name: "+c.getEtype().getName().string(Locale.ENGLISH)+" "+c.getScore());
+        File file = new File("impianti risalita.csv");
+        MatchingService ms = new MatchingService();
+        List<eu.trentorise.opendata.semantics.services.model.ISchemaCorrespondence> sc = ms.matchSchemasFile(file);
+        for (eu.trentorise.opendata.semantics.services.model.ISchemaCorrespondence c : sc) {
+            LOGGER.info("Etype name: " + c.getEtype().getName().string(Locale.ENGLISH) + " " + c.getScore());
 //			for(IAttributeCorrespondence ac: c.getAttributeCorrespondences()){
 //				LOGGER.info("Attribute: "+ac.getAttrDef().getName().getString(Locale.ENGLISH)+" score: "+ac.getScore()+ " index: "+ac.getColumnIndex());
 //			}
-		}
-		assertEquals(sc.get(0).getEtype().getName().string(Locale.ENGLISH), FACILITY);
-	}
-	
+        }
+        assertEquals(sc.get(0).getEtype().getName().string(Locale.ENGLISH), FACILITY);
+    }
 
-	 
 }

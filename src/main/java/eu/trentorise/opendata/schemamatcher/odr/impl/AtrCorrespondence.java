@@ -11,66 +11,63 @@ import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
 import eu.trentorise.opendata.semantics.services.model.IAttributeCorrespondence;
 
 public class AtrCorrespondence implements IAttributeCorrespondence {
-	
-	private float score;
-	private HashMap<IAttributeDef,Float> attrMap;
-	private AttributeDef attrDef;
-	private long headerConceptID;
-	private int columnIndex;
-	
-	
-	public IAttributeDef getAttrDef() {
-		return this.attrDef;
-	}
 
-	public Map<IAttributeDef, Float> getAttrMap() {
-		return this.attrMap;
-	}
+    private float score;
+    private HashMap<IAttributeDef, Float> attrMap;
+    private AttributeDef attrDef;
+    private long headerConceptID;
+    private int columnIndex;
 
-	public int getColumnIndex() {
-		return this.columnIndex;
-	}
+    public IAttributeDef getAttrDef() {
+        return this.attrDef;
+    }
 
-	public String getHeaderConceptURL() {
-		return WebServiceURLs.conceptIDToURL(this.headerConceptID);
-	}
+    public Map<IAttributeDef, Float> getAttrMap() {
+        return this.attrMap;
+    }
 
-	public long getHeaderConceptID() {
-		return this.headerConceptID;
-	}
+    public int getColumnIndex() {
+        return this.columnIndex;
+    }
 
-	public float getScore() {
-		return this.score;
-	}
+    public String getHeaderConceptURL() {
+        return WebServiceURLs.conceptIDToURL(this.headerConceptID);
+    }
 
-	public void setScore(float score) {
-		Preconditions.checkNotNull(score);
+    public long getHeaderConceptID() {
+        return this.headerConceptID;
+    }
 
-		this.score = score;
-	}
+    public float getScore() {
+        return this.score;
+    }
 
-	public void setAttrMap(HashMap<IAttributeDef, Float> attrMap) {
-		Preconditions.checkNotNull(attrMap);
-		this.attrMap = attrMap;
-	}
+    public void setScore(float score) {
+        Preconditions.checkNotNull(score);
 
-	public void setAttrDef(AttributeDef attrDef) {
-		Preconditions.checkNotNull(attrDef);
-		this.attrDef = attrDef;
-	}
+        this.score = score;
+    }
 
-	public void setHeaderConceptID(long headerConceptID) {
-		Preconditions.checkNotNull(headerConceptID);
+    public void setAttrMap(HashMap<IAttributeDef, Float> attrMap) {
+        Preconditions.checkNotNull(attrMap);
+        this.attrMap = attrMap;
+    }
 
-		this.headerConceptID = headerConceptID;
-	}
+    public void setAttrDef(AttributeDef attrDef) {
+        Preconditions.checkNotNull(attrDef);
+        this.attrDef = attrDef;
+    }
 
-	public void setColumnIndex(int columnIndex) {
-		Preconditions.checkNotNull(columnIndex);
+    public void setHeaderConceptID(long headerConceptID) {
+        Preconditions.checkNotNull(headerConceptID);
 
-		this.columnIndex = columnIndex;
-	}
-	
-	
+        this.headerConceptID = headerConceptID;
+    }
+
+    public void setColumnIndex(int columnIndex) {
+        Preconditions.checkNotNull(columnIndex);
+
+        this.columnIndex = columnIndex;
+    }
 
 }

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ClassDiagram name="Reverse engineered main.java.eu.trentorise.opendata.schemamatcher.model 2015.06.24 14-27-47-087">
+  <ClassDiagramComponents>
+    <Class xPosition="20.0" yPosition="20.0" package="eu.trentorise.opendata.schemamatcher.model" name="CachedSchema" visibility="public">
+      <Constructors/>
+      <Fields>
+        <Field name="schemaId" visibility="package" type="Long"/>
+        <Field name="lastModified" visibility="package" type="Long"/>
+      </Fields>
+      <Methods>
+        <Method name="getSchemaId" visibility="public" returnType="Long"/>
+        <Method name="setSchemaId" visibility="public" returnType="void">
+          <Argument type="Long" name="schemaId"/>
+        </Method>
+        <Method name="getLastModified" visibility="public" returnType="Long"/>
+        <Method name="setLastModified" visibility="public" returnType="void">
+          <Argument type="Long" name="lastModified"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class xPosition="320.0" yPosition="20.0" package="eu.trentorise.opendata.schemamatcher.model" name="DataType" visibility="public">
+      <Constructors/>
+      <Fields>
+        <Field name="STRING" visibility="public" type="String" isStatic="true" isFinal="true"/>
+        <Field name="BOOLEAN" visibility="public" type="String" isStatic="true" isFinal="true"/>
+        <Field name="DATE" visibility="public" type="String" isStatic="true" isFinal="true"/>
+        <Field name="INTEGER" visibility="public" type="String" isStatic="true" isFinal="true"/>
+        <Field name="FLOAT" visibility="public" type="String" isStatic="true" isFinal="true"/>
+        <Field name="NLSTRING" visibility="public" type="String" isStatic="true" isFinal="true"/>
+        <Field name="DOUBLE" visibility="public" type="String" isStatic="true" isFinal="true"/>
+        <Field name="LONG" visibility="public" type="String" isStatic="true" isFinal="true"/>
+        <Field name="BIGINT" visibility="public" type="String" isStatic="true" isFinal="true"/>
+      </Fields>
+      <Methods>
+        <Method name="getDataType" visibility="public" returnType="Datatype" isStatic="true">
+          <Argument type="String" name="st"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Interface xPosition="620.0" yPosition="20.0" package="eu.trentorise.opendata.schemamatcher.model" name="IElementContent" visibility="public">
+      <Methods>
+        <Method name="getContent" visibility="public" returnType="List&lt;Object&gt;"/>
+        <Method name="getContentSize" visibility="public" returnType="int"/>
+        <Method name="setContent" visibility="public" returnType="void">
+          <Argument type="List&lt;Object&gt;" name="instances"/>
+        </Method>
+        <Method name="setContentSize" visibility="public" returnType="void">
+          <Argument type="int" name="n"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface xPosition="920.0" yPosition="20.0" package="eu.trentorise.opendata.schemamatcher.model" name="IElementContext" visibility="public">
+      <Methods>
+        <Method name="getElementName" visibility="public" returnType="String"/>
+        <Method name="getElementDescription" visibility="public" returnType="String"/>
+        <Method name="getElementDataType" visibility="public" returnType="String"/>
+        <Method name="getElementConcept" visibility="public" returnType="long"/>
+        <Method name="setElementConcept" visibility="public" returnType="void">
+          <Argument type="Long" name="conceptId"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface xPosition="20.0" yPosition="420.0" package="eu.trentorise.opendata.schemamatcher.model" name="IElementRelation" visibility="public">
+      <Methods>
+        <Method name="getRelation" visibility="public" returnType="String"/>
+        <Method name="setRelation" visibility="public" returnType="void">
+          <Argument type="String" name="relation"/>
+        </Method>
+        <Method name="getRelatedElement" visibility="public" returnType="ISchemaElement"/>
+        <Method name="setRelatedElement" visibility="public" returnType="void">
+          <Argument type="ISchemaElement" name="relatedElement"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Class xPosition="320.0" yPosition="420.0" package="eu.trentorise.opendata.schemamatcher.model" name="IMultiLang" visibility="public">
+      <Constructors/>
+      <Fields/>
+      <Methods/>
+    </Class>
+    <Interface xPosition="620.0" yPosition="420.0" package="eu.trentorise.opendata.schemamatcher.model" name="IResource" visibility="public">
+      <Methods>
+        <Method name="getResourceContext" visibility="public" returnType="IResourceContext"/>
+        <Method name="setResourceContext" visibility="public" returnType="void">
+          <Argument type="IResourceContext" name="resourceContext"/>
+        </Method>
+        <Method name="getTableResource" visibility="public" returnType="ITableResource"/>
+        <Method name="setTableResource" visibility="public" returnType="void">
+          <Argument type="ITableResource" name="tableResource"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface xPosition="920.0" yPosition="420.0" package="eu.trentorise.opendata.schemamatcher.model" name="ISchema" visibility="public">
+      <Methods>
+        <Method name="getSchemaElements" visibility="package" returnType="List&lt;ISchemaElement&gt;"/>
+        <Method name="getElementsNumber" visibility="package" returnType="int"/>
+        <Method name="getSchemaName" visibility="package" returnType="String"/>
+        <Method name="getSchemaDescriptiopn" visibility="package" returnType="String"/>
+        <Method name="getStructureType" visibility="package" returnType="SchemaStructureType"/>
+        <Method name="getSchemaConcept" visibility="package" returnType="Long"/>
+      </Methods>
+    </Interface>
+    <Interface xPosition="20.0" yPosition="820.0" package="eu.trentorise.opendata.schemamatcher.model" name="ISchemaCorrespondence" visibility="public">
+      <Methods>
+        <Method name="getSchemaElementCorrespondence" visibility="package" returnType="List&lt;ISchemaElementCorrespondence&gt;"/>
+        <Method name="getSourceSchema" visibility="package" returnType="ISchema"/>
+        <Method name="getTargetSchema" visibility="package" returnType="ISchema"/>
+        <Method name="getSchemaCorrespondenceScore" visibility="package" returnType="float"/>
+        <Method name="setSourceSchema" visibility="public" returnType="void">
+          <Argument type="ISchema" name="sourceSchema"/>
+        </Method>
+        <Method name="setTargetSchema" visibility="public" returnType="void">
+          <Argument type="ISchema" name="targetSchema"/>
+        </Method>
+        <Method name="setScore" visibility="public" returnType="void">
+          <Argument type="float" name="score"/>
+        </Method>
+        <Method name="setElementCorrespondences" visibility="public" returnType="void">
+          <Argument type="List&lt;ISchemaElementCorrespondence&gt;" name="elementCorrespondences"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface xPosition="320.0" yPosition="820.0" package="eu.trentorise.opendata.schemamatcher.model" name="ISchemaElement" visibility="public">
+      <Methods>
+        <Method name="getElementContent" visibility="public" returnType="IElementContent"/>
+        <Method name="getElementContext" visibility="public" returnType="IElementContext"/>
+        <Method name="getSchemaElementsRelations" visibility="public" returnType="List&lt;IElementRelation&gt;"/>
+        <Method name="hasElementContent" visibility="public" returnType="Boolean"/>
+      </Methods>
+    </Interface>
+    <Interface xPosition="620.0" yPosition="820.0" package="eu.trentorise.opendata.schemamatcher.model" name="ISchemaElementCorrespondence" visibility="public">
+      <Methods>
+        <Method name="getElementCorrespondenceScore" visibility="public" returnType="float"/>
+        <Method name="getTargetElement" visibility="public" returnType="SchemaElement"/>
+        <Method name="setTargetElement" visibility="public" returnType="void">
+          <Argument type="ISchemaElement" name="targetElement"/>
+        </Method>
+        <Method name="getSourceElement" visibility="public" returnType="SchemaElement"/>
+        <Method name="setSourceElement" visibility="public" returnType="void">
+          <Argument type="ISchemaElement" name="sourceSchemaElement"/>
+        </Method>
+        <Method name="setElementCorrespondenceScore" visibility="public" returnType="void">
+          <Argument type="float" name="score"/>
+        </Method>
+        <Method name="getElementMapping" visibility="public" returnType="HashMap&lt;ISchemaElement, Float&gt;"/>
+        <Method name="setElementMapping" visibility="public" returnType="void">
+          <Argument type="HashMap&lt;ISchemaElement, Float&gt;" name="elementMapping"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface xPosition="920.0" yPosition="820.0" package="eu.trentorise.opendata.schemamatcher.model" name="ISchemaElementMatcher" visibility="public">
+      <Methods>
+        <Method name="matchSchemaElements" visibility="package" returnType="ISchemaElementCorrespondence">
+          <Argument type="ISchemaElement" name="sourceSchemaElement"/>
+          <Argument type="ISchemaElement" name="targetSchemaElement"/>
+        </Method>
+        <Method name="matchSchemaElements" visibility="package" returnType="List&lt;ISchemaElementCorrespondence&gt;">
+          <Argument type="List&lt;ISchemaElement&gt;" name="sourceElements"/>
+          <Argument type="List&lt;ISchemaElement&gt;" name="targetElements"/>
+        </Method>
+        <Method name="getElementMatchingAlgorithm" visibility="package" returnType="String"/>
+      </Methods>
+    </Interface>
+    <Interface xPosition="20.0" yPosition="1220.0" package="eu.trentorise.opendata.schemamatcher.model" name="ISchemaMatcher" visibility="public">
+      <Methods>
+        <Method name="matchSchemas" visibility="package" returnType="ISchemaCorrespondence">
+          <Argument type="ISchema" name="sourceSchema"/>
+          <Argument type="ISchema" name="targetSchema"/>
+          <Argument type="String" name="schemaMatchingAlgorithm"/>
+        </Method>
+        <Method name="getSchemaMatchingAlgorithm" visibility="package" returnType="String"/>
+        <Method name="matchSchemas" visibility="package" returnType="List&lt;ISchemaCorrespondence&gt;">
+          <Argument type="List&lt;ISchema&gt;" name="sourceSchemas"/>
+          <Argument type="List&lt;ISchema&gt;" name="targetSchemas"/>
+          <Argument type="String" name="elementMatchingAlgorithm"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Enum xPosition="320.0" yPosition="1220.0" package="eu.trentorise.opendata.schemamatcher.model" name="SchemaStructureType" visibility="public">
+      <Literals>
+        <Literal name="RelationGraph"/>
+        <Literal name="Tree"/>
+        <Literal name="Flat"/>
+      </Literals>
+    </Enum>
+  </ClassDiagramComponents>
+  <ClassDiagramRelations>
+    <UseRelation source="ISchemaCorrespondence" target="ISchema" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="ISchemaMatcher" target="ISchemaCorrespondence" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="ISchemaElement" target="IElementContent" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="ISchemaElement" target="IElementContext" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="ISchemaCorrespondence" target="ISchemaElementCorrespondence" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="ISchema" target="ISchemaElement" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="ISchemaElementMatcher" target="ISchemaElementCorrespondence" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="ISchemaElement" target="IElementRelation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="IElementRelation" target="ISchemaElement" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="ISchemaElementCorrespondence" target="ISchemaElement" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="IResource" target="IResource" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="ISchema" target="SchemaStructureType" sourceCardinality="1..1" targetCardinality="1..1"/>
+  </ClassDiagramRelations>
+</ClassDiagram>

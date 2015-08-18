@@ -65,7 +65,7 @@ public class Schema implements ISchema {
     }
 
     @Override
-    public String getSchemaDescriptiopn() {
+    public String getSchemaDescription() {
         return this.schemaDescription;
     }
 

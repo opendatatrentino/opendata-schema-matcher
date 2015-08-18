@@ -3,13 +3,12 @@ package eu.trentorise.opendata.schemamatcher.implementation.model;
 import it.unitn.disi.sweb.webapi.client.kb.ConceptClient;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import eu.trentorise.opendata.columnrecognizers.ColumnConceptCandidate;
+
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;

@@ -38,7 +38,7 @@ public interface ISchema {
      *
      * @return schema description
      */
-    String getSchemaDescriptiopn();
+    String getSchemaDescription();
 
     /**
      * Type of the schema structure e.g tree, graph

@@ -27,6 +27,7 @@ public class ElementContent implements IElementContent {
         // TODO Auto-generated constructor stub
     }
 
+    @Override
     public List<Object> getContent() {
         return this.instances;
     }

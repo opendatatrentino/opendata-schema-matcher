@@ -16,8 +16,7 @@ import eu.trentorise.opendata.semantics.services.model.IAttributeCorrespondence;
 
 /**
  * @author Ivan Tankoyeu <tankoyeu@disi.unitn.it>
- * @date 24 Feb 2014
- *
+ * 
  */
 public class SchemaCorrespondence implements ISchemaCorrespondence {
 
@@ -115,7 +114,7 @@ public class SchemaCorrespondence implements ISchemaCorrespondence {
         if (this.etype == null) {
             Schema s = (Schema) this.targetSchema;
             sc.setEtype((EntityType) s.getEtype());
-        } else {
+0        } else {
             sc.setEtype((EntityType) this.etype);
         }
         List<IAttributeCorrespondence> atrCors = new ArrayList<IAttributeCorrespondence>();

@@ -3,6 +3,7 @@ package eu.trentorise.opendata.schemamatcher.model;
 import java.util.HashMap;
 
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElement;
+import java.util.Map;
 
 /**
  * Interface describes how a schema element corresponds to other schema elements
@@ -65,7 +66,7 @@ public interface ISchemaElementCorrespondence {
      * @return map where key is a target schema element and value is the score
      * between target and source.
      */
-    public HashMap<ISchemaElement, Float> getElementMapping();
+    public Map<ISchemaElement, Float> getElementMapping();
 
     /**
      * Method allows to set a correspondence of a source element to all the
@@ -74,6 +75,6 @@ public interface ISchemaElementCorrespondence {
      * @param elementMapping map where key is a target schema element and value
      * is the score between target and source.
      */
-    public void setElementMapping(HashMap<ISchemaElement, Float> elementMapping);
+    public void setElementMapping(Map<ISchemaElement, Float> elementMapping);
 
 }

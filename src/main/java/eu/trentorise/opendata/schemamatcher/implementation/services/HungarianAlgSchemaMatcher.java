@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,6 +29,7 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 
     public static final String ALGORITHM_NAME = "HungarianAllocationAndEditDistance";
 
+    @Override
     public ISchemaCorrespondence matchSchemas(ISchema sourceSchema,
             ISchema targetSchema, String elementMatchingAlgorithm) {
 
@@ -48,13 +48,13 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
         schemaCorrespondence.setSourceSchema(sourceSchema);
         schemaCorrespondence.setTargetSchema(targetSchema);
         //create the matrix of schema element correspondence
-        if ((sourceSchemaElements.size() != 0) && (targetSchemaElements.size() != 0)) {
+        if ((!sourceSchemaElements.isEmpty()) && (!targetSchemaElements.isEmpty())) {
             List<ISchemaElementCorrespondence> elementCorrespondences = elementMatcher.matchSchemaElements(sourceSchemaElements, targetSchemaElements);
             score = optimezedCorrespondenceScore(elementCorrespondences);
             schemaCorrespondence.setElementCorrespondences(elementCorrespondences);
 
         } else {
-            List<ISchemaElementCorrespondence> elementCorrespondences = new ArrayList<ISchemaElementCorrespondence>();
+            List<ISchemaElementCorrespondence> elementCorrespondences = new ArrayList();
             schemaCorrespondence.setElementCorrespondences(elementCorrespondences);
         }
         schemaCorrespondence.setScore(score);
@@ -74,10 +74,10 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
         float score = 0;
         int assigmentMatrix[][];
 
-        HashMap<ISchemaElement, Float> corMaps = elementCorrespondences.iterator().next().getElementMapping();
+        Map<ISchemaElement, Float> corMaps = elementCorrespondences.iterator().next().getElementMapping();
 
         ArrayList<ISchemaElement> targetElements = new ArrayList<ISchemaElement>();
-        ArrayList<ISchemaElementCorrespondence> sourceElements = new ArrayList<ISchemaElementCorrespondence>();
+        ArrayList<ISchemaElementCorrespondence> sourceElements = new ArrayList();
 
         int els = elementCorrespondences.size();
         int corMapSize = corMaps.size();
@@ -98,7 +98,7 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
             Arrays.fill(matrixFin[z], (float) 1.0);
         }
 
-        HashMap<ISchemaElement, Float> maping = elementCorrespondences.get(0).getElementMapping();
+        Map<ISchemaElement, Float> maping = elementCorrespondences.get(0).getElementMapping();
 
         TreeMap<ISchemaElement, Float> map = new TreeMap<ISchemaElement, Float>();
 
@@ -117,9 +117,9 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
 
         for (ISchemaElementCorrespondence elCor : elementCorrespondences) {
             int i = 0;
-            HashMap<ISchemaElement, Float> mapingCor = elCor.getElementMapping();
+            Map<ISchemaElement, Float> mapingCor = elCor.getElementMapping();
 
-            TreeMap<ISchemaElement, Float> corMap = new TreeMap<ISchemaElement, Float>(bvc);
+            TreeMap<ISchemaElement, Float> corMap = new TreeMap(bvc);
             corMap.putAll(mapingCor);
 
             for (ISchemaElement key : corMap.keySet()) {
@@ -171,10 +171,12 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
         return ha.computeAssignments(matrix);
     }
 
+    @Override
     public String getSchemaMatchingAlgorithm() {
         return HungarianAlgSchemaMatcher.ALGORITHM_NAME;
     }
 
+    @Override
     public List<ISchemaCorrespondence> matchSchemas(
             List<ISchema> sourceSchemas, List<ISchema> targetSchemas,
             String elementMatchingAlgorithm) {

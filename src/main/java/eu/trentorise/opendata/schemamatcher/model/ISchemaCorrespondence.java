@@ -2,6 +2,10 @@ package eu.trentorise.opendata.schemamatcher.model;
 
 import java.util.List;
 
+
+
+
+
 /**
  * The class stands for description of correspondence between two schemas
  *
@@ -12,7 +16,7 @@ import java.util.List;
 public interface ISchemaCorrespondence {
 
     /**
-     * Method aims to return correspondences between two schema elements.
+     * Returna correspondences between two schema elements.
      *
      * @return correspondences between source and target schema elements
      */
@@ -35,7 +39,7 @@ public interface ISchemaCorrespondence {
     ISchema getTargetSchema();
 
     /**
-     * Method return scores [0,1] that shows the closeness between two given
+     * Return score [0,1] that shows the closeness between two given
      * schemas. The higher the score is, the more similar two schemas are.
      *
      * @return score that represents correspondences between target and source
@@ -44,7 +48,7 @@ public interface ISchemaCorrespondence {
     float getSchemaCorrespondenceScore();
 
     /**
-     * Method allows to set a source schema from which we trying to find mapping
+     * Sets a source schema from which we trying to find mapping
      * (in ODR it is an schema of input data resource )
      *
      * @param sourceSchema
@@ -52,7 +56,7 @@ public interface ISchemaCorrespondence {
     public void setSourceSchema(ISchema sourceSchema);
 
     /**
-     * Method allows to set a target schema to which we trying to find mapping
+     * Sets a target schema to which we trying to find mapping
      * (in ODR it is a target EType)
      *
      * @param targetSchema
@@ -60,7 +64,7 @@ public interface ISchemaCorrespondence {
     public void setTargetSchema(ISchema targetSchema);
 
     /**
-     * Method aloows to set a score [0,1] that shows the closeness between two
+     * Sets a score [0,1] that shows the closeness between two
      * given schemas. The higher the score is, the more similar two schemas are.
      *
      * @param score
@@ -68,7 +72,7 @@ public interface ISchemaCorrespondence {
     public void setScore(float score);
 
     /**
-     * Method allows to set correspondences between schema elements.
+     * Sets correspondences between schema elements.
      *
      * @param elementCorrespondences
      */

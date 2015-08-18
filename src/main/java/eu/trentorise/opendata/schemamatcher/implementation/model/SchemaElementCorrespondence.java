@@ -23,7 +23,7 @@ import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
 public class SchemaElementCorrespondence implements ISchemaElementCorrespondence {
 
     private SchemaElement sourceElement;
-    private HashMap<ISchemaElement, Float> elementMapping;
+    private Map<ISchemaElement, Float> elementMapping;
     private float score;
     private SchemaElement highestTargetElement;
     private IAttributeDef attrDef;
@@ -81,12 +81,12 @@ public class SchemaElementCorrespondence implements ISchemaElementCorrespondence
     }
 
     @Override
-    public HashMap<ISchemaElement, Float> getElementMapping() {
+    public Map<ISchemaElement, Float> getElementMapping() {
         return elementMapping;
     }
 
     @Override
-    public void setElementMapping(HashMap<ISchemaElement, Float> elementMapping) {
+    public void setElementMapping(Map<ISchemaElement, Float> elementMapping) {
         Preconditions.checkNotNull(elementMapping);
         this.elementMapping = elementMapping;
     }
@@ -98,9 +98,9 @@ public class SchemaElementCorrespondence implements ISchemaElementCorrespondence
             this.score = (float) 0;
         } else {
             Map.Entry<ISchemaElement, Float> maxEntry = null;
-            TreeMap<ISchemaElement, Float> map = new TreeMap<ISchemaElement, Float>();
+            TreeMap<ISchemaElement, Float> map = new TreeMap();
             KeyComparator bvc = new KeyComparator(map);
-            TreeMap<ISchemaElement, Float> sortedKeyMap = new TreeMap<ISchemaElement, Float>(bvc);
+            TreeMap<ISchemaElement, Float> sortedKeyMap = new TreeMap(bvc);
             sortedKeyMap.putAll(correspondences);
             for (Map.Entry<ISchemaElement, Float> entry : sortedKeyMap.entrySet()) {
                 if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
@@ -124,8 +124,8 @@ public class SchemaElementCorrespondence implements ISchemaElementCorrespondence
         ac.setColumnIndex(this.sourceElement.getColumnIndex());
         ac.setHeaderConceptID(this.sourceElement.getElementContext().getElementConcept());
 
-        HashMap<ISchemaElement, Float> map = this.elementMapping;
-        HashMap<IAttributeDef, Float> atrCorMap = new HashMap<IAttributeDef, Float>();
+        Map<ISchemaElement, Float> map = this.elementMapping;
+        HashMap<IAttributeDef, Float> atrCorMap = new HashMap();
         for (Map.Entry<ISchemaElement, Float> entry : map.entrySet()) {
             SchemaElement se = (SchemaElement) entry.getKey();
             atrCorMap.put(se.getAttrDef(), entry.getValue());

@@ -1,5 +1,6 @@
 package eu.trentorise.opendata.schemamatcher.implementation.services;
 
+import eu.trentorise.opendata.columnrecognizers.SwebConfiguration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,26 +29,27 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
     public SimpleSchemaMatcher() {
     }
 
+    @Override
     public ISchemaCorrespondence matchSchemas(ISchema sourceSchema,
             ISchema targetSchema, String elementMatchingAlgorithm) {
         SchemaCorrespondence schemaCorrespondence = new SchemaCorrespondence();
         SElementMatchingService elMatching = new SElementMatchingService();
         SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
-        List<ISchemaElement> sourceSchemaElements = sourceSchema.getSchemaElements();
-        List<ISchemaElement> targetSchemaElements = targetSchema.getSchemaElements();
+        List<ISchemaElement> sourceSchemaElements = sourceSchema.getElements();
+        List<ISchemaElement> targetSchemaElements = targetSchema.getElements();
         sourceSchemaElements = sefe.runColumnRecognizer(sourceSchemaElements);
         ISchemaElementMatcher elementMatcher = elMatching.getElementMatcher(elementMatchingAlgorithm);
         schemaCorrespondence.setSourceSchema(sourceSchema);
         schemaCorrespondence.setTargetSchema(targetSchema);
         float score;
         //create the matrix of schema element correspondence
-        if ((sourceSchemaElements.size() != 0) && (targetSchemaElements.size() != 0)) {
+        if ((!sourceSchemaElements.isEmpty()) && (!targetSchemaElements.isEmpty())) {
             List<ISchemaElementCorrespondence> elementCorrespondences = elementMatcher.matchSchemaElements(sourceSchemaElements, targetSchemaElements);
             schemaCorrespondence.setElementCorrespondences(elementCorrespondences);
             score = computeOverallSchemaScore(sourceSchema, targetSchema, schemaCorrespondence);
 
         } else {
-            List<ISchemaElementCorrespondence> elementCorrespondences = new ArrayList<ISchemaElementCorrespondence>();
+            List<ISchemaElementCorrespondence> elementCorrespondences = new ArrayList();
             schemaCorrespondence.setElementCorrespondences(elementCorrespondences);
             score = (float) (computeOverallSchemaScore(sourceSchema, targetSchema) * 0.1);
         }
@@ -55,9 +57,10 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
         return schemaCorrespondence;
     }
 
+    @Override
     public List<ISchemaCorrespondence> matchSchemas(
             List<ISchema> sourceSchemas, List<ISchema> targetSchemas, String elementMatchingAlgorithm) {
-        List<ISchemaCorrespondence> correspondences = new ArrayList<ISchemaCorrespondence>();
+        List<ISchemaCorrespondence> correspondences = new ArrayList();
         for (ISchema sourceSchema : sourceSchemas) {
             for (ISchema targetSchema : targetSchemas) {
                 ISchemaCorrespondence correspondence = matchSchemas(sourceSchema, targetSchema, elementMatchingAlgorithm);
@@ -68,6 +71,7 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
         return correspondences;
     }
 
+    @Override
     public String getSchemaMatchingAlgorithm() {
         return ALGORITHM_NAME;
     }
@@ -95,7 +99,8 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
             ISchema targetSchema, ISchemaCorrespondence sCorrespondence) {
         SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
         float elementMatchScore = computeSchemaElementCorrespondence(sCorrespondence);
-        float nameMatchScore = sefe.getConceptsDistance(sourceSchema.getSchemaConcept(), targetSchema.getSchemaConcept());
+        float nameMatchScore = sefe.getConceptsDistance(SwebConfiguration.getUrlMapper().urlToConceptId(sourceSchema.getConceptUrl()),
+               SwebConfiguration.getUrlMapper().urlToConceptId(targetSchema.getConceptUrl()));
         float overallScore = (elementMatchScore + nameMatchScore) / (sCorrespondence.getSchemaElementCorrespondence().size() + 1);
         return overallScore;
     }
@@ -111,7 +116,7 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
     private float computeOverallSchemaScore(ISchema sourceSchema,
             ISchema targetSchema) {
         SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
-        return sefe.getConceptsDistance(sourceSchema.getSchemaConcept(), targetSchema.getSchemaConcept());
+        return sefe.getConceptsDistance(SwebConfiguration.getUrlMapper().urlToConceptId(sourceSchema.getConceptUrl()),SwebConfiguration.getUrlMapper().urlToConceptId(targetSchema.getConceptUrl()));
     }
 
     /**

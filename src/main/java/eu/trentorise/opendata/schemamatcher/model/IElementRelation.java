@@ -2,35 +2,37 @@ package eu.trentorise.opendata.schemamatcher.model;
 
 /**
  * Describes the relationship between different elements of a schema
- *
+ * 
+ * For {@link SchemaStructureType#TREE} a possible relation is "parent"
+ * 
  * @author Ivan Tankoyeu
  *
  */
 public interface IElementRelation {
 
     /**
-     * Method returns relation between schema elements
+     * The relation between schema elements
      *
      * @return relation between element
      */
     public String getRelation();
 
     /**
-     * Method allows to assign relation between two schema elements
+     * Sets relation between two schema elements
      *
      * @param relation between schema elements
      */
     public void setRelation(String relation);
 
     /**
-     * Method returns target schema element towards which relation is assigned
+     * The target schema element towards which relation is assigned
      *
      * @return schema element
      */
     public ISchemaElement getRelatedElement();
 
     /**
-     * Method allows to assign target schema element
+     * Sets target schema element
      *
      * @param relatedElement related schema element
      */

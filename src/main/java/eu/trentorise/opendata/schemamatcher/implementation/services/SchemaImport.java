@@ -1,10 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.services;
 
-import it.unitn.disi.sweb.webapi.client.eb.InstanceClient;
-import it.unitn.disi.sweb.webapi.model.Pagination;
 import it.unitn.disi.sweb.webapi.model.eb.Attribute;
 import it.unitn.disi.sweb.webapi.model.eb.Instance;
-import it.unitn.disi.sweb.webapi.model.filters.InstanceFilter;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,15 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import au.com.bytecode.opencsv.CSVReader;
+import static com.google.common.base.Preconditions.checkNotNull;
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
-import eu.trentorise.opendata.disiclient.model.entity.EntityType;
-import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
-import eu.trentorise.opendata.disiclient.services.EntityTypeService;
-import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
+import eu.trentorise.opendata.columnrecognizers.SwebConfiguration;
+import eu.trentorise.opendata.schemamatcher.util.SwebClientCrap;
 import eu.trentorise.opendata.nlprise.DataTypeGuess.Datatype;
 import eu.trentorise.opendata.schemamatcher.implementation.model.ElementContent;
 import eu.trentorise.opendata.schemamatcher.implementation.model.ElementContext;
@@ -31,14 +24,22 @@ import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElement;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElementFeatureExtractor;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaMatcherException;
 import eu.trentorise.opendata.schemamatcher.model.IElementRelation;
-import eu.trentorise.opendata.schemamatcher.model.IResource;
 import eu.trentorise.opendata.schemamatcher.model.ISchema;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.services.importing.ISchemaImport;
+import eu.trentorise.opendata.semantics.exceptions.UnsupportedSchemaException;
 import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
 import eu.trentorise.opendata.semantics.model.entity.IEntityType;
-import eu.trentorise.opendata.semantics.model.knowledge.IResourceContext;
-import eu.trentorise.opendata.semantics.model.knowledge.ITableResource;
+import eu.trentorise.opendata.semantics.services.IEkb;
+import eu.trentorise.opendata.semantics.services.IEntityTypeService;
+import eu.trentorise.opendata.traceprov.data.DcatMetadata;
+import eu.trentorise.opendata.traceprov.types.ClassType;
+import eu.trentorise.opendata.traceprov.types.ListType;
+import eu.trentorise.opendata.traceprov.types.StringType;
+import eu.trentorise.opendata.traceprov.types.Type;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains logic for import from *.csv files, EntityTypes and ODR's IResource
@@ -50,21 +51,26 @@ public class SchemaImport implements ISchemaImport {
 
     private static final int RECURSION_DEPTH = 3;
 
-    private final static Logger logger = Logger.getLogger(SchemaImport.class.getName());
+    private final static Logger LOG = LoggerFactory.getLogger(SchemaImport.class.getName());
 
-    private final static int PAGE_SIZE = 100;
+    private IEkb ekb;
 
+    public SchemaImport(IEkb ekb) {
+        checkNotNull(ekb);
+        this.ekb = ekb;
+    }
+
+    @Override
     public ISchema extractSchema(File file) throws SchemaMatcherException {
         // TODO check supported format
-        if (file == null) {
-            throw new SchemaMatcherException("Null input is provided!");
-        }
+        checkNotNull(file);
+
         ISchema schemaOut = null;
         try {
             schemaOut = parseCSV(file);
         }
-        catch (IOException e) {
-            logger.error(e.getMessage());
+        catch (IOException ex) {
+            throw new RuntimeException("Error while parsing schema from CSV!", ex);
         }
         return schemaOut;
     }
@@ -80,14 +86,14 @@ public class SchemaImport implements ISchemaImport {
         CSVReader reader = new CSVReader(new FileReader(file));
         List<String[]> strings = reader.readAll();
         String[] str = strings.get(0);
-        List<ISchemaElement> sElements = new ArrayList<ISchemaElement>();
+        List<ISchemaElement> sElements = new ArrayList();
         for (int i = 0; i < str.length; i++) {
             SchemaElement schemaElement = new SchemaElement();
             ElementContext sContext = new ElementContext();
             sContext.setElementName(str[i]);
 
             ElementContent elContent = new ElementContent();
-            List<Object> elInstances = new ArrayList<Object>();
+            List<Object> elInstances = new ArrayList();
 
             int lineNumber = 1;
 
@@ -113,41 +119,33 @@ public class SchemaImport implements ISchemaImport {
         String fileName = file.getName().replaceFirst("[.][^.]+$", "");
 
         long conceptId = ColumnRecognizer.conceptFromText(fileName);
-        schema.setSchemaConcept(conceptId);
-        schema.setSchemaName(fileName);
+        schema.setConceptUrl(SwebConfiguration.getUrlMapper().conceptIdToUrl(conceptId));
+        schema.setName(fileName);
         reader.close();
         return schema;
     }
 
-    @SuppressWarnings("deprecation")
+    @Override
     public ISchema extractSchema(Object schema, Locale locale) throws SchemaMatcherException {
 
         if (schema == null) {
-            throw new SchemaMatcherException("Null input is provided!");
-        }
-        if (schema instanceof IResource) {
-
-            IResource resource = (IResource) schema;
-            logger.log(Level.INFO, resource.getTableResource().getHeaders());
-            return extractFromODRResource(resource.getResourceContext(), resource.getTableResource());
+            throw new SchemaMatcherException("Null schema input is provided!");
         }
         if ((schema instanceof IEntityType)) {
             IEntityType etype = (IEntityType) schema;
 
             Schema schemaOut = new Schema();
             String name = etype.getName().string(locale);
-            schemaOut.setSchemaName(name);
+            schemaOut.setName(name);
             schemaOut.setEtype(etype);
             List<ISchemaElement> schemaElements = null;
-            if (etype.getAttributeDefs().size() != 0) {
+            if (!etype.getAttributeDefs().isEmpty()) {
                 schemaElements = extractSchemaElements(etype, locale);
             } else {
-                schemaElements = new ArrayList<ISchemaElement>();
+                schemaElements = new ArrayList();
             }
-            ConceptODR codr = new ConceptODR();
-            codr = codr.readConceptGlobalID(etype.getConcept().getGUID());
-            long globalConceptID = codr.getId();
-            schemaOut.setSchemaConcept(globalConceptID);
+
+            schemaOut.setConceptUrl(etype.getConcept().getURL());
             schemaOut.setSchemaElements(schemaElements);
             return schemaOut;
         } else {
@@ -156,43 +154,91 @@ public class SchemaImport implements ISchemaImport {
     }
 
     /**
-     * Method extracts schema from ODR IResource
+     * Extracts schema from Open Entity data format (which is a simple tree)
      *
-     * @param resourceContext
-     * @param tableResource
+     * Currently only supports traceprov type schema
+     * {@code ListType<ClassType{field:string}>}
+     *
      * @return object of Schema
      */
-    private ISchema extractFromODRResource(IResourceContext resourceContext, ITableResource tableResource) {
+    public ISchema extractSchema(DcatMetadata dcatMetadata, Type traceType, Object data) {
+
         Schema schema = new Schema();
 
-        schema.setSchemaName(resourceContext.getResourceName());
-        List<ISchemaElement> selements = new ArrayList<ISchemaElement>();
+        String distribTitle = dcatMetadata.getDistribution().getTitle().some().str();
 
-        List<String> elNames = tableResource.getHeaders();
-        int tableSize = tableResource.getHeaders().size();
-        for (int i = 0; i < tableSize; i++) {
-            SchemaElement sElement = new SchemaElement();
-            ElementContext elContext = new ElementContext();
-            ElementContent elContent = new ElementContent();
+        schema.setName(distribTitle);
+        List<ISchemaElement> selements = new ArrayList();
 
-            List<String> tabInstances = tableResource.getColumns().get(i);
-            List<Object> instances = new ArrayList<Object>();
-            for (String st : tabInstances) {
-                instances.add(st);
+        // ----------------------------------------
+        // checks supported schemas
+        // ListType<ClassType>
+        if (traceType instanceof ListType) {
+            ListType listType = (ListType) traceType;
+            Type subtype = listType.getSubtype();
+            if (subtype instanceof ClassType) {
+                ClassType classType = (ClassType) subtype;
+
+                List<String> elNames = classType.getPropertyDefs().keySet().asList();
+
+                for (String s : elNames) {
+                    Type t = classType.getPropertyDef(s).getType();
+                    if (!t.equals(StringType.of())) {
+                        throw new UnsupportedSchemaException("Found unsupported sub type " + t.getId() + ", currently we only support " + StringType.of().getId());
+                    }
+                }
+
+                for (String elName : elNames) {
+                    SchemaElement sElement = new SchemaElement();
+                    ElementContext elContext = new ElementContext();
+                    ElementContent elContent = new ElementContent();
+                    List<Object> instances = new ArrayList();
+                    elContent.setContent(instances);
+                    elContext.setElementName(elName);
+                    sElement.setElementContext(elContext);
+                    sElement.setElementContent(elContent);
+                    selements.add(sElement);
+                }
+                if (data == null) {
+                    LOG.info("Found null data, will only use type to find schemas");
+                } else {
+                    Iterable dataArray = (Iterable) data;
+                    for (Object dn : dataArray) {
+                        Map dataMap = (Map) dn;
+                        for (int i = 0; i < elNames.size(); i++) {
+
+                            String key = elNames.get(i);
+
+                            Object value = dataMap.get(key); // hope any json terminal value is ok..
+
+                            String sanitizedValue;
+                            if (value == null) {
+                                sanitizedValue = "";
+                            } else if (value instanceof String) {
+                                sanitizedValue = (String) value;
+                            } else {
+                                throw new UnsupportedSchemaException("Found unsupported data Java type " + value.getClass().getCanonicalName()
+                                        + ", currently we only support " + StringType.of().getJavaClass());
+                            }
+
+                            selements.get(i).getElementContent().getContent().add(sanitizedValue);
+                        }
+                    }
+                }
+
+                SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
+                selements = sefe.runColumnRecognizer(selements);
+                schema.setSchemaElements(selements);
+                long schemaConceptID = ColumnRecognizer.conceptFromText(distribTitle);
+                schema.setConceptUrl(SwebConfiguration.getUrlMapper().conceptIdToUrl(schemaConceptID));
+
+                return schema;
             }
-            elContent.setContent(instances);
-            elContext.setElementName(elNames.get(i));
-            sElement.setElementContext(elContext);
-            sElement.setElementContent(elContent);
-            selements.add(sElement);
         }
-        SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
-        selements = sefe.runColumnRecognizer(selements);
-        schema.setSchemaElements(selements);
-        long schemaConceptID = ColumnRecognizer.conceptFromText(resourceContext.getResourceName());
-        schema.setSchemaConcept(schemaConceptID);
 
-        return schema;
+        throw new UnsupportedOperationException(
+                "Could not interpret given data schema: " + traceType.toString());
+
     }
 
     /**
@@ -205,7 +251,7 @@ public class SchemaImport implements ISchemaImport {
      */
     private List<ISchemaElement> extractSchemaElements(IEntityType etype, Locale locale) {
         List<IAttributeDef> attrDefs = etype.getAttributeDefs();
-        List<ISchemaElement> schemaElements = new ArrayList<ISchemaElement>();
+        List<ISchemaElement> schemaElements = new ArrayList();
         getSchemaElements(etype, schemaElements, attrDefs, locale, 0, null);
         return schemaElements;
     }
@@ -217,45 +263,44 @@ public class SchemaImport implements ISchemaImport {
      * @param locale
      */
     private void getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale, int depth, ISchemaElement parentElement) {
-        List<Instance> instances = getEntities(etype);
+        List<Instance> instances = SwebClientCrap.getEntities(etype);
         for (IAttributeDef atrDef : attrDefs) {
             SchemaElement schemaElement = new SchemaElement();
 
             ElementContext elContext = new ElementContext();
             ElementContent elContent = new ElementContent();
-            List<IElementRelation> schemaElementRelations = new ArrayList<IElementRelation>();
+            List<IElementRelation> schemaElementRelations = new ArrayList();
             ElementRelation elRelation = new ElementRelation();
             if (parentElement != null) {
                 elRelation.setRelation("parent");
                 elRelation.setRelatedElement(parentElement);
             }
             schemaElementRelations.add(elRelation);
-            //context extraction
-            schemaElement.setAttrDef(atrDef);
+            //context extraction            
             elContext.setElementName(atrDef.getName().string(locale));
-            String dataType = atrDef.getDataType();
+            String dataType = atrDef.getDatatype();
             elContext.setElemetnDataType(dataType);
             //convert local concept id to a global one
-            elContext.setElementConcept(WebServiceURLs.urlToConceptID(atrDef.getConceptURL()));
+            elContext.setElementConcept(atrDef.getConceptURL());
             schemaElement.setElementContext(elContext);
             //schema element relation extraction
             schemaElement.setSchemaElementRelations(schemaElementRelations);
 
             //schema element's content extraction
             //TODO find the way to download best representing content
-            List<Object> values = new ArrayList<Object>();
+            List<Object> values = new ArrayList();
             if (instances != null) {
-                if ((atrDef.getDataType().equalsIgnoreCase("xsd:float")) || (atrDef.getDataType().equalsIgnoreCase("xsd:integer"))
-                        || (atrDef.getDataType().equalsIgnoreCase("xsd:long"))) {
+                if ((atrDef.getDatatype().equalsIgnoreCase("xsd:float")) || (atrDef.getDatatype().equalsIgnoreCase("xsd:integer"))
+                        || (atrDef.getDatatype().equalsIgnoreCase("xsd:long"))) {
                     values = getValues(instances, atrDef);
                 }
             }
             elContent.setContent(values);
             schemaElement.setElementContent(elContent);
             schemaElements.add(schemaElement);
-            if (atrDef.getDataType().equalsIgnoreCase("oe:structure")) {
-                EntityTypeService ets = new EntityTypeService();
-                IEntityType structureEtype = (EntityType) ets.readEntityType(atrDef.getRangeEtypeURL());
+            if (atrDef.getDatatype().equalsIgnoreCase("oe:structure")) {
+                IEntityTypeService ets = ekb.getEntityTypeService();
+                IEntityType structureEtype = ets.readEntityType(atrDef.getRangeEtypeURL());
                 List<IAttributeDef> strAttrDefs = structureEtype.getAttributeDefs();
                 if (depth < RECURSION_DEPTH) {
                     getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale, ++depth, schemaElement);
@@ -266,45 +311,17 @@ public class SchemaImport implements ISchemaImport {
 
     private List<Object> getValues(List<Instance> instances,
             IAttributeDef atrDef) {
-        List<Object> objects = new ArrayList<Object>();
+        List<Object> objects = new ArrayList();
         for (Instance in : instances) {
             List<Attribute> attrs = in.getAttributes();
             for (Attribute a : attrs) {
-                if (a.getConceptId() == WebServiceURLs.urlToConceptID(atrDef.getConceptURL())) {
+                if (a.getConceptId()== SwebConfiguration.getUrlMapper().urlToConceptId(atrDef.getConceptURL())) {
                     objects.add(a.getValues().iterator().next().getValue());
                 }
             }
         }
 
         return objects;
-    }
-
-    /**
-     * methods takes random entities from Entitypedia
-     *
-     * @param etype
-     * @return
-     */
-    public List<Instance> getEntities(IEntityType etype) {
-
-        InstanceClient insClient = new InstanceClient(WebServiceURLs.getClientProtocol());
-        Long etypeId = WebServiceURLs.urlToEtypeID(etype.getURL());
-        Pagination page = new Pagination();
-        page.setPageSize(PAGE_SIZE);
-        List<Instance> instances = insClient.readInstances(1L, etypeId, null, null, page); // TODO Make sure that they are taken randomly
-        List<Long> instancesIds = new ArrayList<Long>();
-
-        for (Instance in : instances) {
-            instancesIds.add(in.getId());
-        }
-        InstanceFilter filter = new InstanceFilter();
-        filter.setIncludeAttributes(true);
-        if (instancesIds.size() != 0) {
-            List<Instance> instancesFull = insClient.readInstancesById(instancesIds, filter);
-            return instancesFull;
-        } else {
-            return null;
-        }
     }
 
     public String extractDataType(ElementContent elContent) {

@@ -39,7 +39,7 @@ public interface IElementContext {
      *
      * @return name of the element
      */
-    public long getElementConcept();
+    public String getElementConcept();
 
     /**
      * Method allows assigns concept id
@@ -47,6 +47,6 @@ public interface IElementContext {
      * @param conceptId
      * @return
      */
-    public void setElementConcept(Long conceptId);
+    public void setElementConcept(String conceptId);
 
 }

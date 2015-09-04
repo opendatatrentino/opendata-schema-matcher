@@ -13,25 +13,25 @@ import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 
 public class Schema implements ISchema {
 
-    private String schemaName;
-    private String schemaDescription;
-    private List<ISchemaElement> schemaElements;
+    private String name;
+    private String description;
+    private List<ISchemaElement> elements;
     private int elementsNumber;
     private SchemaStructureType structureType;
-    private long schemaConcept;
+    private String conceptUrl;
     private IEntityType etype;
 
-    public Schema(String schemaName, String schemaDescription,
-            List<ISchemaElement> schemaElements, int elementsNumber,
-            SchemaStructureType structureType, Long schemaConcept,
+    public Schema(String name, String description,
+            List<ISchemaElement> elements, int number,
+            SchemaStructureType structureType, String conceptUrl,
             IEntityType etype) {
         super();
-        this.schemaName = schemaName;
-        this.schemaDescription = schemaDescription;
-        this.schemaElements = schemaElements;
-        this.elementsNumber = elementsNumber;
+        this.name = name;
+        this.description = description;
+        this.elements = elements;
+        this.elementsNumber = number;
         this.structureType = structureType;
-        this.schemaConcept = schemaConcept;
+        this.conceptUrl = conceptUrl;
         this.etype = etype;
     }
 
@@ -40,33 +40,31 @@ public class Schema implements ISchema {
 
     @Override
     public String toString() {
-        return "Schema [schemaName=" + schemaName + ", schemaDescription="
-                + schemaDescription + ", schemaElements=" + schemaElements.toString()
-                + ", elementsNumber=" + elementsNumber + ", structureType="
-                + structureType + "]";
+        return "Schema{" + "name=" + name + ", description=" + description + ", elements=" + elements + ", elementsNumber=" + elementsNumber + ", structureType=" + structureType + ", conceptUrl=" + conceptUrl + ", etype=" + etype + '}';
     }
+   
 
     @Override
-    public List<ISchemaElement> getSchemaElements() {
-        return this.schemaElements;
+    public List<ISchemaElement> getElements() {
+        return this.elements;
     }
 
     @Override
     public int getElementsNumber() {
-        if ((Integer) this.elementsNumber == null) {
-            this.elementsNumber = this.schemaElements.size();
-        }
+        
+        this.elementsNumber = this.elements.size();
+        
         return this.elementsNumber;
     }
 
     @Override
-    public String getSchemaName() {
-        return this.schemaName;
+    public String getName() {
+        return this.name;
     }
 
     @Override
-    public String getSchemaDescription() {
-        return this.schemaDescription;
+    public String getDescription() {
+        return this.description;
     }
 
     @Override
@@ -76,27 +74,28 @@ public class Schema implements ISchema {
 
     public void setSchemaElements(List<ISchemaElement> schemaElements) {
         Preconditions.checkNotNull(schemaElements);
-        this.schemaElements = schemaElements;
+        this.elements = schemaElements;
     }
 
     @Nullable
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+    public void setName(String schemaName) {
+        this.name = schemaName;
     }
 
-    public void setSchemaDescription(String schemaDescription) {
+    public void setDescription(String schemaDescription) {
         Preconditions.checkNotNull(schemaDescription);
-        this.schemaDescription = schemaDescription;
+        this.description = schemaDescription;
     }
 
     @Override
-    public Long getSchemaConcept() {
-        return this.schemaConcept;
+    public String getConceptUrl() {
+        return this.conceptUrl;
     }
 
-    public void setSchemaConcept(Long conceptId) {
-        Preconditions.checkNotNull(conceptId);
-        this.schemaConcept = conceptId;
+    public void setConceptUrl(String conceptUrl) {
+        
+        Preconditions.checkNotNull(conceptUrl);
+        this.conceptUrl = conceptUrl;
     }
 
     public IEntityType getEtype() {

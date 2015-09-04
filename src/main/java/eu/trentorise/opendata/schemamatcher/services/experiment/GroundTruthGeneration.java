@@ -1,16 +1,14 @@
 package eu.trentorise.opendata.schemamatcher.services.experiment;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import eu.trentorise.opendata.columnrecognizers.SwebConfiguration;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import eu.trentorise.opendata.disiclient.model.entity.EntityType;
-import eu.trentorise.opendata.disiclient.services.EntityTypeService;
-import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaCorrespondence;
-import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElement;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElementCorrespondence;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaMatcherException;
 import eu.trentorise.opendata.schemamatcher.implementation.services.SchemaImport;
@@ -18,6 +16,8 @@ import eu.trentorise.opendata.schemamatcher.model.ISchema;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
+import eu.trentorise.opendata.semantics.model.entity.IEntityType;
+import eu.trentorise.opendata.semantics.services.IEkb;
 
 /**
  * Generates ground truth for schema matching experiments. It is important to
@@ -36,7 +36,7 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> LODGING_FACILITY_ELEMENTS_MAP;
 
     static {
-        LODGING_FACILITY_ELEMENTS_MAP = new HashMap<String, String>();
+        LODGING_FACILITY_ELEMENTS_MAP = new HashMap();
         LODGING_FACILITY_ELEMENTS_MAP.put("Nome_Impresa_agricola", "Nome");
         LODGING_FACILITY_ELEMENTS_MAP.put("Latitudine", "Latitudine");
         LODGING_FACILITY_ELEMENTS_MAP.put("Longitudine", "Longitudine");
@@ -74,7 +74,7 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> FACILITY_ELEMENTS_MAP1;
 
     static {
-        FACILITY_ELEMENTS_MAP1 = new HashMap<String, String>();
+        FACILITY_ELEMENTS_MAP1 = new HashMap();
         FACILITY_ELEMENTS_MAP1.put("nome", "Nome");
         FACILITY_ELEMENTS_MAP1.put("orari", "Orario di apertura");
         FACILITY_ELEMENTS_MAP1.put("typeIt", "Classe");
@@ -88,7 +88,7 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> FACILITY_ELEMENTS_MAP2;
 
     static {
-        FACILITY_ELEMENTS_MAP2 = new HashMap<String, String>();
+        FACILITY_ELEMENTS_MAP2 = new HashMap();
         FACILITY_ELEMENTS_MAP2.put("OSPEDALE", "Nome");
         FACILITY_ELEMENTS_MAP2.put("INDIRIZZO", "Indirizzo");
         FACILITY_ELEMENTS_MAP2.put("TIPO_OSP", "Classe");
@@ -108,7 +108,7 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> FACILITY_ELEMENTS_MAP3;
 
     static {
-        FACILITY_ELEMENTS_MAP3 = new HashMap<String, String>();
+        FACILITY_ELEMENTS_MAP3 = new HashMap();
         FACILITY_ELEMENTS_MAP3.put("INDIRIZZO", "Indirizzo");
         FACILITY_ELEMENTS_MAP3.put("NOTE", "Descrizione");
         FACILITY_ELEMENTS_MAP3.put("LATITUDINE_P", "Latitudine");
@@ -124,7 +124,7 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> SHOPPING_FACILITY_ELEMENTS_MAP1;
 
     static {
-        SHOPPING_FACILITY_ELEMENTS_MAP1 = new HashMap<String, String>();
+        SHOPPING_FACILITY_ELEMENTS_MAP1 = new HashMap();
         SHOPPING_FACILITY_ELEMENTS_MAP1.put("Insegna", "Nome");
         SHOPPING_FACILITY_ELEMENTS_MAP1.put("Indirizzo", "Indirizzo");
         SHOPPING_FACILITY_ELEMENTS_MAP1.put("Note", "Descrizione");
@@ -137,7 +137,7 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> SHOPPING_FACILITY_ELEMENTS_MAP2;
 
     static {
-        SHOPPING_FACILITY_ELEMENTS_MAP2 = new HashMap<String, String>();
+        SHOPPING_FACILITY_ELEMENTS_MAP2 = new HashMap();
         SHOPPING_FACILITY_ELEMENTS_MAP2.put("FARMACIA", "Nome");
         SHOPPING_FACILITY_ELEMENTS_MAP2.put("COMUNE", "Comune");
         SHOPPING_FACILITY_ELEMENTS_MAP1.put("FRAZIONE ", "Frazione");
@@ -156,7 +156,7 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> SHOPPING_FACILITY_ELEMENTS_MAP3;
 
     static {
-        SHOPPING_FACILITY_ELEMENTS_MAP3 = new HashMap<String, String>();
+        SHOPPING_FACILITY_ELEMENTS_MAP3 = new HashMap();
         SHOPPING_FACILITY_ELEMENTS_MAP3.put("PARAFARMACIA", "Nome");
         SHOPPING_FACILITY_ELEMENTS_MAP3.put("INDIRIZZO", "Indirizzo");
         SHOPPING_FACILITY_ELEMENTS_MAP3.put("COMUNE", "Comune");
@@ -172,7 +172,7 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> PRODUCT_ELEMENTS_MAP;
 
     static {
-        PRODUCT_ELEMENTS_MAP = new HashMap<String, String>();
+        PRODUCT_ELEMENTS_MAP = new HashMap();
         PRODUCT_ELEMENTS_MAP.put("category", "Classe");
         PRODUCT_ELEMENTS_MAP.put("DESCRIZIONE SINTETICA DEL PRODOTTO", "Descrizione");
         PRODUCT_ELEMENTS_MAP.put("CURIOSITA", "Descrizione");
@@ -186,7 +186,7 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> CERT_PRODUCT_ELEMENTS_MAP;
 
     static {
-        CERT_PRODUCT_ELEMENTS_MAP = new HashMap<String, String>();
+        CERT_PRODUCT_ELEMENTS_MAP = new HashMap();
         CERT_PRODUCT_ELEMENTS_MAP.put("category", "Classe");
         CERT_PRODUCT_ELEMENTS_MAP.put("Caratteristiche", "Descrizione");
         CERT_PRODUCT_ELEMENTS_MAP.put("Nome", "Nome");
@@ -199,13 +199,28 @@ public class GroundTruthGeneration {
     private final static HashMap<String, String> LOCATION_ELEMENTS_MAP;
 
     static {
-        LOCATION_ELEMENTS_MAP = new HashMap<String, String>();
+        LOCATION_ELEMENTS_MAP = new HashMap();
         LOCATION_ELEMENTS_MAP.put("Luogo storico del commercio", "Nome");
     }
-    private final Long LOCATION_ETYPE_ID = 18L;
-    SchemaImport si = new SchemaImport();
 
-    List<ISchemaCorrespondence> schemaCorrespondenceGT = new ArrayList<ISchemaCorrespondence>();
+    private SchemaImport si;
+    private List<ISchemaCorrespondence> schemaCorrespondenceGT = new ArrayList();
+
+    private final Long LOCATION_ETYPE_ID = 18L;
+
+    private IEkb ekb;
+
+    public GroundTruthGeneration(IEkb ekb) {
+        checkNotNull(ekb);
+        this.ekb = ekb;
+        this.si = new SchemaImport(ekb);
+    }
+
+    public List<ISchemaCorrespondence> getSchemaCorrespondenceGT() {
+        return schemaCorrespondenceGT;
+    }
+    
+    
 
     /**
      * Generate correspondence between source and target schemas
@@ -221,8 +236,8 @@ public class GroundTruthGeneration {
         File file1 = new File(GROUND_TRUTH_DATA_FOLDER + inputDataSet);
         ISchema sourceSchema = si.extractSchema(file1);
         sc.setSourceSchema(sourceSchema);
-        EntityTypeService ets = new EntityTypeService();
-        EntityType etype = (EntityType) ets.readEntityType(WebServiceURLs.etypeIDToURL(etypeID));
+        
+        IEntityType etype = ekb.getEntityTypeService().readEntityType(SwebConfiguration.getUrlMapper().etypeIdToUrl(etypeID));
         ISchema targetSchema = si.extractSchema(etype, Locale.ITALIAN);
         sc.setTargetSchema(targetSchema);
         List<ISchemaElementCorrespondence> elementCorrespondences = generateGTElementCorrespondence(sourceSchema, targetSchema, elementMapping);
@@ -240,8 +255,8 @@ public class GroundTruthGeneration {
      * @return list of correspondences among input and source schemas elements
      */
     private List<ISchemaElementCorrespondence> generateGTElementCorrespondence(ISchema sourceSchema, ISchema targetSchema, HashMap<String, String> elementMapping) {
-        List<ISchemaElementCorrespondence> elementCorrs = new ArrayList<ISchemaElementCorrespondence>();
-        List<ISchemaElement> elements = sourceSchema.getSchemaElements();
+        List<ISchemaElementCorrespondence> elementCorrs = new ArrayList();
+        List<ISchemaElement> elements = sourceSchema.getElements();
 
         for (ISchemaElement el : elements) {
             ISchemaElementCorrespondence elCorr = new SchemaElementCorrespondence();
@@ -261,7 +276,7 @@ public class GroundTruthGeneration {
      * @return schema element
      */
     private ISchemaElement getTargetElement(String targetElementName, ISchema targetSchema) {
-        for (ISchemaElement el : targetSchema.getSchemaElements()) {
+        for (ISchemaElement el : targetSchema.getElements()) {
             if ((el.getElementContext().getElementName() != null) && (el.getElementContext().getElementName().equalsIgnoreCase(targetElementName))) {
                 return el;
             }
@@ -275,7 +290,7 @@ public class GroundTruthGeneration {
      *
      * @throws SchemaMatcherException
      */
-    public void generateGT() throws SchemaMatcherException {
+    public void generateGT() {
         SchemaCorrespondence sc1 = generateGT(LODGING_FACILITY_DATASET, LODGING_FACILITY_ETYPE_ID, LODGING_FACILITY_ELEMENTS_MAP);
         schemaCorrespondenceGT.add(sc1);
         SchemaCorrespondence sc2 = generateGT(REFRESHMENT_FACILITY_DATASET, REFRESHMENT_FACILITY_ETYPE_ID, REFRESHMENT_FACILITY_ELEMENTS_MAP);

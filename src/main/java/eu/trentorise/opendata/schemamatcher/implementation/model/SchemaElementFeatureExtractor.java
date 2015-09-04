@@ -8,10 +8,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
-import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
-import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
+import eu.trentorise.opendata.columnrecognizers.SwebConfiguration;
 import eu.trentorise.opendata.schemamatcher.model.DataType;
 import eu.trentorise.opendata.schemamatcher.model.IElementContent;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
@@ -19,40 +17,40 @@ import eu.trentorise.opendata.schemamatcher.model.DataType.Datatype;
 import eu.trentorise.opendata.schemamatcher.schemaanalysis.service.ISchemaElementFeatureExtractor;
 
 public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtractor {
-
+ 
     public static final float CONCEPT_DISTANCE_WEIGHT = 0.5f;
     public static final float EDIT_DISTANCE_WEIGHT = 0.4f;
     public static final float DATATYPE_DISTANCE_WEIGHT = 0.1f;
     public static final double LOGOF2 = Math.log(2);
 
+    @Override
     public void getSchemaElementConcept(ISchemaElement schemaElement) {
         //	schemaElement.getElementContext().getElementConcept()
         //TODO
     }
 
+    @Override
     public void getSchemaElementConcept(List<ISchemaElement> schemaElement) {
         // TODO Auto-generated method stub
     }
 
     /**
-     * run column-concept recognizer, that extracts concepts for each schema
-     * element in the data set
+     * Extracts concepts for each schema element in the data set with
+     * column-concept recognizer
      *
-     * @param schemaEls
-     * @return
      */
     public List<ISchemaElement> runColumnRecognizer(List<ISchemaElement> schemaEls) {
         List<ISchemaElement> schemaElements = schemaEls;
-        List<String> elementNames = new ArrayList<String>();
-        List<List<String>> elementContent = new ArrayList<List<String>>();
-        HashMap<Integer, ISchemaElement> map = new HashMap<Integer, ISchemaElement>();
+        List<String> elementNames = new ArrayList();
+        List<List<String>> elementContent = new ArrayList();
+        HashMap<Integer, ISchemaElement> map = new HashMap();
         int x = 0;
         for (ISchemaElement element : schemaElements) {
             x++;
             map.put(x, element);
             elementNames.add(element.getElementContext().getElementName());
             List<Object> content = element.getElementContent().getContent();
-            List<String> contStr = new ArrayList<String>();
+            List<String> contStr = new ArrayList();
             for (Object o : content) {
                 contStr.add(o.toString());
             }
@@ -60,22 +58,13 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
         }
 
         List<Long> extractedConceptsIDs = ColumnRecognizer.computeColumnConceptIDs(elementNames, elementContent);
-        List<ISchemaElement> schemaElementsOut = new ArrayList<ISchemaElement>();
+        List<ISchemaElement> schemaElementsOut = new ArrayList();
 
         for (int i = 0; i < extractedConceptsIDs.size(); i++) {
-            Long conceptId = extractedConceptsIDs.get(i);
-            long globalConceptID;
-            if (conceptId == -1) {
-                globalConceptID = -1;
-            } else {
-                ConceptODR codr = new ConceptODR();
-                codr = codr.readConceptGlobalID(conceptId);
-                globalConceptID = codr.getId();
-            }
+            Long conceptId = extractedConceptsIDs.get(i);            
             SchemaElement se = (SchemaElement) map.get(i + 1);
-
             se.setColumnIndex(i);
-            se.getElementContext().setElementConcept(globalConceptID);
+            se.getElementContext().setElementConcept(SwebConfiguration.getUrlMapper().conceptIdToUrl(conceptId));
             schemaElementsOut.add(se);
         }
         return schemaElementsOut;
@@ -89,7 +78,7 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
      * @return
      */
     public float getConceptsDistance(long source, long target) {
-        ConceptClient cClient = new ConceptClient(WebServiceURLs.getClientProtocol());
+        ConceptClient cClient = new ConceptClient(SwebConfiguration.getClientProtocol());
         if ((source == -1) || (target == -1)) {
             return 0;
         }
@@ -134,7 +123,7 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
     }
 
     /**
-     * The method compares data types from source and target elements and
+     * Compares data types from source and target elements and
      * returns score that represents similarity between them.
      *
      * @param sourceDataType
@@ -153,7 +142,9 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
     }
 
     public float getComplexDistance(ElementContext sourceElementContext, ElementContext targetElementContext) {
-        float complexDistance = (float) (getConceptsDistance(sourceElementContext.getElementConcept(), targetElementContext.getElementConcept())
+        float complexDistance = (float) (getConceptsDistance(SwebConfiguration.getUrlMapper().urlToConceptId(sourceElementContext.getElementConcept()),
+                
+               SwebConfiguration.getUrlMapper().urlToConceptId(targetElementContext.getElementConcept()))
                 * CONCEPT_DISTANCE_WEIGHT + getLevinsteinDistance(sourceElementContext.getElementName(), targetElementContext.getElementName())
                 * EDIT_DISTANCE_WEIGHT + getDataTypeSimilarity(sourceElementContext.getElementName(), targetElementContext.getElementName())
                 * DATATYPE_DISTANCE_WEIGHT);

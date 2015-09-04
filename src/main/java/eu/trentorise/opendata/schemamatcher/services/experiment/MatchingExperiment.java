@@ -1,14 +1,13 @@
 package eu.trentorise.opendata.schemamatcher.services.experiment;
 
+import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
 
-import eu.trentorise.opendata.disiclient.services.EntityTypeService;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaMatcherException;
 import eu.trentorise.opendata.schemamatcher.implementation.services.SchemaImport;
 import eu.trentorise.opendata.schemamatcher.implementation.services.SchemaMatcherFactory;
@@ -17,11 +16,24 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaMatcher;
 import eu.trentorise.opendata.semantics.model.entity.IEntityType;
+import eu.trentorise.opendata.semantics.services.IEkb;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MatchingExperiment implements IMatchingExperiment {
 
-    private final static Logger LOGGER = Logger.getLogger(MatchingExperiment.class.getName());
+    private final static Logger LOG = LoggerFactory.getLogger(MatchingExperiment.class.getName());
 
+    private IEkb ekb;
+    
+    public MatchingExperiment(IEkb ekb) {
+        Preconditions.checkNotNull(ekb);
+        this.ekb = ekb;    
+    }
+
+    
+    
+    @Override
     public IExperimentResult runExperiment(File file, String methodology, String approach,
             List<ISchemaCorrespondence> groundTruth) {
         List<ISchema> sourceSchemas = null;
@@ -29,7 +41,7 @@ public class MatchingExperiment implements IMatchingExperiment {
             sourceSchemas = getAllSourceSchemas(file);
         }
         catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            LOG.error(e.getMessage());
             e.printStackTrace();
         }
         List<ISchema> targetSchemas = null;
@@ -37,7 +49,7 @@ public class MatchingExperiment implements IMatchingExperiment {
             targetSchemas = getAllTargetSchemas();
         }
         catch (SchemaMatcherException e) {
-            LOGGER.error(e.getMessage());
+            LOG.error(e.getMessage());
             e.printStackTrace();
         }
 
@@ -48,13 +60,13 @@ public class MatchingExperiment implements IMatchingExperiment {
         int numberOfMappedAttributes = 0;
         int correctlyMappedAttribute = 0;
         for (ISchema sourceSchema : sourceSchemas) {
-            List<ISchema> source = new ArrayList<ISchema>();
+            List<ISchema> source = new ArrayList();
             source.add(sourceSchema);
-            List<ISchemaCorrespondence> schemaCorespondencesResult = new ArrayList<ISchemaCorrespondence>();
+            List<ISchemaCorrespondence> schemaCorespondencesResult = new ArrayList();
             schemaCorespondencesResult = schemaMatcher.matchSchemas(source, targetSchemas, approach);
             for (ISchemaCorrespondence gtSchema : groundTruth) {
-                if (gtSchema.getSourceSchema().getSchemaName().equals(schemaCorespondencesResult.get(0).getSourceSchema().getSchemaName())) {
-                    if (gtSchema.getTargetSchema().getSchemaName().equals(schemaCorespondencesResult.get(0).getTargetSchema().getSchemaName())) {
+                if (gtSchema.getSourceSchema().getName().equals(schemaCorespondencesResult.get(0).getSourceSchema().getName())) {
+                    if (gtSchema.getTargetSchema().getName().equals(schemaCorespondencesResult.get(0).getTargetSchema().getName())) {
                         firstAppearance++;
                         withinFiveAppearance++;
                         continue;
@@ -63,8 +75,8 @@ public class MatchingExperiment implements IMatchingExperiment {
                 }
 
                 for (int i = 1; i < 5; i++) {
-                    if (gtSchema.getSourceSchema().getSchemaName().equals(schemaCorespondencesResult.get(i).getSourceSchema().getSchemaName())) {
-                        if (gtSchema.getTargetSchema().getSchemaName().equals(schemaCorespondencesResult.get(i).getTargetSchema().getSchemaName())) {
+                    if (gtSchema.getSourceSchema().getName().equals(schemaCorespondencesResult.get(i).getSourceSchema().getName())) {
+                        if (gtSchema.getTargetSchema().getName().equals(schemaCorespondencesResult.get(i).getTargetSchema().getName())) {
                             withinFiveAppearance++;
                         }
                     }
@@ -73,19 +85,19 @@ public class MatchingExperiment implements IMatchingExperiment {
 
             for (ISchemaCorrespondence gtSchema : groundTruth) {
                 List<ISchemaElementCorrespondence> gtCorrs = gtSchema.getSchemaElementCorrespondence();
-                if (gtSchema.getSourceSchema().getSchemaName().equals(schemaCorespondencesResult.get(0).getSourceSchema().getSchemaName())) {
+                if (gtSchema.getSourceSchema().getName().equals(schemaCorespondencesResult.get(0).getSourceSchema().getName())) {
                     for (ISchemaCorrespondence resultSchema : schemaCorespondencesResult) {
-                        if (gtSchema.getTargetSchema().getSchemaName().equals(resultSchema.getTargetSchema().getSchemaName())) {
+                        if (gtSchema.getTargetSchema().getName().equals(resultSchema.getTargetSchema().getName())) {
                             List<ISchemaElementCorrespondence> elCorGt = gtSchema.getSchemaElementCorrespondence();
                             List<ISchemaElementCorrespondence> elCorRes = resultSchema.getSchemaElementCorrespondence();
                             for (ISchemaElementCorrespondence elGt : elCorGt) {
                                 if (elGt.getTargetElement() != null) {
                                     for (ISchemaElementCorrespondence elRes : elCorRes) {
                                         if (elGt.getSourceElement().getElementContext().getElementName().equals(elRes.getSourceElement().getElementContext().getElementName())) {
-                                            LOGGER.info("elGtSource: " + elGt.getSourceElement().getElementContext().getElementName());
-                                            LOGGER.info("elGtTarget: " + elGt.getTargetElement().getElementContext().getElementName());
-                                            LOGGER.info("elResSource: " + elRes.getSourceElement().getElementContext().getElementName());
-                                            LOGGER.info("elResTarget: " + elRes.getTargetElement().getElementContext().getElementName());
+                                            LOG.info("elGtSource: " + elGt.getSourceElement().getElementContext().getElementName());
+                                            LOG.info("elGtTarget: " + elGt.getTargetElement().getElementContext().getElementName());
+                                            LOG.info("elResSource: " + elRes.getSourceElement().getElementContext().getElementName());
+                                            LOG.info("elResTarget: " + elRes.getTargetElement().getElementContext().getElementName());
                                             if (elGt.getTargetElement().getElementContext().getElementName().equals(elRes.getTargetElement().getElementContext().getElementName())) {
                                                 {
                                                     correctlyMappedAttribute++;
@@ -100,12 +112,12 @@ public class MatchingExperiment implements IMatchingExperiment {
                     }
                 }
                 for (ISchemaCorrespondence resultSchema : schemaCorespondencesResult) {
-                    if (gtSchema.getTargetSchema().getSchemaName().equals(resultSchema.getSourceSchema().getSchemaName())) {
+                    if (gtSchema.getTargetSchema().getName().equals(resultSchema.getSourceSchema().getName())) {
                         List<ISchemaElementCorrespondence> resCorrs = resultSchema.getSchemaElementCorrespondence();
                         for (ISchemaElementCorrespondence rsel : resCorrs) {
                             for (ISchemaElementCorrespondence sel : gtCorrs) {
                                 if (sel.getTargetElement() != null) {
-                                    LOGGER.info("source: " + sel.getSourceElement().getElementContext().getElementName()
+                                    LOG.info("source: " + sel.getSourceElement().getElementContext().getElementName()
                                             + " target: " + sel.getTargetElement().getElementContext().getElementName());
                                 }
                             }
@@ -113,32 +125,32 @@ public class MatchingExperiment implements IMatchingExperiment {
                     }
                 }
             }
-            LOGGER.info("Source name:" + schemaCorespondencesResult.get(0).getSourceSchema().getSchemaName());
-            LOGGER.info("Target name:" + schemaCorespondencesResult.get(0).getTargetSchema().getSchemaName());
-            LOGGER.info("Score: " + schemaCorespondencesResult.get(0).getSchemaCorrespondenceScore());
+            LOG.info("Source name:" + schemaCorespondencesResult.get(0).getSourceSchema().getName());
+            LOG.info("Target name:" + schemaCorespondencesResult.get(0).getTargetSchema().getName());
+            LOG.info("Score: " + schemaCorespondencesResult.get(0).getSchemaCorrespondenceScore());
 
-            LOGGER.info("Target name:" + schemaCorespondencesResult.get(1).getTargetSchema().getSchemaName());
-            LOGGER.info("Score: " + schemaCorespondencesResult.get(1).getSchemaCorrespondenceScore());
+            LOG.info("Target name:" + schemaCorespondencesResult.get(1).getTargetSchema().getName());
+            LOG.info("Score: " + schemaCorespondencesResult.get(1).getSchemaCorrespondenceScore());
 
-            LOGGER.info("Target name:" + schemaCorespondencesResult.get(2).getTargetSchema().getSchemaName());
-            LOGGER.info("Score: " + schemaCorespondencesResult.get(2).getSchemaCorrespondenceScore());
+            LOG.info("Target name:" + schemaCorespondencesResult.get(2).getTargetSchema().getName());
+            LOG.info("Score: " + schemaCorespondencesResult.get(2).getSchemaCorrespondenceScore());
 
-            LOGGER.info("Target name:" + schemaCorespondencesResult.get(3).getTargetSchema().getSchemaName());
-            LOGGER.info("Score: " + schemaCorespondencesResult.get(3).getSchemaCorrespondenceScore());
+            LOG.info("Target name:" + schemaCorespondencesResult.get(3).getTargetSchema().getName());
+            LOG.info("Score: " + schemaCorespondencesResult.get(3).getSchemaCorrespondenceScore());
 
-            LOGGER.info("Target name:" + schemaCorespondencesResult.get(4).getTargetSchema().getSchemaName());
-            LOGGER.info("Appearance: " + firstAppearance);
+            LOG.info("Target name:" + schemaCorespondencesResult.get(4).getTargetSchema().getName());
+            LOG.info("Appearance: " + firstAppearance);
 
-            LOGGER.info("___________");
+            LOG.info("___________");
 
         }
         int datasetSize = groundTruth.size();
-        LOGGER.info("Appearance: " + firstAppearance);
-        LOGGER.info("Within 5: " + withinFiveAppearance);
-        LOGGER.info("Number of Mapped attribute in GT: " + numberOfMappedAttributes);
-        LOGGER.info("Correctly mapped Attributes: " + correctlyMappedAttribute);
+        LOG.info("Appearance: " + firstAppearance);
+        LOG.info("Within 5: " + withinFiveAppearance);
+        LOG.info("Number of Mapped attribute in GT: " + numberOfMappedAttributes);
+        LOG.info("Correctly mapped Attributes: " + correctlyMappedAttribute);
         float attrRate = (float) correctlyMappedAttribute / (float) numberOfMappedAttributes;
-        LOGGER.info("Correctly mapped Attributes rates: " + attrRate);
+        LOG.info("Correctly mapped Attributes rates: " + attrRate);
 
         double precisionFive = (double) withinFiveAppearance / (double) datasetSize;
         double precision = (double) firstAppearance / (double) datasetSize;
@@ -147,17 +159,19 @@ public class MatchingExperiment implements IMatchingExperiment {
         return experimentResults;
     }
 
+    @Override
     public List<String> experimentMethodologies() {
         return null;
     }
 
+    @Override
     public List<String> matchingApproach() {
         return null;
     }
 
-    public static List<ISchema> getAllSourceSchemas(final File folder) throws IOException {
-        List<ISchema> schemas = new ArrayList<ISchema>();
-        SchemaImport si = new SchemaImport();
+    public List<ISchema> getAllSourceSchemas(final File folder) throws IOException {
+        List<ISchema> schemas = new ArrayList();
+        SchemaImport si = new SchemaImport(ekb);
         for (final File fileEntry : folder.listFiles()) {
             if (fileEntry.isDirectory()) {
                 getAllSourceSchemas(fileEntry);
@@ -168,11 +182,11 @@ public class MatchingExperiment implements IMatchingExperiment {
         return schemas;
     }
 
-    public static List<ISchema> getAllTargetSchemas() throws SchemaMatcherException {
-        EntityTypeService etypeService = new EntityTypeService();
-        List<IEntityType> etypeList = etypeService.getAllEntityTypes();
-        List<ISchema> targetSchemas = new ArrayList<ISchema>();
-        SchemaImport si = new SchemaImport();
+    public List<ISchema> getAllTargetSchemas() throws SchemaMatcherException {
+        
+        List<IEntityType> etypeList = ekb.getEntityTypeService().readAllEntityTypes();
+        List<ISchema> targetSchemas = new ArrayList();
+        SchemaImport si = new SchemaImport(ekb);
 
         for (IEntityType etype : etypeList) {
             ISchema schemaEtype = si.extractSchema(etype, Locale.ITALIAN);

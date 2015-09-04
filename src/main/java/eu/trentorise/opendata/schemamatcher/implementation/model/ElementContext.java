@@ -14,19 +14,19 @@ import eu.trentorise.opendata.schemamatcher.model.IElementContext;
  */
 public class ElementContext implements IElementContext {
 
-    private String elementName;
-    private String elementDescription;
-    private String elementDataType;
+    private String name;
+    private String description;
+    private String dataType;
     @Nullable
-    private long elementConcept;
+    private String concept;
 
-    public ElementContext(String elementName, String elementDescription,
-            String elementDataType, long elementConcept) {
+    public ElementContext(String name, String description,
+            String dataType, String concept) {
         super();
-        this.elementName = elementName;
-        this.elementDescription = elementDescription;
-        this.elementDataType = elementDataType;
-        this.elementConcept = elementConcept;
+        this.name = name;
+        this.description = description;
+        this.dataType = dataType;
+        this.concept = concept;
     }
 
     public ElementContext() {
@@ -35,51 +35,51 @@ public class ElementContext implements IElementContext {
 
     @Override
     public String toString() {
-        return "ElementContext [elementName=" + elementName
-                + ", elementDescription=" + elementDescription
-                + ", elementDataType=" + elementDataType + ", elementConcept="
-                + elementConcept + "]";
+        return "ElementContext [elementName=" + name
+                + ", elementDescription=" + description
+                + ", elementDataType=" + dataType + ", elementConcept="
+                + concept + "]";
     }
 
     @Override
     public String getElementName() {
-        return this.elementName;
+        return this.name;
     }
 
     @Override
     public String getElementDescription() {
-        return this.elementName;
+        return this.name;
     }
 
     @Override
     public String getElementDataType() {
-        return this.elementDataType;
+        return this.dataType;
     }
 
     public void setElemetnDataType(String elementDataType) {
         Preconditions.checkNotNull(elementDataType);
-        this.elementDataType = elementDataType;
+        this.dataType = elementDataType;
     }
 
     @Override
     @Nullable
-    public long getElementConcept() {
-        return elementConcept;
+    public String getElementConcept() {
+        return concept;
     }
 
     @Override
     @Nullable
-    public void setElementConcept(Long elementConcept) {
+    public void setElementConcept(String elementConcept) {
         Preconditions.checkNotNull(elementConcept);
-        this.elementConcept = elementConcept;
+        this.concept = elementConcept;
     }
 
     public void setElementName(String elementName) {
-        this.elementName = elementName;
+        this.name = elementName;
     }
 
     public void setElementDescription(String elementDescription) {
         Preconditions.checkNotNull(elementDescription);
-        this.elementDescription = elementDescription;
+        this.description = elementDescription;
     }
 }

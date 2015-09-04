@@ -1,6 +1,6 @@
 package eu.trentorise.opendata.schemamatcher.implementation.services;
 
-import it.unitn.disi.sweb.webapi.client.IProtocolClient;
+import eu.trentorise.opendata.columnrecognizers.SwebConfiguration;
 import it.unitn.disi.sweb.webapi.client.kb.ConceptClient;
 
 import java.util.AbstractMap;
@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.schemamatcher.implementation.model.SchemaElementCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
@@ -18,39 +17,45 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaElementMatcher;
 
 public class SimpleElementMatcher implements ISchemaElementMatcher {
 
-    private final String ELEMENT_MATCHING_ALGORITHM = "ConceptDistanceBased";
+    private static final String ELEMENT_MATCHING_ALGORITHM = "ConceptDistanceBased";
 
+    @Override
     public ISchemaElementCorrespondence matchSchemaElements(ISchemaElement sourceSchemaElement,
             ISchemaElement targetSchemaElement) {
         ISchemaElementCorrespondence elementCorrespondence = new SchemaElementCorrespondence();
         elementCorrespondence.setSourceElement(sourceSchemaElement);
         elementCorrespondence.setTargetElement(targetSchemaElement);
-        float score = getConceptsDistance(sourceSchemaElement.getElementContext().getElementConcept(), targetSchemaElement.getElementContext().getElementConcept());
+        float score = getConceptsDistance(
+                SwebConfiguration.getUrlMapper().urlToConceptId(sourceSchemaElement.getElementContext().getElementConcept()), 
+                SwebConfiguration.getUrlMapper().urlToConceptId(targetSchemaElement.getElementContext().getElementConcept()));
         elementCorrespondence.setElementCorrespondenceScore(score);
         return elementCorrespondence;
     }
 
+    @Override
     public List<ISchemaElementCorrespondence> matchSchemaElements(
             List<ISchemaElement> sourceElements,
             List<ISchemaElement> targetElements) {
-        List<ISchemaElementCorrespondence> elementCorespondences = new ArrayList<ISchemaElementCorrespondence>();
+        List<ISchemaElementCorrespondence> elementCorespondences = new ArrayList();
 
         for (ISchemaElement sElement : sourceElements) {
-            List<Entry<Long, Long>> batch = new ArrayList<Entry<Long, Long>>();
+            List<Entry<Long, Long>> batch = new ArrayList();
             List<Integer> distances;
-            if (sElement.getElementContext().getElementConcept() == -1) {
+            if (sElement.getElementContext().getElementConcept().isEmpty()) {
                 distances = null;
             } else {
                 for (ISchemaElement tElement : targetElements) {
                     Map.Entry<Long, Long> entry
-                            = new AbstractMap.SimpleEntry<Long, Long>(sElement.getElementContext().getElementConcept(), tElement.getElementContext().getElementConcept());
+                            = new AbstractMap.SimpleEntry(
+                                   SwebConfiguration.getUrlMapper().urlToConceptId(sElement.getElementContext().getElementConcept()),
+                                   SwebConfiguration.getUrlMapper().urlToConceptId(tElement.getElementContext().getElementConcept()));
                     batch.add(entry);
                 }
                 distances = getBatchDistance(batch);
             }
 
             SchemaElementCorrespondence sec = new SchemaElementCorrespondence();
-            HashMap<ISchemaElement, Float> correspondences = new HashMap<ISchemaElement, Float>();
+            HashMap<ISchemaElement, Float> correspondences = new HashMap();
 
             for (int i = 0; i < targetElements.size(); i++) {
                 float score = 0.01f;
@@ -69,8 +74,9 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
         return elementCorespondences;
     }
 
+    @Override
     public String getElementMatchingAlgorithm() {
-        return this.ELEMENT_MATCHING_ALGORITHM;
+        return SimpleElementMatcher.ELEMENT_MATCHING_ALGORITHM;
     }
 
     /**
@@ -81,29 +87,21 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
      * @return
      */
     private float getConceptsDistance(long source, long target) {
-        ConceptClient cClient = new ConceptClient(getClientProtocol());
+        ConceptClient cClient = new ConceptClient(SwebConfiguration.getClientProtocol());
         float score = (float) cClient.getDistanceUsingLca(source, target);
         if (score == -1) {
             return 0;
         }
         if ((score - 1) != 0) {
-            return score = 1 / (score - 1);
+            return 1 / (score - 1);
         } else {
             return 0;
         }
     }
 
-    /**
-     * Returns protocol for connection to the server.
-     *
-     * @return protocol that provides connection to the server.
-     */
-    private IProtocolClient getClientProtocol() {
-        return WebServiceURLs.getClientProtocol();
-    }
-
+   
     private List<Integer> getBatchDistance(List<Entry<Long, Long>> batch) {
-        ConceptClient cClient = new ConceptClient(getClientProtocol());
+        ConceptClient cClient = new ConceptClient(SwebConfiguration.getClientProtocol());
         return cClient.getDistances(batch, 0);
     }
 
@@ -122,7 +120,7 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
         if (score == 0) {
             return 1;
         } else {
-            return score = 1 / (score + 1);
+            return 1 / (score + 1);
         }
     }
 }

@@ -19,6 +19,7 @@ Contributing: See <a href="../../wiki" target="_blank">the wiki</a>
 #### Projects using this API
 
 * <a href="https://github.com/opendatatrentino/OpenDataRise" target="_blank"> OpenDataRise</a>: a power tool to cleanse and semantify open data, based on Refine
+* <a href="https://github.com/opendatatrentino/disi-open-data-client" target="_blank"> Disi open data client</a> : Client to connect to KnowDive/sweb services via OpenEntity interface.
 
 #### Credits
 

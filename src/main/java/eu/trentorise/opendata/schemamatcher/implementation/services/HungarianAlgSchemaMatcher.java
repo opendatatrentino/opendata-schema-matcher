@@ -38,8 +38,8 @@ public class HungarianAlgSchemaMatcher implements ISchemaMatcher {
         SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
         float score = 0;
 
-        List<ISchemaElement> sourceSchemaElements = sourceSchema.getSchemaElements();
-        List<ISchemaElement> targetSchemaElements = targetSchema.getSchemaElements();
+        List<ISchemaElement> sourceSchemaElements = sourceSchema.getElements();
+        List<ISchemaElement> targetSchemaElements = targetSchema.getElements();
 
         sourceSchemaElements = sefe.runColumnRecognizer(sourceSchemaElements);
 

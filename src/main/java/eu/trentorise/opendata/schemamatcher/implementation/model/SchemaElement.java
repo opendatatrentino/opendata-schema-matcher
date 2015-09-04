@@ -80,14 +80,6 @@ public class SchemaElement implements ISchemaElement {
         return (List<IElementRelation>) this.schemaElementRelations;
     }
 
-    public IAttributeDef getAttrDef() {
-        return attrDef;
-    }
-
-    public void setAttrDef(IAttributeDef attrDef) {
-        Preconditions.checkNotNull(attrDef);
-        this.attrDef = attrDef;
-    }
 
     public int getColumnIndex() {
         return columnIndex;

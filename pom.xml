@@ -40,6 +40,36 @@
         </developer>
 
     </developers>
+    
+    <repositories>
+        <repository>
+            <id>sweb-internal</id>
+            <layout>default</layout>
+            <name>Archiva Managed Internal Repository</name>
+            <url>https://sweb.science.unitn.it/archiva/repository/internal</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sweb-snapshots</id>
+            <name>Archiva Managed Snapshot Repository</name>
+            <url>https://sweb.science.unitn.it/archiva/repository/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+        
+
+    </repositories>    
 
     <build>
 
@@ -93,17 +123,45 @@
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
 
-
-
         </plugins>
 
     </build>
 
     <dependencies>
+        
         <dependency>
             <groupId>eu.trentorise.opendata</groupId>
-            <artifactId>disi-open-data-client</artifactId>            
+            <artifactId>openentity-api</artifactId>
         </dependency>
+        
+        <!-- temporary start this temporary until we fix stupid concept glob id issues -->
+        
+        <dependency>
+            <groupId>eu.trentorise.opendata</groupId>
+            <artifactId>column-recognizers</artifactId>              
+        </dependency>
+
+        <dependency>
+            <groupId>it.unitn.disi.sweb</groupId>
+            <artifactId>sweb-webapi-kb-client</artifactId>
+            <version>3.0.1-RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>  
+        
+        <dependency>
+            <groupId>it.unitn.disi.sweb</groupId>
+            <artifactId>sweb-webapi-eb-client</artifactId>
+            <version>3.0.1-RELEASE</version>        
+        </dependency>  
+                               
+        <!-- temporary end crap -->
+        
+        
         <dependency>
             <groupId>net.sf.opencsv</groupId>
             <artifactId>opencsv</artifactId>
@@ -114,6 +172,23 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.3.2</version>
         </dependency>
+
+        <!-- ***********   TEST DEPENDENCIES ************* -->
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>            
+        </dependency>
+
+
+        <!-- temporarily disabled until we solve this dep hell 
+        <dependency>
+            <groupId>eu.trentorise.opendata</groupId>
+            <artifactId>disi-open-data-client</artifactId>                        
+            <scope>test</scope>
+        </dependency> -->
+    
 
     </dependencies>
 

@@ -1,6 +1,6 @@
 package eu.trentorise.opendata.schemamatcher.implementation.model;
 
-public class SchemaMatcherException extends Exception {
+public class SchemaMatcherException extends RuntimeException {
 
     public SchemaMatcherException(String s) {
         super(s);

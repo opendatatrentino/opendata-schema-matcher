@@ -28,11 +28,11 @@ import eu.trentorise.opendata.schemamatcher.model.IElementRelation;
 import eu.trentorise.opendata.schemamatcher.model.ISchema;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.services.importing.ISchemaImport;
+import eu.trentorise.opendata.semantics.DataTypes;
 import eu.trentorise.opendata.semantics.exceptions.UnsupportedSchemaException;
 import eu.trentorise.opendata.semantics.model.entity.AttrDef;
 import eu.trentorise.opendata.semantics.model.entity.Etype;
 import eu.trentorise.opendata.semantics.services.IEkb;
-import eu.trentorise.opendata.semantics.services.IEtypeService;
 import eu.trentorise.opendata.semantics.services.IEtypeService;
 import eu.trentorise.opendata.traceprov.data.DcatMetadata;
 import eu.trentorise.opendata.traceprov.types.ClassType;
@@ -299,15 +299,15 @@ public class SchemaImport implements ISchemaImport {
             //TODO find the way to download best representing content
             List<Object> values = new ArrayList();
             if (instances != null) {
-                if ((atrDef.getType().getDatatype().equalsIgnoreCase("xsd:float")) || (atrDef.getType().getDatatype().equalsIgnoreCase("xsd:integer"))
-                        || (atrDef.getType().getDatatype().equalsIgnoreCase("xsd:long"))) {
+                if ((atrDef.getType().getDatatype().equalsIgnoreCase(DataTypes.FLOAT)) || (atrDef.getType().getDatatype().equalsIgnoreCase(DataTypes.INTEGER))
+                        || (atrDef.getType().getDatatype().equalsIgnoreCase(DataTypes.LONG))) {
                     values = getValues(instances, atrDef);
                 }
             }
             elContent.setContent(values);
             schemaElement.setElementContent(elContent);
             schemaElements.add(schemaElement);
-            if (atrDef.getType().getDatatype().equalsIgnoreCase("oe:structure")) {
+            if (atrDef.getType().getDatatype().equalsIgnoreCase(DataTypes.STRUCTURE)) {
                 IEtypeService ets = ekb.getEtypeService();
                 Etype structureEtype = ets.readEtype(atrDef.getType().getEtypeId());
                 List<AttrDef> strAttrDefs = new ArrayList(structureEtype.getAttrDefs().values());

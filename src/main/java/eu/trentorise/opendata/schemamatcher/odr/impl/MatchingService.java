@@ -20,10 +20,10 @@ import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaMatcher;
 
-import eu.trentorise.opendata.semantics.model.entity.IEntityType;
-import eu.trentorise.opendata.semantics.services.AttributeMapping;
+import eu.trentorise.opendata.semantics.model.entity.Etype;
 import eu.trentorise.opendata.semantics.services.IEkb;
-import eu.trentorise.opendata.semantics.services.IEntityTypeService;
+import eu.trentorise.opendata.semantics.services.AttrMapping;
+import eu.trentorise.opendata.semantics.services.IEtypeService;
 import eu.trentorise.opendata.semantics.services.Mappings;
 import eu.trentorise.opendata.semantics.services.SchemaMapping;
 import eu.trentorise.opendata.traceprov.data.DcatMetadata;
@@ -66,10 +66,10 @@ public class MatchingService implements eu.trentorise.opendata.semantics.service
         
         SchemaImport si = new SchemaImport(ekb);
         
-        List<IEntityType> etypeList = ekb.getEntityTypeService().readAllEntityTypes();
+        List<Etype> etypeList = ekb.getEtypeService().readAllEtypes();
         List<ISchema> targetSchemas = new ArrayList();
 
-        for (IEntityType etype : etypeList) {
+        for (Etype etype : etypeList) {
 
             ISchema schemaEtype;
             try {
@@ -83,7 +83,7 @@ public class MatchingService implements eu.trentorise.opendata.semantics.service
                 }
             }
             catch (SchemaMatcherException e) {
-                LOG.error("Could not extract schema from etype " + etype.getURL() + ", skipping it", e);
+                LOG.error("Could not extract schema from etype " + etype.getId() + ", skipping it", e);
             }
 
         }
@@ -102,13 +102,13 @@ public class MatchingService implements eu.trentorise.opendata.semantics.service
         // so... let's start data rock'n'roll
 
         SchemaImport si = new SchemaImport(ekb);
-        IEntityTypeService etypeService = ekb.getEntityTypeService();
-        List<IEntityType> etypeList = etypeService.readAllEntityTypes();
+        IEtypeService etypeService = ekb.getEtypeService();
+        List<Etype> etypeList = etypeService.readAllEtypes();
         List<ISchema> targetSchemas = new ArrayList();
 
         ISchema sourceSchema = si.extractSchema(dcatMetadata, traceType, data);
         
-        for (IEntityType etype : etypeList) {
+        for (Etype etype : etypeList) {
 
             ISchema schemaEtype = null;
             try {
@@ -172,9 +172,9 @@ public class MatchingService implements eu.trentorise.opendata.semantics.service
         
         SchemaMapping.Builder smBuilder = SchemaMapping.builder();
         
-        List<AttributeMapping> amaps = new ArrayList();
+        List<AttrMapping> amaps = new ArrayList();
         for (ISchemaElementCorrespondence sec : sc.getSchemaElementCorrespondence()){
-            AttributeMapping.Builder amBuilder = AttributeMapping.builder();
+            AttrMapping.Builder amBuilder = AttrMapping.builder();
             amBuilder.addSourcePath(Mappings.SCHEMA_SOURCE);
             amBuilder.addAllSourcePath(extractPath(sec.getSourceElement()));
             amBuilder.addAllTargetPath(extractPath(sec.getTargetElement()));

@@ -99,8 +99,8 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
             ISchema targetSchema, ISchemaCorrespondence sCorrespondence) {
         SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
         float elementMatchScore = computeSchemaElementCorrespondence(sCorrespondence);
-        float nameMatchScore = sefe.getConceptsDistance(SwebConfiguration.getUrlMapper().urlToConceptId(sourceSchema.getConceptUrl()),
-               SwebConfiguration.getUrlMapper().urlToConceptId(targetSchema.getConceptUrl()));
+        float nameMatchScore = sefe.getConceptsDistance(SwebConfiguration.getUrlMapper().conceptUrlToId(sourceSchema.getConceptUrl()),
+               SwebConfiguration.getUrlMapper().conceptUrlToId(targetSchema.getConceptUrl()));
         float overallScore = (elementMatchScore + nameMatchScore) / (sCorrespondence.getSchemaElementCorrespondence().size() + 1);
         return overallScore;
     }
@@ -116,7 +116,7 @@ public class SimpleSchemaMatcher implements ISchemaMatcher {
     private float computeOverallSchemaScore(ISchema sourceSchema,
             ISchema targetSchema) {
         SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
-        return sefe.getConceptsDistance(SwebConfiguration.getUrlMapper().urlToConceptId(sourceSchema.getConceptUrl()),SwebConfiguration.getUrlMapper().urlToConceptId(targetSchema.getConceptUrl()));
+        return sefe.getConceptsDistance(SwebConfiguration.getUrlMapper().conceptUrlToId(sourceSchema.getConceptUrl()),SwebConfiguration.getUrlMapper().conceptUrlToId(targetSchema.getConceptUrl()));
     }
 
     /**

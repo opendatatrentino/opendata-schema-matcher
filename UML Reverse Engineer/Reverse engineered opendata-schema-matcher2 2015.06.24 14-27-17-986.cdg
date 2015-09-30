@@ -93,7 +93,7 @@
           <Argument type="int" name="elementsNumber"/>
           <Argument type="SchemaStructureType" name="structureType"/>
           <Argument type="Long" name="schemaConcept"/>
-          <Argument type="IEntityType" name="etype"/>
+          <Argument type="Etype" name="etype"/>
         </Constructor>
         <Constructor name="Schema" visibility="public"/>
       </Constructors>
@@ -104,7 +104,7 @@
         <Field name="elementsNumber" visibility="private" type="int"/>
         <Field name="structureType" visibility="private" type="SchemaStructureType"/>
         <Field name="schemaConcept" visibility="private" type="long"/>
-        <Field name="etype" visibility="private" type="IEntityType"/>
+        <Field name="etype" visibility="private" type="Etype"/>
       </Fields>
       <Methods>
         <Method name="toString" visibility="public" returnType="String"/>
@@ -126,9 +126,9 @@
         <Method name="setSchemaConcept" visibility="public" returnType="void">
           <Argument type="Long" name="conceptId"/>
         </Method>
-        <Method name="getEtype" visibility="public" returnType="IEntityType"/>
+        <Method name="getEtype" visibility="public" returnType="Etype"/>
         <Method name="setEtype" visibility="public" returnType="void">
-          <Argument type="IEntityType" name="etype"/>
+          <Argument type="Etype" name="etype"/>
         </Method>
       </Methods>
     </Class>
@@ -136,7 +136,7 @@
       <Constructors>
         <Constructor name="SchemaCorrespondence" visibility="public">
           <Argument type="ISchema" name="sourceSchema"/>
-          <Argument type="IEntityType" name="etype"/>
+          <Argument type="Etype" name="etype"/>
           <Argument type="ISchema" name="targetSchema"/>
           <Argument type="float" name="score"/>
           <Argument type="List&lt;ISchemaElementCorrespondence&gt;" name="elementCorrespondences"/>
@@ -146,7 +146,7 @@
       <Fields>
         <Field name="SCORE_TOLERANCE" visibility="public" type="double" isStatic="true" isFinal="true"/>
         <Field name="sourceSchema" visibility="private" type="ISchema"/>
-        <Field name="etype" visibility="private" type="IEntityType"/>
+        <Field name="etype" visibility="private" type="Etype"/>
         <Field name="targetSchema" visibility="private" type="ISchema"/>
         <Field name="score" visibility="private" type="float"/>
         <Field name="elementCorrespondences" visibility="private" type="List&lt;ISchemaElementCorrespondence&gt;"/>
@@ -184,7 +184,7 @@
           <Argument type="IElementContent" name="elementContent"/>
           <Argument type="IElementContext" name="elementContext"/>
           <Argument type="List&lt;IElementRelation&gt;" name="schemaElementRelations"/>
-          <Argument type="IAttributeDef" name="attrDef"/>
+          <Argument type="AttrDef" name="attrDef"/>
           <Argument type="int" name="columnIndex"/>
         </Constructor>
         <Constructor name="SchemaElement" visibility="public"/>
@@ -193,7 +193,7 @@
         <Field name="elementContent" visibility="private" type="IElementContent"/>
         <Field name="elementContext" visibility="private" type="IElementContext"/>
         <Field name="schemaElementRelations" visibility="private" type="List&lt;IElementRelation&gt;"/>
-        <Field name="attrDef" visibility="protected" type="IAttributeDef"/>
+        <Field name="attrDef" visibility="protected" type="AttrDef"/>
         <Field name="columnIndex" visibility="private" type="int"/>
       </Fields>
       <Methods>
@@ -212,9 +212,9 @@
         <Method name="getElementContext" visibility="public" returnType="IElementContext"/>
         <Method name="hasElementContent" visibility="public" returnType="Boolean"/>
         <Method name="getSchemaElementsRelations" visibility="public" returnType="List&lt;IElementRelation&gt;"/>
-        <Method name="getAttrDef" visibility="public" returnType="IAttributeDef"/>
+        <Method name="getAttrDef" visibility="public" returnType="AttrDef"/>
         <Method name="setAttrDef" visibility="public" returnType="void">
-          <Argument type="IAttributeDef" name="attrDef"/>
+          <Argument type="AttrDef" name="attrDef"/>
         </Method>
         <Method name="getColumnIndex" visibility="public" returnType="int"/>
         <Method name="setColumnIndex" visibility="public" returnType="void">
@@ -229,7 +229,7 @@
           <Argument type="HashMap&lt;ISchemaElement, Float&gt;" name="elementMapping"/>
           <Argument type="float" name="score"/>
           <Argument type="SchemaElement" name="highestTargetElement"/>
-          <Argument type="IAttributeDef" name="attrDef"/>
+          <Argument type="AttrDef" name="attrDef"/>
         </Constructor>
         <Constructor name="SchemaElementCorrespondence" visibility="public"/>
       </Constructors>
@@ -238,7 +238,7 @@
         <Field name="elementMapping" visibility="private" type="HashMap&lt;ISchemaElement, Float&gt;"/>
         <Field name="score" visibility="private" type="float"/>
         <Field name="highestTargetElement" visibility="private" type="SchemaElement"/>
-        <Field name="attrDef" visibility="private" type="IAttributeDef"/>
+        <Field name="attrDef" visibility="private" type="AttrDef"/>
       </Fields>
       <Methods>
         <Method name="getElementCorrespondenceScore" visibility="public" returnType="float"/>
@@ -477,23 +477,23 @@
           <Argument type="ITableResource" name="tableResource"/>
         </Method>
         <Method name="extractSchemaElements" visibility="private" returnType="List&lt;ISchemaElement&gt;">
-          <Argument type="IEntityType" name="etype"/>
+          <Argument type="Etype" name="etype"/>
           <Argument type="Locale" name="locale"/>
         </Method>
         <Method name="getSchemaElements" visibility="private" returnType="void">
-          <Argument type="IEntityType" name="etype"/>
+          <Argument type="Etype" name="etype"/>
           <Argument type="List&lt;ISchemaElement&gt;" name="schemaElements"/>
-          <Argument type="List&lt;IAttributeDef&gt;" name="attrDefs"/>
+          <Argument type="List&lt;AttrDef&gt;" name="attrDefs"/>
           <Argument type="Locale" name="locale"/>
           <Argument type="int" name="depth"/>
           <Argument type="ISchemaElement" name="parentElement"/>
         </Method>
         <Method name="getValues" visibility="private" returnType="List&lt;Object&gt;">
           <Argument type="List&lt;Instance&gt;" name="instances"/>
-          <Argument type="IAttributeDef" name="atrDef"/>
+          <Argument type="AttrDef" name="atrDef"/>
         </Method>
         <Method name="getEntities" visibility="public" returnType="List&lt;Instance&gt;">
-          <Argument type="IEntityType" name="etype"/>
+          <Argument type="Etype" name="etype"/>
         </Method>
         <Method name="extractDataType" visibility="public" returnType="String">
           <Argument type="ElementContent" name="elContent"/>
@@ -792,14 +792,14 @@
       <Constructors/>
       <Fields>
         <Field name="score" visibility="private" type="float"/>
-        <Field name="attrMap" visibility="private" type="HashMap&lt;IAttributeDef, Float&gt;"/>
+        <Field name="attrMap" visibility="private" type="HashMap&lt;AttrDef, Float&gt;"/>
         <Field name="attrDef" visibility="private" type="AttributeDef"/>
         <Field name="headerConceptID" visibility="private" type="long"/>
         <Field name="columnIndex" visibility="private" type="int"/>
       </Fields>
       <Methods>
-        <Method name="getAttrDef" visibility="public" returnType="IAttributeDef"/>
-        <Method name="getAttrMap" visibility="public" returnType="Map&lt;IAttributeDef, Float&gt;"/>
+        <Method name="getAttrDef" visibility="public" returnType="AttrDef"/>
+        <Method name="getAttrMap" visibility="public" returnType="Map&lt;AttrDef, Float&gt;"/>
         <Method name="getColumnIndex" visibility="public" returnType="int"/>
         <Method name="getHeaderConceptURL" visibility="public" returnType="String"/>
         <Method name="getHeaderConceptID" visibility="public" returnType="long"/>
@@ -808,7 +808,7 @@
           <Argument type="float" name="score"/>
         </Method>
         <Method name="setAttrMap" visibility="public" returnType="void">
-          <Argument type="HashMap&lt;IAttributeDef, Float&gt;" name="attrMap"/>
+          <Argument type="HashMap&lt;AttrDef, Float&gt;" name="attrMap"/>
         </Method>
         <Method name="setAttrDef" visibility="public" returnType="void">
           <Argument type="AttributeDef" name="attrDef"/>
@@ -1084,11 +1084,11 @@
         <Field name="DEFAULT_KB" visibility="private" type="long" isStatic="true" isFinal="true"/>
         <Field name="singleton" visibility="private" type="EtypeCache" isStatic="true" isFinal="true"/>
         <Field name="etypesStatusMap" visibility="private" type="HashMap&lt;Long, Long&gt;"/>
-        <Field name="etypes" visibility="private" type="ImmutableList&lt;IEntityType&gt;"/>
+        <Field name="etypes" visibility="private" type="ImmutableList&lt;Etype&gt;"/>
       </Fields>
       <Methods>
         <Method name="of" visibility="public" returnType="EtypeCache" isStatic="true"/>
-        <Method name="readSchemas" visibility="public" returnType="List&lt;IEntityType&gt;" isSynchronized="true"/>
+        <Method name="readSchemas" visibility="public" returnType="List&lt;Etype&gt;" isSynchronized="true"/>
         <Method name="createSchemas" visibility="public" returnType="void"/>
         <Method name="updateSchemas" visibility="private" returnType="void">
           <Argument type="ArrayList&lt;Long&gt;" name="outdatedSchemaIds"/>

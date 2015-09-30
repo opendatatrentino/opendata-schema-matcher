@@ -15,7 +15,7 @@ import eu.trentorise.opendata.schemamatcher.model.ISchema;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaMatcher;
-import eu.trentorise.opendata.semantics.model.entity.IEntityType;
+import eu.trentorise.opendata.semantics.model.entity.Etype;
 import eu.trentorise.opendata.semantics.services.IEkb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,11 +184,11 @@ public class MatchingExperiment implements IMatchingExperiment {
 
     public List<ISchema> getAllTargetSchemas() throws SchemaMatcherException {
         
-        List<IEntityType> etypeList = ekb.getEntityTypeService().readAllEntityTypes();
+        List<Etype> etypeList = ekb.getEtypeService().readAllEtypes();
         List<ISchema> targetSchemas = new ArrayList();
         SchemaImport si = new SchemaImport(ekb);
 
-        for (IEntityType etype : etypeList) {
+        for (Etype etype : etypeList) {
             ISchema schemaEtype = si.extractSchema(etype, Locale.ITALIAN);
             targetSchemas.add(schemaEtype);
         }

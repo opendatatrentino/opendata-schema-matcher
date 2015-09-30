@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,10 +29,11 @@ import eu.trentorise.opendata.schemamatcher.model.ISchema;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.services.importing.ISchemaImport;
 import eu.trentorise.opendata.semantics.exceptions.UnsupportedSchemaException;
-import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
-import eu.trentorise.opendata.semantics.model.entity.IEntityType;
+import eu.trentorise.opendata.semantics.model.entity.AttrDef;
+import eu.trentorise.opendata.semantics.model.entity.Etype;
 import eu.trentorise.opendata.semantics.services.IEkb;
-import eu.trentorise.opendata.semantics.services.IEntityTypeService;
+import eu.trentorise.opendata.semantics.services.IEtypeService;
+import eu.trentorise.opendata.semantics.services.IEtypeService;
 import eu.trentorise.opendata.traceprov.data.DcatMetadata;
 import eu.trentorise.opendata.traceprov.types.ClassType;
 import eu.trentorise.opendata.traceprov.types.ListType;
@@ -131,21 +133,21 @@ public class SchemaImport implements ISchemaImport {
         if (schema == null) {
             throw new SchemaMatcherException("Null schema input is provided!");
         }
-        if ((schema instanceof IEntityType)) {
-            IEntityType etype = (IEntityType) schema;
+        if ((schema instanceof Etype)) {
+            Etype etype = (Etype) schema;
 
             Schema schemaOut = new Schema();
             String name = etype.getName().string(locale);
             schemaOut.setName(name);
             schemaOut.setEtype(etype);
             List<ISchemaElement> schemaElements = null;
-            if (!etype.getAttributeDefs().isEmpty()) {
+            if (!etype.getAttrDefs().isEmpty()) {
                 schemaElements = extractSchemaElements(etype, locale);
             } else {
                 schemaElements = new ArrayList();
             }
 
-            schemaOut.setConceptUrl(etype.getConcept().getURL());
+            schemaOut.setConceptUrl(etype.getConceptId());
             schemaOut.setSchemaElements(schemaElements);
             return schemaOut;
         } else {
@@ -227,8 +229,15 @@ public class SchemaImport implements ISchemaImport {
                 }
 
                 SchemaElementFeatureExtractor sefe = new SchemaElementFeatureExtractor();
-                selements = sefe.runColumnRecognizer(selements);
-                schema.setSchemaElements(selements);
+                // TODO THIS CALL ALSO *MODIFIES* STUFF INSIDE SELEMENTS :-@ 
+                List<ISchemaElement> newSchemaElements;
+                if (selements.isEmpty()){
+                    newSchemaElements = new ArrayList();
+                } else {
+                    newSchemaElements = sefe.runColumnRecognizer(selements);    
+                }
+                                
+                schema.setSchemaElements(newSchemaElements);
                 long schemaConceptID = ColumnRecognizer.conceptFromText(distribTitle);
                 schema.setConceptUrl(SwebConfiguration.getUrlMapper().conceptIdToUrl(schemaConceptID));
 
@@ -249,8 +258,8 @@ public class SchemaImport implements ISchemaImport {
      * language
      * @return list of schema elements
      */
-    private List<ISchemaElement> extractSchemaElements(IEntityType etype, Locale locale) {
-        List<IAttributeDef> attrDefs = etype.getAttributeDefs();
+    private List<ISchemaElement> extractSchemaElements(Etype etype, Locale locale) {
+        List<AttrDef> attrDefs = new ArrayList(etype.getAttrDefs().values());
         List<ISchemaElement> schemaElements = new ArrayList();
         getSchemaElements(etype, schemaElements, attrDefs, locale, 0, null);
         return schemaElements;
@@ -262,9 +271,9 @@ public class SchemaImport implements ISchemaImport {
      * @param attrDefs
      * @param locale
      */
-    private void getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale, int depth, ISchemaElement parentElement) {
+    private void getSchemaElements(Etype etype, List<ISchemaElement> schemaElements, List<AttrDef> attrDefs, Locale locale, int depth, ISchemaElement parentElement) {
         List<Instance> instances = SwebClientCrap.getEntities(etype);
-        for (IAttributeDef atrDef : attrDefs) {
+        for (AttrDef atrDef : attrDefs) {
             SchemaElement schemaElement = new SchemaElement();
 
             ElementContext elContext = new ElementContext();
@@ -277,11 +286,11 @@ public class SchemaImport implements ISchemaImport {
             }
             schemaElementRelations.add(elRelation);
             //context extraction            
-            elContext.setElementName(atrDef.getName().string(locale));
-            String dataType = atrDef.getDatatype();
+            elContext.setElementName(atrDef.getName().str(locale));
+            String dataType = atrDef.getType().getDatatype();
             elContext.setElemetnDataType(dataType);
             //convert local concept id to a global one
-            elContext.setElementConcept(atrDef.getConceptURL());
+            elContext.setElementConcept(atrDef.getConceptId());
             schemaElement.setElementContext(elContext);
             //schema element relation extraction
             schemaElement.setSchemaElementRelations(schemaElementRelations);
@@ -290,18 +299,18 @@ public class SchemaImport implements ISchemaImport {
             //TODO find the way to download best representing content
             List<Object> values = new ArrayList();
             if (instances != null) {
-                if ((atrDef.getDatatype().equalsIgnoreCase("xsd:float")) || (atrDef.getDatatype().equalsIgnoreCase("xsd:integer"))
-                        || (atrDef.getDatatype().equalsIgnoreCase("xsd:long"))) {
+                if ((atrDef.getType().getDatatype().equalsIgnoreCase("xsd:float")) || (atrDef.getType().getDatatype().equalsIgnoreCase("xsd:integer"))
+                        || (atrDef.getType().getDatatype().equalsIgnoreCase("xsd:long"))) {
                     values = getValues(instances, atrDef);
                 }
             }
             elContent.setContent(values);
             schemaElement.setElementContent(elContent);
             schemaElements.add(schemaElement);
-            if (atrDef.getDatatype().equalsIgnoreCase("oe:structure")) {
-                IEntityTypeService ets = ekb.getEntityTypeService();
-                IEntityType structureEtype = ets.readEntityType(atrDef.getRangeEtypeURL());
-                List<IAttributeDef> strAttrDefs = structureEtype.getAttributeDefs();
+            if (atrDef.getType().getDatatype().equalsIgnoreCase("oe:structure")) {
+                IEtypeService ets = ekb.getEtypeService();
+                Etype structureEtype = ets.readEtype(atrDef.getType().getEtypeId());
+                List<AttrDef> strAttrDefs = new ArrayList(structureEtype.getAttrDefs().values());
                 if (depth < RECURSION_DEPTH) {
                     getSchemaElements(structureEtype, schemaElements, strAttrDefs, locale, ++depth, schemaElement);
                 }
@@ -310,12 +319,12 @@ public class SchemaImport implements ISchemaImport {
     }
 
     private List<Object> getValues(List<Instance> instances,
-            IAttributeDef atrDef) {
+            AttrDef atrDef) {
         List<Object> objects = new ArrayList();
         for (Instance in : instances) {
             List<Attribute> attrs = in.getAttributes();
             for (Attribute a : attrs) {
-                if (a.getConceptId()== SwebConfiguration.getUrlMapper().urlToConceptId(atrDef.getConceptURL())) {
+                if (a.getConceptId()== SwebConfiguration.getUrlMapper().conceptUrlToId(atrDef.getConceptId())) {
                     objects.add(a.getValues().iterator().next().getValue());
                 }
             }

@@ -9,7 +9,7 @@ import com.google.common.base.Preconditions;
 
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
-import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
+import eu.trentorise.opendata.semantics.model.entity.AttrDef;
 
 public class SchemaElementCorrespondence implements ISchemaElementCorrespondence {
 
@@ -20,7 +20,7 @@ public class SchemaElementCorrespondence implements ISchemaElementCorrespondence
 
     public SchemaElementCorrespondence(SchemaElement sourceElement,
             HashMap<ISchemaElement, Float> elementMapping, float score,
-            SchemaElement highestTargetElement, IAttributeDef attrDef) {
+            SchemaElement highestTargetElement, AttrDef attrDef) {
         super();
         this.sourceElement = sourceElement;
         this.elementMapping = elementMapping;

@@ -8,20 +8,20 @@ import eu.trentorise.opendata.schemamatcher.model.IElementContent;
 import eu.trentorise.opendata.schemamatcher.model.IElementContext;
 import eu.trentorise.opendata.schemamatcher.model.IElementRelation;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
-import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
+import eu.trentorise.opendata.semantics.model.entity.AttrDef;
 
 public class SchemaElement implements ISchemaElement {
 
     private IElementContent elementContent;
     private IElementContext elementContext;
     private List<IElementRelation> schemaElementRelations;
-    protected IAttributeDef attrDef;
+    protected AttrDef attrDef;
     private int columnIndex;
 
     public SchemaElement(IElementContent elementContent,
             IElementContext elementContext,
             List<IElementRelation> schemaElementRelations,
-            IAttributeDef attrDef, int columnIndex) {
+            AttrDef attrDef, int columnIndex) {
         super();
         this.elementContent = elementContent;
         this.elementContext = elementContext;

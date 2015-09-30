@@ -16,7 +16,7 @@ import eu.trentorise.opendata.schemamatcher.model.ISchema;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaCorrespondence;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElementCorrespondence;
-import eu.trentorise.opendata.semantics.model.entity.IEntityType;
+import eu.trentorise.opendata.semantics.model.entity.Etype;
 import eu.trentorise.opendata.semantics.services.IEkb;
 
 /**
@@ -237,7 +237,7 @@ public class GroundTruthGeneration {
         ISchema sourceSchema = si.extractSchema(file1);
         sc.setSourceSchema(sourceSchema);
         
-        IEntityType etype = ekb.getEntityTypeService().readEntityType(SwebConfiguration.getUrlMapper().etypeIdToUrl(etypeID));
+        Etype etype = ekb.getEtypeService().readEtype(SwebConfiguration.getUrlMapper().etypeIdToUrl(etypeID));
         ISchema targetSchema = si.extractSchema(etype, Locale.ITALIAN);
         sc.setTargetSchema(targetSchema);
         List<ISchemaElementCorrespondence> elementCorrespondences = generateGTElementCorrespondence(sourceSchema, targetSchema, elementMapping);

@@ -17,7 +17,7 @@ package eu.trentorise.opendata.schemamatcher.util;
 
 import eu.trentorise.opendata.columnrecognizers.SwebConfiguration;
 import eu.trentorise.opendata.commons.OdtUtils;
-import eu.trentorise.opendata.semantics.model.entity.IEntityType;
+import eu.trentorise.opendata.semantics.model.entity.Etype;
 import it.unitn.disi.sweb.webapi.client.eb.InstanceClient;
 import it.unitn.disi.sweb.webapi.client.kb.ConceptClient;
 import it.unitn.disi.sweb.webapi.model.Pagination;
@@ -48,11 +48,11 @@ public class SwebClientCrap {
      * @param etype
      * @return
      */
-    public static List<Instance> getEntities(IEntityType etype) {
+    public static List<Instance> getEntities(Etype etype) {
 
         InstanceClient insClient = new InstanceClient(SwebConfiguration.getClientProtocol());
-        Long etypeId = SwebConfiguration.getUrlMapper().etypeUrlToId(etype.getURL());
-        Pagination page = new Pagination();
+        Long etypeId = SwebConfiguration.getUrlMapper().etypeUrlToId(etype.getId());
+        Pagination page = new Pagination();        
         page.setPageSize(PAGE_SIZE);
         List<Instance> instances = insClient.readInstances(1L, etypeId, null, null, page); // TODO Make sure that they are taken randomly
         List<Long> instancesIds = new ArrayList();

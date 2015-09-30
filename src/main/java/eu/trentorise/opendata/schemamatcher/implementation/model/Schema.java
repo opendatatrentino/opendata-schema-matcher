@@ -9,7 +9,7 @@ import com.google.common.base.Preconditions;
 import eu.trentorise.opendata.schemamatcher.model.ISchema;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.SchemaStructureType;
-import eu.trentorise.opendata.semantics.model.entity.IEntityType;
+import eu.trentorise.opendata.semantics.model.entity.Etype;
 
 public class Schema implements ISchema {
 
@@ -19,12 +19,12 @@ public class Schema implements ISchema {
     private int elementsNumber;
     private SchemaStructureType structureType;
     private String conceptUrl;
-    private IEntityType etype;
+    private Etype etype;
 
     public Schema(String name, String description,
             List<ISchemaElement> elements, int number,
             SchemaStructureType structureType, String conceptUrl,
-            IEntityType etype) {
+            Etype etype) {
         super();
         this.name = name;
         this.description = description;
@@ -98,11 +98,11 @@ public class Schema implements ISchema {
         this.conceptUrl = conceptUrl;
     }
 
-    public IEntityType getEtype() {
+    public Etype getEtype() {
         return this.etype;
     }
 
-    public void setEtype(IEntityType etype) {
+    public void setEtype(Etype etype) {
         Preconditions.checkNotNull(etype);
         this.etype = etype;
     }

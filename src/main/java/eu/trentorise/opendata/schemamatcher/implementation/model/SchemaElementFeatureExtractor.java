@@ -1,23 +1,28 @@
 package eu.trentorise.opendata.schemamatcher.implementation.model;
 
-import it.unitn.disi.sweb.webapi.client.kb.ConceptClient;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.parboiled.common.ImmutableList;
+import org.slf4j.LoggerFactory;
 
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.columnrecognizers.SwebConfiguration;
 import eu.trentorise.opendata.schemamatcher.model.DataType;
+import eu.trentorise.opendata.schemamatcher.model.DataType.Datatype;
 import eu.trentorise.opendata.schemamatcher.model.IElementContent;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
-import eu.trentorise.opendata.schemamatcher.model.DataType.Datatype;
 import eu.trentorise.opendata.schemamatcher.schemaanalysis.service.ISchemaElementFeatureExtractor;
+import eu.trentorise.opendata.semantics.exceptions.OpenEntityNotFoundException;
+import it.unitn.disi.sweb.webapi.client.kb.ConceptClient;
 
 public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtractor {
- 
+
+    private static final Logger LOG = Logger.getLogger(SchemaElementFeatureExtractor.class.getName());
+    
     public static final float CONCEPT_DISTANCE_WEIGHT = 0.5f;
     public static final float EDIT_DISTANCE_WEIGHT = 0.4f;
     public static final float DATATYPE_DISTANCE_WEIGHT = 0.1f;
@@ -37,10 +42,16 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
     /**
      * Extracts concepts for each schema element in the data set with
      * column-concept recognizer
+     * 
+     * TODO THIS MESSY FUNCTION RETURNS A NEW LIST MADE WITH *MODIFIED* ELEMENTS OF THE INPUT :-@ 
      *
      */
-    public List<ISchemaElement> runColumnRecognizer(List<ISchemaElement> schemaEls) {
-        List<ISchemaElement> schemaElements = schemaEls;
+    public List<ISchemaElement> runColumnRecognizer(List<ISchemaElement> schemaElements) {
+        
+	if (schemaElements.isEmpty()){
+	    return new ArrayList();
+	}
+	
         List<String> elementNames = new ArrayList();
         List<List<String>> elementContent = new ArrayList();
         HashMap<Integer, ISchemaElement> map = new HashMap();
@@ -57,17 +68,36 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
             elementContent.add(contStr);
         }
 
-        List<Long> extractedConceptsIDs = ColumnRecognizer.computeColumnConceptIDs(elementNames, elementContent);
-        List<ISchemaElement> schemaElementsOut = new ArrayList();
+        List<Long> extractedConceptsGuids = ColumnRecognizer.computeColumnConceptIDs(elementNames, elementContent);
+        
+        List<ISchemaElement> ret = new ArrayList();
 
-        for (int i = 0; i < extractedConceptsIDs.size(); i++) {
-            Long conceptId = extractedConceptsIDs.get(i);            
+        List<Long> extractedConceptIds = new ArrayList();
+        for (Long guid : extractedConceptsGuids){
+            ConceptClient client = new ConceptClient(SwebConfiguration.getClientProtocol());
+            List<it.unitn.disi.sweb.webapi.model.kb.concepts.Concept> concepts = client.readConcepts(1L, guid, null, null, null, null);
+            if (concepts.isEmpty()) {
+                throw new OpenEntityNotFoundException("Couldn't find concept with sweb global id " + guid);
+            } else {
+                if (concepts.size() > 1) {
+                    LOG.warning("todo - only the first concept is returned. The number of returned concepts were: " + concepts.size());
+                }                  
+                it.unitn.disi.sweb.webapi.model.kb.concepts.Concept conc = concepts.get(0);
+                
+                extractedConceptIds.add(conc.getId());
+            }
+
+        }
+        
+        for (int i = 0; i < extractedConceptIds.size(); i++) {
+            Long conceptId = extractedConceptIds.get(i);            
             SchemaElement se = (SchemaElement) map.get(i + 1);
             se.setColumnIndex(i);
-            se.getElementContext().setElementConcept(SwebConfiguration.getUrlMapper().conceptIdToUrl(conceptId));
-            schemaElementsOut.add(se);
+            se.getElementContext().setElementConcept(
+        	    SwebConfiguration.getUrlMapper().conceptIdToUrl(conceptId));
+            ret.add(se);
         }
-        return schemaElementsOut;
+        return ret;
     }
 
     /**
@@ -142,9 +172,9 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
     }
 
     public float getComplexDistance(ElementContext sourceElementContext, ElementContext targetElementContext) {
-        float complexDistance = (float) (getConceptsDistance(SwebConfiguration.getUrlMapper().urlToConceptId(sourceElementContext.getElementConcept()),
+        float complexDistance = (float) (getConceptsDistance(SwebConfiguration.getUrlMapper().conceptUrlToId(sourceElementContext.getElementConcept()),
                 
-               SwebConfiguration.getUrlMapper().urlToConceptId(targetElementContext.getElementConcept()))
+               SwebConfiguration.getUrlMapper().conceptUrlToId(targetElementContext.getElementConcept()))
                 * CONCEPT_DISTANCE_WEIGHT + getLevinsteinDistance(sourceElementContext.getElementName(), targetElementContext.getElementName())
                 * EDIT_DISTANCE_WEIGHT + getDataTypeSimilarity(sourceElementContext.getElementName(), targetElementContext.getElementName())
                 * DATATYPE_DISTANCE_WEIGHT);

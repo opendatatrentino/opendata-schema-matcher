@@ -26,8 +26,8 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
         elementCorrespondence.setSourceElement(sourceSchemaElement);
         elementCorrespondence.setTargetElement(targetSchemaElement);
         float score = getConceptsDistance(
-                SwebConfiguration.getUrlMapper().urlToConceptId(sourceSchemaElement.getElementContext().getElementConcept()), 
-                SwebConfiguration.getUrlMapper().urlToConceptId(targetSchemaElement.getElementContext().getElementConcept()));
+                SwebConfiguration.getUrlMapper().conceptUrlToId(sourceSchemaElement.getElementContext().getElementConcept()), 
+                SwebConfiguration.getUrlMapper().conceptUrlToId(targetSchemaElement.getElementContext().getElementConcept()));
         elementCorrespondence.setElementCorrespondenceScore(score);
         return elementCorrespondence;
     }
@@ -47,8 +47,8 @@ public class SimpleElementMatcher implements ISchemaElementMatcher {
                 for (ISchemaElement tElement : targetElements) {
                     Map.Entry<Long, Long> entry
                             = new AbstractMap.SimpleEntry(
-                                   SwebConfiguration.getUrlMapper().urlToConceptId(sElement.getElementContext().getElementConcept()),
-                                   SwebConfiguration.getUrlMapper().urlToConceptId(tElement.getElementContext().getElementConcept()));
+                                   SwebConfiguration.getUrlMapper().conceptUrlToId(sElement.getElementContext().getElementConcept()),
+                                   SwebConfiguration.getUrlMapper().conceptUrlToId(tElement.getElementContext().getElementConcept()));
                     batch.add(entry);
                 }
                 distances = getBatchDistance(batch);

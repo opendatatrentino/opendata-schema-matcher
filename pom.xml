@@ -20,7 +20,7 @@
     <parent>
         <groupId>eu.trentorise.opendata.commons</groupId>
         <artifactId>tod-super-pom</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
+        <version>1.4.0-SNAPSHOT</version>
     </parent>          
          
     <!-- better to copy scm, see https://github.com/opendatatrentino/tod-super-pom/issues/1 -->    

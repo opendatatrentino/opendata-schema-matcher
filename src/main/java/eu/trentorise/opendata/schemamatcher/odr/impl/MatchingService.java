@@ -27,7 +27,7 @@ import eu.trentorise.opendata.semantics.services.IEtypeService;
 import eu.trentorise.opendata.semantics.services.Mappings;
 import eu.trentorise.opendata.semantics.services.SchemaMapping;
 import eu.trentorise.opendata.traceprov.data.DcatMetadata;
-import eu.trentorise.opendata.traceprov.types.Type;
+import eu.trentorise.opendata.traceprov.types.TraceType;
 import java.util.Collections;
 import java.util.LinkedList;
 import javax.annotation.Nullable;
@@ -94,7 +94,7 @@ public class MatchingService implements eu.trentorise.opendata.semantics.service
     
 
     @Override
-    public List<SchemaMapping> matchSchemas(DcatMetadata dcatMetadata, Type traceType, @Nullable Object data) {
+    public List<SchemaMapping> matchSchemas(DcatMetadata dcatMetadata, TraceType traceType, @Nullable Object data) {
         checkNotNull(dcatMetadata);
         checkNotNull(traceType);
 

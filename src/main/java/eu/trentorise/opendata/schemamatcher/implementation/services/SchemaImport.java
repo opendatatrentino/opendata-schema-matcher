@@ -38,7 +38,7 @@ import eu.trentorise.opendata.traceprov.data.DcatMetadata;
 import eu.trentorise.opendata.traceprov.types.ClassType;
 import eu.trentorise.opendata.traceprov.types.ListType;
 import eu.trentorise.opendata.traceprov.types.StringType;
-import eu.trentorise.opendata.traceprov.types.Type;
+import eu.trentorise.opendata.traceprov.types.TraceType;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,6 +154,8 @@ public class SchemaImport implements ISchemaImport {
             throw new SchemaMatcherException("Unsupported schema format!");
         }
     }
+    
+    
 
     /**
      * Extracts schema from Open Entity data format (which is a simple tree)
@@ -163,7 +165,7 @@ public class SchemaImport implements ISchemaImport {
      *
      * @return object of Schema
      */
-    public ISchema extractSchema(DcatMetadata dcatMetadata, Type traceType, Object data) {
+    public ISchema extractSchema(DcatMetadata dcatMetadata, TraceType traceType, Object data) {
 
         Schema schema = new Schema();
 
@@ -175,16 +177,17 @@ public class SchemaImport implements ISchemaImport {
         // ----------------------------------------
         // checks supported schemas
         // ListType<ClassType>
+        
         if (traceType instanceof ListType) {
             ListType listType = (ListType) traceType;
-            Type subtype = listType.getSubtype();
+            TraceType subtype = listType.getSubtype();
             if (subtype instanceof ClassType) {
                 ClassType classType = (ClassType) subtype;
 
                 List<String> elNames = classType.getPropertyDefs().keySet().asList();
 
                 for (String s : elNames) {
-                    Type t = classType.getPropertyDef(s).getType();
+                    TraceType t = classType.getPropertyDef(s).getType();
                     if (!t.equals(StringType.of())) {
                         throw new UnsupportedSchemaException("Found unsupported sub type " + t.getId() + ", currently we only support " + StringType.of().getId());
                     }

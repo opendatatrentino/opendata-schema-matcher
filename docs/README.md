@@ -20,4 +20,4 @@ In case updates are available, version numbers follows <a href="http://semver.or
 
 ### Documentation
 
-A report documenting the schema matcher can be found [here](schema-matching.odt)
+A report documenting the schema matcher can be found [here](schema-matching.tod)

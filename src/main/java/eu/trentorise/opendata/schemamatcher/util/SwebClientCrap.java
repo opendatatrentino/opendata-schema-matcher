@@ -16,7 +16,7 @@
 package eu.trentorise.opendata.schemamatcher.util;
 
 import eu.trentorise.opendata.columnrecognizers.SwebConfiguration;
-import eu.trentorise.opendata.commons.OdtUtils;
+import eu.trentorise.opendata.commons.TodUtils;
 import eu.trentorise.opendata.semantics.model.entity.Etype;
 import it.unitn.disi.sweb.webapi.client.eb.InstanceClient;
 import it.unitn.disi.sweb.webapi.client.kb.ConceptClient;

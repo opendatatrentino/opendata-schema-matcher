@@ -11,6 +11,10 @@ logs/
 /conf/*
 !/conf/README.txt
 
+/release.properties
+/pom.xml.releaseBackup
+
+
 ##### INTELLIJ specific
 
 .idea/workspace.xml

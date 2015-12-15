@@ -24,7 +24,7 @@ import eu.trentorise.opendata.semantics.model.entity.Etype;
 import eu.trentorise.opendata.semantics.services.IEkb;
 import eu.trentorise.opendata.semantics.services.AttrMapping;
 import eu.trentorise.opendata.semantics.services.IEtypeService;
-import eu.trentorise.opendata.semantics.services.Mappings;
+import eu.trentorise.opendata.semantics.services.Schemas;
 import eu.trentorise.opendata.semantics.services.SchemaMapping;
 import eu.trentorise.opendata.traceprov.data.DcatMetadata;
 import eu.trentorise.opendata.traceprov.types.TraceType;
@@ -175,7 +175,7 @@ public class MatchingService implements eu.trentorise.opendata.semantics.service
         List<AttrMapping> amaps = new ArrayList();
         for (ISchemaElementCorrespondence sec : sc.getSchemaElementCorrespondence()){
             AttrMapping.Builder amBuilder = AttrMapping.builder();
-            amBuilder.addSourcePath(Mappings.SCHEMA_SOURCE);
+            amBuilder.addSourcePath(Schemas.SCHEMA_SOURCE);
             amBuilder.addAllSourcePath(extractPath(sec.getSourceElement()));
             amBuilder.addAllTargetPath(extractPath(sec.getTargetElement()));
             amaps.add(amBuilder.build());

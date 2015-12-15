@@ -67,7 +67,7 @@ public class TestSimpleSchemaMatcher {
 	@Test
 	public void testSchemaElementMatcherAllEtypes() throws IOException, SchemaMatcherException{
 		SchemaImport si = new SchemaImport();
-		File file = new File("/home/ivan/work/development/Schema Matching dataset/FARM001.csv");
+		File file = new File("FARM001.csv");
 		//File file = new File("impianti risalita.csv");
 		//		File file = new File("impianti risalita.csv");
 

@@ -154,8 +154,15 @@ public class SchemaImport implements ISchemaImport{
 
 			ConceptODR codr = new ConceptODR();
 			codr = new KnowledgeService().readConceptGlobalID(etype.getConcept().getGUID());
-			long globalConceptID =codr.getId();
-			schemaOut.setSchemaConcept(globalConceptID);
+                        long conceptId;
+                        if (codr == null){
+                            logger.warn("COULDN'T FIND CONCEPT WITH GLOBAL ID " + etype.getConcept().getGUID() + "IN KB, SETTING ROOT CONCEPT FOR SCHEMA");
+                            conceptId = WebServiceURLs.urlToConceptID(new KnowledgeService().getRootConcept().getURL());
+                        } else {
+                            conceptId = codr.getId();
+                        }
+			
+			schemaOut.setSchemaConcept(conceptId);
 			schemaOut.setSchemaElements(schemaElements);
 			return schemaOut;
 		}

@@ -14,11 +14,13 @@ import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
 import eu.trentorise.opendata.disiclient.services.KnowledgeService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
+import eu.trentorise.opendata.schemamatcher.implementation.services.SchemaImport;
 import eu.trentorise.opendata.schemamatcher.model.DataType;
 import eu.trentorise.opendata.schemamatcher.model.IElementContent;
 import eu.trentorise.opendata.schemamatcher.model.ISchemaElement;
 import eu.trentorise.opendata.schemamatcher.model.DataType.Datatype;
 import eu.trentorise.opendata.schemamatcher.schemaanalysis.service.ISchemaElementFeatureExtractor;
+import org.apache.log4j.Logger;
 
 public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtractor{
 
@@ -28,7 +30,7 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 	public static final float EDIT_DISTANCE_WEIGHT=  0.4f;
 	public static final float DATATYPE_DISTANCE_WEIGHT=  0.1f;
 
-
+        private final static Logger logger = Logger.getLogger(SchemaElementFeatureExtractor.class.getName());
 
 	public void getSchemaElementConcept(ISchemaElement schemaElement) {
 		//	schemaElement.getElementContext().getElementConcept()
@@ -78,8 +80,15 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 				globalConceptID=-1;
 			}else{
 				ConceptODR codr = new ConceptODR();
+                                
 				codr = new KnowledgeService().readConceptGlobalID(conceptId);
-				globalConceptID =codr.getId();
+                                if (codr == null){
+                                    logger.warn("COULDN'T FIND CONCEPT WITH GLOBAL ID " + conceptId + "IN KB, IGNORING IT");
+                                    globalConceptID=-1;
+                                } else {
+                          
+                                    globalConceptID =codr.getId();                                                                        
+                                }				
 			}
 			SchemaElement se =(SchemaElement) map.get(i+1);
 

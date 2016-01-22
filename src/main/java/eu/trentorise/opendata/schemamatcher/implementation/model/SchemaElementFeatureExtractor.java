@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import eu.trentorise.opendata.columnrecognizers.ColumnConceptCandidate;
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
+import eu.trentorise.opendata.disiclient.services.KnowledgeService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.schemamatcher.model.DataType;
 import eu.trentorise.opendata.schemamatcher.model.IElementContent;
@@ -77,7 +78,7 @@ public class SchemaElementFeatureExtractor implements ISchemaElementFeatureExtra
 				globalConceptID=-1;
 			}else{
 				ConceptODR codr = new ConceptODR();
-				codr = codr.readConceptGlobalID(conceptId);
+				codr = new KnowledgeService().readConceptGlobalID(conceptId);
 				globalConceptID =codr.getId();
 			}
 			SchemaElement se =(SchemaElement) map.get(i+1);

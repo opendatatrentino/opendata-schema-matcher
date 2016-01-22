@@ -24,6 +24,7 @@ import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
 import eu.trentorise.opendata.disiclient.services.EntityTypeService;
+import eu.trentorise.opendata.disiclient.services.KnowledgeService;
 import eu.trentorise.opendata.disiclient.services.WebServiceURLs;
 import eu.trentorise.opendata.nlprise.DataTypeGuess;
 import eu.trentorise.opendata.nlprise.DataTypeGuess.Datatype;
@@ -152,7 +153,7 @@ public class SchemaImport implements ISchemaImport{
 			}
 
 			ConceptODR codr = new ConceptODR();
-			codr = codr.readConceptGlobalID(etype.getConcept().getGUID());
+			codr = new KnowledgeService().readConceptGlobalID(etype.getConcept().getGUID());
 			long globalConceptID =codr.getId();
 			schemaOut.setSchemaConcept(globalConceptID);
 			schemaOut.setSchemaElements(schemaElements);

@@ -20,6 +20,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
 import eu.trentorise.opendata.disiclient.model.entity.EntityType;
 import eu.trentorise.opendata.disiclient.model.knowledge.ConceptODR;
@@ -63,7 +64,7 @@ public class SchemaImport implements ISchemaImport {
      *
      * @since 0.0.2
      */
-    private static Multimap<String, Instance> cachedInstances = ArrayListMultimap.create();
+    private  static  Multimap<String, Instance> cachedInstances = Multimaps.synchronizedListMultimap(ArrayListMultimap.<String, Instance>create());
 
     /**
      * A map from etype URL to Timestamp of instances retrieval

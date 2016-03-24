@@ -1,11 +1,7 @@
 package eu.trentorise.opendata.schemamatcher.implementation.services;
 
-import it.unitn.disi.sweb.webapi.client.eb.InstanceClient;
-import it.unitn.disi.sweb.webapi.model.Pagination;
 import it.unitn.disi.sweb.webapi.model.eb.Attribute;
 import it.unitn.disi.sweb.webapi.model.eb.Instance;
-import it.unitn.disi.sweb.webapi.model.filters.InstanceFilter;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,7 +14,6 @@ import org.apache.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import eu.trentorise.opendata.columnrecognizers.ColumnRecognizer;
@@ -42,8 +37,6 @@ import eu.trentorise.opendata.semantics.model.entity.IAttributeDef;
 import eu.trentorise.opendata.semantics.model.entity.IEntityType;
 import eu.trentorise.opendata.semantics.model.knowledge.IResourceContext;
 import eu.trentorise.opendata.semantics.model.knowledge.ITableResource;
-import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -265,7 +258,7 @@ public class SchemaImport implements ISchemaImport {
      * @param locale
      */
     private void getSchemaElements(IEntityType etype, List<ISchemaElement> schemaElements, List<IAttributeDef> attrDefs, Locale locale, int depth) {
-        Collection<Instance> instances = getEntities(etype);
+        
         for (IAttributeDef atrDef : attrDefs) {
             SchemaElement schemaElement = new SchemaElement();
 
@@ -285,12 +278,6 @@ public class SchemaImport implements ISchemaImport {
             //schema element's content extraction
             //TODO find the way to download best representing content
             List<Object> values = new ArrayList<Object>();
-            if (instances != null) {
-                if ((atrDef.getDataType().equalsIgnoreCase("xsd:float")) || (atrDef.getDataType().equalsIgnoreCase("xsd:integer"))
-                        || (atrDef.getDataType().equalsIgnoreCase("xsd:long"))) {
-                    values = getValues(instances, atrDef);
-                }
-            }
             elContent.setContent(values);
             schemaElement.setElementContent(elContent);
             schemaElements.add(schemaElement);
@@ -324,61 +311,7 @@ public class SchemaImport implements ISchemaImport {
         return objects;
     }
 
-    /**
-     * methods takes random entities from Entitypedia
-     *
-     * @param etype
-     * @return
-     */
-    @Nullable
-    public Collection<Instance> getEntities(IEntityType etype) {
-        if (instancesPopulationTimestamp.get(etype.getURL()) == null) {
-            logger.info("Found empty entities cache for etype " + etype.getURL() + " going to populate it...");
-            InstanceClient insClient = new InstanceClient(WebServiceURLs.getClientProtocol());
-            Long etypeId = WebServiceURLs.urlToEtypeID(etype.getURL());
-            Pagination page = new Pagination();
-
-            //		Random rand = new Random();
-            //		int pageIndex = rand.nextInt((1000 - 1) + 1) + 1; //random number from 1 to 1000
-            //	page.setPageIndex(10);
-            page.setPageSize(PAGE_SIZE);
-
-            List<Instance> instances = insClient.readInstances(1L, etypeId, null, null, page); // TODO Make sure that they are taken randomly
-            List<Long> instancesIds = new ArrayList<Long>();
-
-            for (Instance in : instances) {
-                instancesIds.add(in.getId());
-            }
-            instancesPopulationTimestamp.put(etype.getURL(), new Date());
-
-            InstanceFilter filter = new InstanceFilter();
-            filter.setIncludeAttributes(true);
-            if (instancesIds.size() != 0) {
-                List<Instance> instancesFull = insClient.readInstancesById(instancesIds, filter);
-                //			for(Instance in: instancesFull){
-                //				List<Attribute> attrs = in.getAttributes();
-                //
-                //				for(Attribute a : attrs){
-                //					if(a.getDataType().equals(DataType.FLOAT))
-                //						//System.out.println(a.getDataType());
-                //						System.out.println(a.getValues().iterator().next().getValue().toString());
-                //				}
-                //			}
-                for (Instance instance : instancesFull) {
-                    cachedInstances.put(etype.getURL(), instance);
-                }
-
-                return instancesFull;
-
-            } else {
-                return null;
-            }
-        } else {
-            logger.info("Returning entities from cache for etype " + etype.getURL());
-            return cachedInstances.get(etype.getURL());
-        }
-
-    }
+        
 
     public String extractDataType(ElementContent elContent) {
         //TODO think about best content for representation

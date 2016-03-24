@@ -63,12 +63,4 @@ public class TestSchemaImport {
 
 	}
 
-	@Test
-	public void testSchemaImportEntities() throws SchemaMatcherException{
-
-		SchemaImport si = new SchemaImport();
-		si.getEntities(etype);
-
-	}
-
 }
